@@ -59,13 +59,14 @@ def main():
     parser.add_argument("--max_grad_norm", type=float, default=1.0)
     
     #callbacks
-    parser.add_argument('--early_stopping',action="store_false")
+    parser.add_argument('--early_stopping', default=True, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--patience", type=int, default=3)
 
     #others
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument("--n_gpu", type=int, default=1)
-    parser.add_argument('--fp16', action="store_true")
+    parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
+
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
     
     args = parser.parse_args()

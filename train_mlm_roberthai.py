@@ -16,7 +16,7 @@ from thai2transformers.datasets import MLMDataset
 #argparse
 import argparse
 # python train_mlm_roberthai.py --tokenizer_name_or_path data/tokenizer/bpe_enth_52000 \
-# --vocab_size 52000 --train_dir data/valid_lm --eval_dir data/valid_lm --num_train_epochs 1
+# --vocab_size 52000 --train_dir data/train_lm --eval_dir data/valid_lm --num_train_epochs 5
 
 def main():
     #argparser
@@ -34,7 +34,7 @@ def main():
 
     #checkpoint
     parser.add_argument("--output_dir", type=str, default="./results")
-    parser.add_argument('--overwrite_output_dir',action="store_false")
+    parser.add_argument('--overwrite_output_dir', default=True, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--save_total_limit", type=int, default=1)
     parser.add_argument("--save_steps", type=int, default=500)
     
@@ -43,14 +43,14 @@ def main():
     parser.add_argument("--logging_steps", type=int, default=200)
     
     #eval
-    parser.add_argument('--evaluate_during_training',action="store_false")
+    parser.add_argument('--evaluate_during_training', default=True, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--eval_steps", type=int, default=500)
     
     #train hyperparameters
     parser.add_argument("--train_max_length", type=int, default=128)
     parser.add_argument("--eval_max_length", type=int, default=128)
-    parser.add_argument("--per_device_train_batch_size", type=int, default=8)
-    parser.add_argument("--per_device_eval_batch_size", type=int, default=16)
+    parser.add_argument("--per_device_train_batch_size", type=int, default=32)
+    parser.add_argument("--per_device_eval_batch_size", type=int, default=64)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
     parser.add_argument("--learning_rate", type=float, default=6e-4)
     parser.add_argument("--warmup_steps", type=int, default=500)
@@ -58,15 +58,15 @@ def main():
     parser.add_argument("--adam_epsilon", type=float, default=1e-6)
     parser.add_argument("--max_grad_norm", type=float, default=1.0)
     parser.add_argument("--mlm_probability", type=float, default=0.15)
-    parser.add_argument('--dataloader_drop_last',action="store_true")
+    parser.add_argument('--dataloader_drop_last', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     
     #others
     parser.add_argument("--seed", type=int, default=1412)
-    parser.add_argument('--fp16', action="store_true")
+    parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
     
     args = parser.parse_args()
-
+    
     #initialize tokenizer
     tokenizer = RobertaTokenizerFast.from_pretrained(args.tokenizer_name_or_path)
     

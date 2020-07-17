@@ -36,7 +36,7 @@ def main():
 
     #checkpoint
     parser.add_argument("--output_dir", type=str, default="./results")
-    parser.add_argument('--overwrite_output_dir',action="store_false")
+    parser.add_argument('--overwrite_output_dir', default=True, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--save_total_limit", type=int, default=1)
     parser.add_argument("--save_steps", type=int, default=500)
     
@@ -45,7 +45,7 @@ def main():
     parser.add_argument("--logging_steps", type=int, default=200)
     
     #eval
-    parser.add_argument('--evaluate_during_training',action="store_false")
+    parser.add_argument('--evaluate_during_training', default=True, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--eval_steps", type=int, default=500)
     
     #train hyperparameters
@@ -59,11 +59,11 @@ def main():
     parser.add_argument("--weight_decay", type=float, default=0.01)
     parser.add_argument("--adam_epsilon", type=float, default=1e-8)
     parser.add_argument("--max_grad_norm", type=float, default=1.0)
-    parser.add_argument('--dataloader_drop_last',action="store_true")
+    parser.add_argument('--dataloader_drop_last', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     
     #others
     parser.add_argument("--seed", type=int, default=1412)
-    parser.add_argument('--fp16', action="store_true")
+    parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
     
     args = parser.parse_args()
