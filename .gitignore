@@ -2,10 +2,9 @@
 .DS_Store
 
 #files
-cleaned_data/
-cleaned_data.zip
-raw_data/
-wikiextractor/
+data*
+lightning_logs
+results
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
