@@ -206,7 +206,7 @@ class SequenceClassificationFinetuner(pl.LightningModule):
     def test_dataloader(self):
         test_dataset = SequenceClassificationDataset(tokenizer=self.tokenizer,
             data_dir = self.hparams.test_dir,
-            max_len=self.hparams.max_length,
+            max_length=self.hparams.max_length,
             )
         
         return DataLoader(
