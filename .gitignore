@@ -2,9 +2,11 @@
 .DS_Store
 
 #files
-data*
+data
+data_prep
 lightning_logs
 results
+*.ckpt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
