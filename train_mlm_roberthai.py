@@ -43,7 +43,7 @@ def main():
     parser.add_argument("--logging_steps", type=int, default=200)
     
     #eval
-    parser.add_argument('--evaluate_during_training', default=True, type=lambda x: (str(x).lower() in ['true','True','T']))
+    parser.add_argument('--evaluate_during_training', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--eval_steps", type=int, default=500)
     
     #train hyperparameters
@@ -138,7 +138,7 @@ def main():
     trainer.train()
     
     #save
-    trainer.save('test_lm')
+    trainer.save_model('test_lm')
     
     #evaluate
     trainer.evaluate()

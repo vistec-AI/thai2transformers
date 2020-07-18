@@ -6,6 +6,8 @@ data
 data_prep
 lightning_logs
 results
+logs
+runs
 *.ckpt
 
 # Byte-compiled / optimized / DLL files
