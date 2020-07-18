@@ -8,6 +8,9 @@ lightning_logs
 results
 logs
 runs
+raw_data/
+wikiextractor/
+wikitokenizer/
 *.ckpt
 
 # Byte-compiled / optimized / DLL files

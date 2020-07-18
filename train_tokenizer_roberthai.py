@@ -22,10 +22,11 @@ def main():
     parser.add_argument("--min_frequency", type=int, default=2)
     parser.add_argument("--train_dir", type=str,)
     parser.add_argument("--output_dir", type=str,)
+    parser.add_argument("--ext", type=str, default='.txt')
     
     args = parser.parse_args()
     
-    fnames = [str(x) for x in glob.glob(f"{args.train_dir}/*.txt")]
+    fnames = [str(x) for x in glob.glob(f"{args.train_dir}/*{args.ext}")]
 
     # Initialize a tokenizer
     tokenizer = ByteLevelBPETokenizer()

@@ -12,9 +12,10 @@ class MLMDataset(Dataset):
         tokenizer,
         data_dir,
         max_length=512,
+        ext='.txt',
         bs = 10000,
     ):
-        self.fnames = glob.glob(f"{data_dir}/*.txt")
+        self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
         self.tokenizer = tokenizer
         self.bs = bs

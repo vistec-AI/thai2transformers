@@ -47,8 +47,8 @@ def main():
     parser.add_argument("--eval_steps", type=int, default=500)
     
     #train hyperparameters
-    parser.add_argument("--train_max_length", type=int, default=128)
-    parser.add_argument("--eval_max_length", type=int, default=128)
+    parser.add_argument("--train_max_length", type=int, default=512)
+    parser.add_argument("--eval_max_length", type=int, default=512)
     parser.add_argument("--per_device_train_batch_size", type=int, default=32)
     parser.add_argument("--per_device_eval_batch_size", type=int, default=64)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
@@ -60,7 +60,14 @@ def main():
     parser.add_argument("--mlm_probability", type=float, default=0.15)
     parser.add_argument('--dataloader_drop_last', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     
+    #model architecture
+    parser.add_argument("--num_hidden_layers", type=int, default=12)
+    parser.add_argument("--hidden_size", type=int, default=768)
+    parser.add_argument("--intermediate_size", type=int, default=3072)
+    parser.add_argument("--num_attention_head", type=int, default=12)
+    
     #others
+    parser.add_argument("--ext", type=str, default=".txt")
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
@@ -74,11 +81,11 @@ def main():
     config = RobertaConfig(
         vocab_size=args.vocab_size,
         type_vocab_size=1,
-        #roberta base
-        num_hidden_layers=12,
-        hidden_size=768, 
-        intermediate_size=3072,
-        num_attention_head=12,
+        #roberta base as default
+        num_hidden_layers=args.num_hidden_layers,
+        hidden_size=args.hidden_size, 
+        intermediate_size=args.intermediate_size,
+        num_attention_head=args.num_attention_head,
     #     #roberta large
     #     num_hidden_layers=24,
     #     hidden_size=1024, 
