@@ -1,5 +1,5 @@
-# `thai2bert`
-Pretraining transformers in Thai
+# `thai2transformers`
+Pretraining transformers in Thai and English
 
 ## Pretraining Datasets
 
