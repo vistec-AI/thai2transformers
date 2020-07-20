@@ -76,7 +76,7 @@ def main():
     
     #initialize tokenizer
    
-    tokenizer = CamembertTokenizer.from_pretrained(args.tokenizer_name_or_path)
+    tokenizer = CamembertTokenizer(vocab_file=args.tokenizer_name_or_path)
    
     #initialize models
     config = CamembertConfig(
