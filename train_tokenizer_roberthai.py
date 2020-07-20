@@ -39,7 +39,7 @@ def main():
     if args.bpe_tokenizer == 'sentencepiece':
         _BPE_TOKENIZER =  SentencePieceBPETokenizer
 
-    tokenizer = _BPE_TOKENIZER
+    tokenizer = _BPE_TOKENIZER()
 
     # Customize training
     tokenizer.train(files=fnames, vocab_size=args.vocab_size, 
