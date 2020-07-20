@@ -1,9 +1,11 @@
+import glob
 import logging
 logging.basicConfig(level=logging.INFO)
 
 from transformers import RobertaTokenizerFast
-from tokenizers import ByteLevelBPETokenizer
-import glob
+from tokenizers import (ByteLevelBPETokenizer,
+                        CharBPETokenizer,
+                        SentencePieceBPETokenizer)
 
 #argparse
 import argparse
@@ -18,6 +20,7 @@ def main():
     )
     
     #required
+    parser.add_argument("--bpe_tokenizer", type=str, default='sentencepiece', help='Specify the name of BPE Tokenizer')
     parser.add_argument("--vocab_size", type=int, default=52000)
     parser.add_argument("--min_frequency", type=int, default=2)
     parser.add_argument("--train_dir", type=str,)
@@ -29,7 +32,14 @@ def main():
     fnames = [str(x) for x in glob.glob(f"{args.train_dir}/*{args.ext}")]
 
     # Initialize a tokenizer
-    tokenizer = ByteLevelBPETokenizer()
+    if args.bpe_tokenizer == 'byte_level':
+        _BPE_TOKENIZER = ByteLevelBPETokenizer
+    if args.bpe_tokenizer == 'char':
+        _BPE_TOKENIZER = CharBPETokenizer
+    if args.bpe_tokenizer == 'sentencepiece':
+        _BPE_TOKENIZER =  SentencePieceBPETokenizer
+
+    tokenizer = _BPE_TOKENIZER
 
     # Customize training
     tokenizer.train(files=fnames, vocab_size=args.vocab_size, 
