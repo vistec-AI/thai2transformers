@@ -2,6 +2,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 from transformers import (
+    RobertaTokenizer,
     RobertaTokenizerFast, 
     RobertaConfig,
     RobertaForMaskedLM,
@@ -31,6 +32,7 @@ def main():
     parser.add_argument("--train_dir", type=str,)
     parser.add_argument("--eval_dir", type=str,)
     parser.add_argument("--num_train_epochs", type=int,)
+    parser.add_argument("--sentencepiece_bpe", action='store_true', default=False)
 
     #checkpoint
     parser.add_argument("--output_dir", type=str, default="./results")
@@ -75,7 +77,11 @@ def main():
     args = parser.parse_args()
     
     #initialize tokenizer
-    tokenizer = RobertaTokenizerFast.from_pretrained(args.tokenizer_name_or_path)
+    if args.sentencepiece_bpe:
+        print('Load BPE vocab with RobertaTokenizer')
+        tokenizer = RobertaTokenizer.from_pretrained(args.tokenizer_name_or_path)
+    else: 
+        tokenizer = RobertaTokenizerFast.from_pretrained(args.tokenizer_name_or_path)
     
     #initialize models
     config = RobertaConfig(
