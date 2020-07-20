@@ -37,7 +37,7 @@ def main():
     if args.bpe_tokenizer == 'char':
         _BPE_TOKENIZER = CharBPETokenizer
     if args.bpe_tokenizer == 'sentencepiece':
-        _BPE_TOKENIZER =  SentencePieceBPETokenizer
+        _BPE_TOKENIZER = SentencePieceBPETokenizer
 
     tokenizer = _BPE_TOKENIZER()
 
