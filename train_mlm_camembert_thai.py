@@ -3,8 +3,8 @@ logging.basicConfig(level=logging.INFO)
 
 from transformers import (
     CamembertTokenizer,
-    CamembertConfig,
-    CamembertForMaskedLM,
+    RobertaConfig,
+    RobertaForMaskedLM,
     DataCollatorForLanguageModeling,
     Trainer, 
     TrainingArguments
@@ -79,7 +79,7 @@ def main():
     tokenizer = CamembertTokenizer(vocab_file=args.tokenizer_name_or_path)
    
     #initialize models
-    config = CamembertConfig(
+    config = RobertaConfig(
         vocab_size=args.vocab_size,
         type_vocab_size=1,
         #roberta base as default
@@ -94,11 +94,11 @@ def main():
     #     num_attention_head=16
     )
     
-    model = CamembertForMaskedLM(config=config)
+    model = RobertaForMaskedLM(config=config)
     
     #datasets
-    train_dataset = MLMDataset(tokenizer,args.train_dir,args.train_max_length)
-    eval_dataset = MLMDataset(tokenizer,args.eval_dir,args.eval_max_length)
+    train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length)
+    eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length)
     
     #data collator
     data_collator = DataCollatorForLanguageModeling(
