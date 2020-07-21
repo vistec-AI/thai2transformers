@@ -77,11 +77,7 @@ def main():
     args = parser.parse_args()
     
     #initialize tokenizer
-    if args.sentencepiece_bpe:
-        print('Load BPE vocab with RobertaTokenizer')
-        tokenizer = RobertaTokenizer.from_pretrained(args.tokenizer_name_or_path)
-    else: 
-        tokenizer = RobertaTokenizerFast.from_pretrained(args.tokenizer_name_or_path)
+    tokenizer = RobertaTokenizerFast.from_pretrained(args.tokenizer_name_or_path)
     
     #initialize models
     config = RobertaConfig(
