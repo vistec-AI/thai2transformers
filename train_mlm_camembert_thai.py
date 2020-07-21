@@ -1,4 +1,5 @@
 import logging
+import os
 logging.basicConfig(level=logging.INFO)
 
 from transformers import (
@@ -157,7 +158,7 @@ def main():
     trainer.train()
     
     #save
-    trainer.save_model('test_lm')
+    trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
     
     #evaluate
     trainer.evaluate()
