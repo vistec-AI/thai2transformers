@@ -135,11 +135,11 @@ def main():
 
     #initiate trainer
     trainer = Trainer(
-    model=model,
-    args=training_args,
-    data_collator = data_collator,
-    train_dataset=train_dataset,
-    eval_dataset=eval_dataset
+        model=model,
+        args=training_args,
+        data_collator = data_collator,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset
     )
     
     #train
