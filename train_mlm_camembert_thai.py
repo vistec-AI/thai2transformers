@@ -80,8 +80,8 @@ def main():
    
     #initialize models
     config = RobertaConfig(
-        vocab_size=tokenizer.vocab_size,
-        type_vocab_size=1,
+        vocab_size=tokenizer.vocab_size + 5,
+        type_vocab_size=2,
         #roberta base as default
         num_hidden_layers=args.num_hidden_layers,
         hidden_size=args.hidden_size, 
