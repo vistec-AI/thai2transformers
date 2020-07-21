@@ -27,7 +27,7 @@ def main():
     
     #required
     parser.add_argument("--tokenizer_name_or_path", type=str,)
-    # parser.add_argument("--vocab_size", type=int,)
+    parser.add_argument("--vocab_size", type=int,)
     parser.add_argument("--train_dir", type=str,)
     parser.add_argument("--eval_dir", type=str,)
     parser.add_argument("--num_train_epochs", type=int,)
@@ -80,7 +80,7 @@ def main():
    
     #initialize models
     config = RobertaConfig(
-        vocab_size=tokenizer.vocab_size + 5,
+        vocab_size=args.vocab_size + 5,
         type_vocab_size=2,
         #roberta base as default
         num_hidden_layers=args.num_hidden_layers,
