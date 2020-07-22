@@ -75,9 +75,13 @@ def main():
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
-    
+    parser.add_argument("--local_rank", type=int, default=-1)
+
     args = parser.parse_args()
-    
+   
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
     #initialize tokenizer
    
     tokenizer = CamembertTokenizer(vocab_file=args.tokenizer_name_or_path)
@@ -137,9 +141,15 @@ def main():
         seed=args.seed,
         fp16=args.fp16,
         fp16_opt_level=args.fp16_opt_level,
+        local_rank=args.local_rank,
         dataloader_drop_last=args.dataloader_drop_last,
     )
 
+    logging.info("Number of devices: %d", training_args.n_gpu)
+    logging.info("Device: %d", training_args.device)
+    logging.info("Local rank: %d", training_args.local_rank)
+    logging.info("FP16 Training %d", training_args.fp16)
+    
     #initiate trainer
     trainer = Trainer(
         model=model,
