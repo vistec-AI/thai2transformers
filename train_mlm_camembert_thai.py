@@ -102,9 +102,9 @@ def main():
     #     num_attention_head=16
     )
     
-    device = torch.device('cuda:0')
+    # device = torch.device('cuda:0')
     model = RobertaForMaskedLM(config=config)
-    model.to(device)
+    # model.to(device)
 
     #datasets
     train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length)
@@ -145,10 +145,10 @@ def main():
         dataloader_drop_last=args.dataloader_drop_last,
     )
 
-    logging.info("Number of devices: %d", training_args.n_gpu)
-    logging.info("Device: %d", training_args.device)
-    logging.info("Local rank: %d", training_args.local_rank)
-    logging.info("FP16 Training %d", training_args.fp16)
+    logging.info(" Number of devices: %d", training_args.n_gpu)
+    logging.info(" Device: %s", training_args.device)
+    logging.info(" Local rank: %s", training_args.local_rank)
+    logging.info(" FP16 Training: %s", training_args.fp16)
     
     #initiate trainer
     trainer = Trainer(
