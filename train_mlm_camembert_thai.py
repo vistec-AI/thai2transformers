@@ -13,6 +13,8 @@ from transformers import (
 #thai2transformers
 from thai2transformers.datasets import MLMDataset
 
+import torch
+
 #argparse
 import argparse
 # python train_mlm_roberthai.py --tokenizer_name_or_path data/tokenizer/bpe_enth_52000 \
@@ -94,8 +96,10 @@ def main():
     #     num_attention_head=16
     )
     
+    device = torch.device('cuda:0')
     model = RobertaForMaskedLM(config=config)
-    
+    model.to(device)
+
     #datasets
     train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length)
     eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length)
