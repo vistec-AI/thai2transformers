@@ -1,4 +1,5 @@
 import logging
+import os
 logging.basicConfig(level=logging.INFO)
 
 from transformers import (
@@ -29,10 +30,11 @@ def main():
     
     #required
     parser.add_argument("--tokenizer_name_or_path", type=str,)
-    # parser.add_argument("--vocab_size", type=int,)
+    parser.add_argument("--vocab_size", type=int,)
     parser.add_argument("--train_dir", type=str,)
     parser.add_argument("--eval_dir", type=str,)
     parser.add_argument("--num_train_epochs", type=int,)
+    parser.add_argument("--max_steps", type=int,)
 
     #checkpoint
     parser.add_argument("--output_dir", type=str, default="./results")
@@ -82,7 +84,7 @@ def main():
    
     #initialize models
     config = RobertaConfig(
-        vocab_size=tokenizer.vocab_size + 5,
+        vocab_size=tokenizer.vocab_size,
         type_vocab_size=2,
         #roberta base as default
         num_hidden_layers=args.num_hidden_layers,
@@ -111,6 +113,7 @@ def main():
     #training args
     training_args = TrainingArguments(
         num_train_epochs=args.num_train_epochs,
+        max_steps=args.max_steps,
         per_device_train_batch_size=args.per_device_train_batch_size,
         per_device_eval_batch_size=args.per_device_eval_batch_size,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
@@ -145,12 +148,21 @@ def main():
         train_dataset=train_dataset,
         eval_dataset=eval_dataset
     )
+
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        data_collator=data_collator,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        prediction_loss_only=True,
+    )
     
     #train
     trainer.train()
     
     #save
-    trainer.save_model('test_lm')
+    trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
     
     #evaluate
     trainer.evaluate()
