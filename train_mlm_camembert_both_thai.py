@@ -77,9 +77,6 @@ def main():
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
     
     args = parser.parse_args()
-   
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
 
     #initialize tokenizer
    
