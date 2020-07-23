@@ -15,8 +15,6 @@ from thai2transformers.datasets import MLMDataset
 
 #argparse
 import argparse
-# python train_mlm_roberthai.py --tokenizer_name_or_path data/tokenizer/bpe_enth_52000 \
-# --vocab_size 52000 --train_dir data/train_lm --eval_dir data/valid_lm --num_train_epochs 5
 
 def main():
     #argparser
@@ -27,7 +25,6 @@ def main():
     
     #required
     parser.add_argument("--tokenizer_name_or_path", type=str,)
-    # parser.add_argument("--vocab_size", type=int,)
     parser.add_argument("--train_dir", type=str,)
     parser.add_argument("--eval_dir", type=str,)
     parser.add_argument("--num_train_epochs", type=int,)
@@ -76,12 +73,12 @@ def main():
     
     #initialize tokenizer
    
-    tokenizer = CamembertTokenizer(vocab_file=args.tokenizer_name_or_path)
+    tokenizer = CamembertTokenizer.from_pretrained(args.tokenizer_name_or_path)
    
     #initialize models
     config = RobertaConfig(
-        vocab_size=tokenizer.vocab_size + 5,
-        type_vocab_size=2,
+        vocab_size=tokenizer.vocab_size,
+        type_vocab_size=1,
         #roberta base as default
         num_hidden_layers=args.num_hidden_layers,
         hidden_size=args.hidden_size, 
