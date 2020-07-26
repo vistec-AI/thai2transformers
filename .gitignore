@@ -12,6 +12,7 @@ raw_data/
 wikiextractor/
 wikitokenizer/
 *.ckpt
+checkpoints/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
