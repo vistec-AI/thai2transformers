@@ -26,7 +26,7 @@ class MLMDataset(Dataset):
         return len(self.features)
 
     def __getitem__(self, i):
-when         return torch.tensor(self.features[i]), dtype=torch.log)
+        return torch.tensor(self.features[i], dtype=torch.log)
     
     def _build(self):
         input_ids = []
@@ -46,7 +46,7 @@ when         return torch.tensor(self.features[i]), dtype=torch.log)
                     input_ids+=tokenized_inputs['input_ids']
 
         for i in tqdm(range(len(input_ids))):
-            self.features.append(feature)
+            self.features.append(input_ids[i])
 
 class SequenceClassificationDataset(Dataset):
     def __init__(
