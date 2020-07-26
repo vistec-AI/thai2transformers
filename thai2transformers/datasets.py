@@ -46,7 +46,7 @@ class MLMDataset(Dataset):
                     input_ids+=tokenized_inputs['input_ids']
 
         for i in tqdm(range(len(input_ids))):
-            self.features.append(feature)
+            self.features.append(input_ids[i])
 
 class SequenceClassificationDataset(Dataset):
     def __init__(
