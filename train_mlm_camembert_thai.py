@@ -133,7 +133,6 @@ def main():
         seed=args.seed,
         fp16=args.fp16,
         fp16_opt_level=args.fp16_opt_level,
-        local_rank=args.local_rank,
         dataloader_drop_last=args.dataloader_drop_last,
     )
 
