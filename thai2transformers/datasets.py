@@ -26,7 +26,7 @@ class MLMDataset(Dataset):
         return len(self.features)
 
     def __getitem__(self, i):
-        return torch.tensor(self.features[i], dtype=torch.log)
+        return torch.tensor(self.features[i], dtype=torch.long)
     
     def _build(self):
         input_ids = []
