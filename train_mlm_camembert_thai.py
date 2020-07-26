@@ -15,8 +15,6 @@ from transformers import (
 #thai2transformers
 from thai2transformers.datasets import MLMDataset
 
-import torch
-
 #argparse
 import argparse
 
@@ -29,10 +27,6 @@ def main():
     
     #required
     parser.add_argument("--tokenizer_name_or_path", type=str,)
-<<<<<<< HEAD
-    parser.add_argument("--vocab_size", type=int,)
-=======
->>>>>>> f4a2fb03b04c9b8ac09b08f950b75f4076a87bdb
     parser.add_argument("--train_dir", type=str,)
     parser.add_argument("--eval_dir", type=str,)
     parser.add_argument("--num_train_epochs", type=int,)
@@ -77,12 +71,8 @@ def main():
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
-    parser.add_argument("--local_rank", type=int, default=-1)
 
     args = parser.parse_args()
-   
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
 
     #initialize tokenizer
    
