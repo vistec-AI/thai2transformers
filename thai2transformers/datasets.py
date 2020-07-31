@@ -259,4 +259,3 @@ class TokenClassificationDataset(Dataset):
             for i, row in tqdm(df.iterrows()):
                 feature = self._build_one(row[0], row[1])
                 self.features.append(feature)
->>>>>>> d3242ad526b56f63c3cb03922e5a3dffafc16b04
