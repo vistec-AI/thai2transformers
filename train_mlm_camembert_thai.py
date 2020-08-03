@@ -94,9 +94,7 @@ def main():
     #     num_attention_head=16
     )
     
-    # device = torch.device('cuda:0')
     model = RobertaForMaskedLM(config=config)
-    # model.to(device)
 
     #datasets
     train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length)
