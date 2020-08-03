@@ -50,29 +50,29 @@ class SequenceClassificationDataset(Dataset):
         ext=".csv",
         bs=10000,
         preprocessor=None,
-        huggingface_format=False,
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
         self.tokenizer = tokenizer
         self.bs = bs
         self.preprocessor = preprocessor
-        self.features = []
-        if huggingface_format:
-            self._build_hf()
-        else:
-            self._build()
+        self.input_ids = []
+        self.attention_masks = []
+        self.labels = []
+
+        self._build()
 
     def __len__(self):
         return len(self.features)
 
     def __getitem__(self, i):
-        return self.features[i]
+        return {
+            "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
+            "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
+            "label": torch.tensor(self.labels[i], dtype=torch.long),
+        }
 
     def _build(self):
-        input_ids = []
-        attention_masks = []
-        labels = []
         for fname in tqdm(self.fnames):
             df = pd.read_csv(fname)
             for i in tqdm(range(math.ceil(df.shape[0] / self.bs))):
@@ -94,59 +94,9 @@ class SequenceClassificationDataset(Dataset):
                 )
 
                 # add to list
-                self.features
-                input_ids += tokenized_inputs["input_ids"]
-                attention_masks += tokenized_inputs["attention_mask"]
-                labels += list(df.iloc[i * self.bs : (i + 1) * self.bs, 1])
-
-        for i in tqdm(range(len(input_ids))):
-            feature = {
-                "input_ids": torch.tensor(input_ids[i], dtype=torch.long),
-                "attention_mask": torch.tensor(attention_masks[i], dtype=torch.long),
-                "label": torch.tensor(labels[i], dtype=torch.long),
-            }
-            self.features.append(feature)
-
-    def _build_hf(self):
-        """
-        Experimental; mimic huggingface datasets
-        """
-        input_ids = []
-        attention_masks = []
-        labels = []
-        for fname in tqdm(self.fnames):
-            df = pd.read_csv(fname)
-            for i in tqdm(range(math.ceil(df.shape[0] / self.bs))):
-                if self.preprocessor:
-                    texts = list(
-                        df.iloc[i * self.bs : (i + 1) * self.bs, 0].map(
-                            self.preprocessor
-                        )
-                    )
-                else:
-                    texts = list(df.iloc[i * self.bs : (i + 1) * self.bs, 0])
-
-                # tokenize
-                tokenized_inputs = self.tokenizer(
-                    texts,
-                    max_length=self.max_length,
-                    truncation=True,
-                    pad_to_max_length=True,
-                )
-
-                # add to list
-                self.features
-                input_ids += tokenized_inputs["input_ids"]
-                attention_masks += tokenized_inputs["attention_mask"]
-                labels += list(df.iloc[i * self.bs : (i + 1) * self.bs, 1])
-
-        for i in tqdm(range(len(input_ids))):
-            feature = InputFeatures(
-                input_ids=input_ids[i],
-                attention_mask=attention_masks[i],
-                label=labels[i],
-            )
-            self.features.append(feature)
+                self.input_ids += tokenized_inputs["input_ids"]
+                self.attention_masks += tokenized_inputs["attention_mask"]
+                self.labels += list(df.iloc[i * self.bs : (i + 1) * self.bs, 1])
 
 
 class TokenClassificationDataset(Dataset):
@@ -172,18 +122,30 @@ class TokenClassificationDataset(Dataset):
         return len(self.features)
 
     def __getitem__(self, i):
-        return self.features[i]
+        feature = self.features[i]
+        return {
+            "input_ids": torch.tensor(feature["input_ids"], dtype=torch.long),
+            "attention_mask": torch.tensor(feature["attention_mask"], dtype=torch.long),
+            "label": torch.tensor(feature["label"], dtype=torch.long),
+            "word2sub": feature["word2sub"],
+        }
 
     def _build_one(self, src_, lbl_):
         # encode-decode to make sure characters are the same as in tokenizer vocab; e.g. เ เ and แ
         src_ = "".join(
             [
                 self.tokenizer.decode(i)
-                for i in self.tokenizer.encode(src_, add_special_tokens=False)
+                for i in self.tokenizer.encode(
+                    src_,
+                    add_special_tokens=False,
+                    max_length=self.max_length,
+                    truncation=True,
+                    pad_to_max_length=False,
+                )
             ]
         )
         src_ = src_.split("|")
-        lbl_ = lbl_.split("|")
+        lbl_ = lbl_.split("|")[: len(src_)]
         src = [self.tokenizer.bos_token, " "] + src_ + [self.tokenizer.eos_token]
         txt = "".join(src)
         lbl = (
@@ -203,7 +165,7 @@ class TokenClassificationDataset(Dataset):
         sub_txt = "".join(sub)
 
         # pad labels and words
-        lbl += [label_pad_token] * to_pad
+        lbl += [self.label_pad_token] * to_pad
         src += [self.tokenizer.pad_token] * to_pad
         txt += self.tokenizer.pad_token * to_pad
 
@@ -244,9 +206,9 @@ class TokenClassificationDataset(Dataset):
         word2sub = {w: s for w, s in zip(word_agg["word_i"], word_agg["sub_i"])}
 
         return {
-            "input_ids": torch.tensor(ids, dtype=torch.long),
-            "attention_mask": torch.tensor(attn, dtype=torch.long),
-            "label": torch.tensor(subword_df.label, dtype=torch.long),
+            "input_ids": ids,
+            "attention_mask": attn,
+            "label": list(subword_df.label),
             "word2sub": word2sub,
         }
 
