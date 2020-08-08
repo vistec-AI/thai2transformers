@@ -68,7 +68,9 @@ class SequenceClassificationDataset(Dataset):
     def __getitem__(self, i):
         return {
             "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
-            "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
+            "attention_mask": torch.tensor(
+                self.attention_masks[i], dtype=torch.long
+            ),
             "label": torch.tensor(self.labels[i], dtype=torch.long),
         }
 
@@ -96,7 +98,9 @@ class SequenceClassificationDataset(Dataset):
                 # add to list
                 self.input_ids += tokenized_inputs["input_ids"]
                 self.attention_masks += tokenized_inputs["attention_mask"]
-                self.labels += list(df.iloc[i * self.bs : (i + 1) * self.bs, 1])
+                self.labels += list(
+                    df.iloc[i * self.bs : (i + 1) * self.bs, 1]
+                )
 
 
 class TokenClassificationDataset(Dataset):
@@ -115,6 +119,7 @@ class TokenClassificationDataset(Dataset):
         self.label_pad_token = label_pad_token
         self.label_first_subword = label_first_subword
         self.features = []
+        self.word2sub = []
 
         self._build()
 
@@ -125,9 +130,10 @@ class TokenClassificationDataset(Dataset):
         feature = self.features[i]
         return {
             "input_ids": torch.tensor(feature["input_ids"], dtype=torch.long),
-            "attention_mask": torch.tensor(feature["attention_mask"], dtype=torch.long),
+            "attention_mask": torch.tensor(
+                feature["attention_mask"], dtype=torch.long
+            ),
             "label": torch.tensor(feature["label"], dtype=torch.long),
-            "word2sub": feature["word2sub"],
         }
 
     def _build_one(self, src_, lbl_):
@@ -146,10 +152,14 @@ class TokenClassificationDataset(Dataset):
         )
         src_ = src_.split("|")
         lbl_ = lbl_.split("|")[: len(src_)]
-        src = [self.tokenizer.bos_token, " "] + src_ + [self.tokenizer.eos_token]
+        src = (
+            [self.tokenizer.bos_token, " "] + src_ + [self.tokenizer.eos_token]
+        )
         txt = "".join(src)
         lbl = (
-            [self.label_pad_token, self.label_pad_token] + lbl_ + [self.label_pad_token]
+            [self.label_pad_token, self.label_pad_token]
+            + lbl_
+            + [self.label_pad_token]
         )
 
         # totkenize
@@ -161,7 +171,10 @@ class TokenClassificationDataset(Dataset):
         ids += [self.tokenizer.pad_token_id] * to_pad
         attn = tokenized_inputs["attention_mask"]
         attn += [0] * to_pad
-        sub = [i.replace("▁", " ") for i in self.tokenizer.convert_ids_to_tokens(ids)]
+        sub = [
+            i.replace("▁", " ")
+            for i in self.tokenizer.convert_ids_to_tokens(ids)
+        ]
         sub_txt = "".join(sub)
 
         # pad labels and words
@@ -193,7 +206,9 @@ class TokenClassificationDataset(Dataset):
 
         # map subwords to labels
         subword_df = (
-            word_df.groupby(["sub_i"]).agg({"label": max, "word_i": max}).reset_index()
+            word_df.groupby(["sub_i"])
+            .agg({"label": max, "word_i": max})
+            .reset_index()
         )
 
         # label for only the first subword of token
@@ -203,7 +218,9 @@ class TokenClassificationDataset(Dataset):
 
         # map subwords to words
         word_agg = word_df.groupby("word_i").sub_i.max().reset_index()
-        word2sub = {w: s for w, s in zip(word_agg["word_i"], word_agg["sub_i"])}
+        word2sub = {
+            w: s for w, s in zip(word_agg["word_i"], word_agg["sub_i"])
+        }
 
         return {
             "input_ids": ids,
