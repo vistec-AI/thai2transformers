@@ -4,13 +4,17 @@ from torch.utils.data import DataLoader
 import pytorch_lightning as pl
 import argparse
 from thai2transformers.metrics import sequence_classification_metrics
-from thai2transformers.datasets import SequenceClassificationDataset
+from thai2transformers.datasets import (
+    SequenceClassificationDataset,
+    TokenClassificationDataset,
+)
 from transformers import (
     AdamW,
     get_linear_schedule_with_warmup,
     AutoTokenizer,
     AutoModel,
 )
+
 
 class TokenClassificationFinetuner(pl.LightningModule):
     def __init__(self, hparams):
@@ -59,22 +63,22 @@ class TokenClassificationFinetuner(pl.LightningModule):
         active_labels = torch.where(
             active_mask,
             batch["label"].view(-1),
-            torch.tensor(lfn.ignore_index).type_as(batch["label"]),
+            torch.tensor(self.loss_fn.ignore_index).type_as(batch["label"]),
         )
         return active_preds, active_labels
 
     def _step(self, batch):
         active_preds, active_labels = self._flatten_batch(batch)
         loss = self.loss_fn(active_preds, active_labels)
-        return loss, preds
+        return loss
 
     def training_step(self, batch, batch_nb):
-        loss, _ = self._step(batch)
+        loss = self._step(batch)
         tensorboard_logs = {"train_loss": loss}
         return {"loss": loss, "log": tensorboard_logs}
 
     def validation_step(self, batch, batch_nb):
-        loss, _ = self._step(batch)
+        loss = self._step(batch)
         active_preds, active_labels = self._flatten_batch(batch)
         pred = argparse.Namespace(
             label_ids=active_labels.cpu(), predictions=active_preds.cpu()
@@ -86,7 +90,7 @@ class TokenClassificationFinetuner(pl.LightningModule):
     def test_step(self, batch, batch_nb):
         return self.validation_step(batch, batch_nb)
 
-   def validation_epoch_end(self, outputs):
+    def validation_epoch_end(self, outputs):
         avg_val_loss = np.stack([x["loss"] for x in outputs]).mean()
         avg_val_acc = np.stack([x["accuracy"] for x in outputs]).mean()
         avg_val_f1_micro = np.stack([x["f1_micro"] for x in outputs]).mean()
