@@ -8,7 +8,7 @@ lightning_logs
 results
 logs
 runs
-raw_data/
+raw_data/*.csv
 wikiextractor/
 wikitokenizer/
 *.ckpt
