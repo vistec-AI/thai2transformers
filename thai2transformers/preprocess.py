@@ -112,7 +112,7 @@ def rm_useless_spaces(text: str) -> str:
     return re.sub(" {2,}", " ", text)
 
 
-def replace_rep_after(text: str, with_num: bool = True) -> str:
+def replace_rep_after(text: str) -> str:
     """
     Replace repetitions at the character level in `text`
     :param str text: input text to replace character repetition
