@@ -1,5 +1,8 @@
+
 # Mac
 .DS_Store
+*.zip
+raw_data
 
 #files
 data

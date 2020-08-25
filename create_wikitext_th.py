@@ -12,38 +12,14 @@ import csv
 
 from shutil import copyfile
 from pythainlp.tokenize import word_tokenize
-from pythainlp.ulmfit.preprocess import rm_useless_spaces, rm_useless_newlines
-
-import re
-def rm_brackets(text: str) -> str:
-    "Remove all empty brackets and artifacts within brackets from `text`."
-    #remove empty brackets
-    new_line = re.sub(r"\(\)", "", text)
-    new_line = re.sub(r"\{\}", "", new_line)
-    new_line = re.sub(r"\[\]", "", new_line)
-    #brakets with only punctuations
-    new_line = re.sub(r"\([^a-zA-Z0-9ก-๙]+\)", "", new_line)
-    new_line = re.sub(r"\{[^a-zA-Z0-9ก-๙]+\}", "", new_line)
-    new_line = re.sub(r"\[[^a-zA-Z0-9ก-๙]+\]", "", new_line)
-    #artifiacts after (
-    new_line = re.sub(r"(?<=\()[^a-zA-Z0-9ก-๙]+(?=[a-zA-Z0-9ก-๙])","",new_line)
-    new_line = re.sub(r"(?<=\{)[^a-zA-Z0-9ก-๙]+(?=[a-zA-Z0-9ก-๙])","",new_line)
-    new_line = re.sub(r"(?<=\[)[^a-zA-Z0-9ก-๙]+(?=[a-zA-Z0-9ก-๙])","",new_line)
-    #artifacts before )
-    new_line = re.sub(r"(?<=[a-zA-Z0-9ก-๙])[^a-zA-Z0-9ก-๙]+(?=\))","",new_line)
-    new_line = re.sub(r"(?<=[a-zA-Z0-9ก-๙])[^a-zA-Z0-9ก-๙]+(?=\})","",new_line)
-    new_line = re.sub(r"(?<=[a-zA-Z0-9ก-๙])[^a-zA-Z0-9ก-๙]+(?=\])","",new_line)
-    return new_line
+from thai2transformers.preprocess import process_tranformers
 
 class ThaiTokenizer:
     def __init__(self, tokenize_func):
         self.tokenize_func = tokenize_func
 
     def clean_wiki(self,text):
-        res = rm_brackets(text)
-        res = rm_useless_spaces(res)
-        res = rm_useless_newlines(res)
-        return res
+        return process_tranformers(res)
 
     def tokenize(self,text):
         return self.tokenize_func(text)

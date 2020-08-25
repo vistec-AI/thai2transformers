@@ -14,7 +14,6 @@ import argparse
 
 # python3 preprocess_corpus.py --input_dir raw_data/wisesight-large --output_dir cleaned_data/wisesight-large-cleaned
 
-
 def process_one(fname, min_seq_length, max_seq_length):
     with open(fname, "r") as f:
         line_count = 0
