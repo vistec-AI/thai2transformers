@@ -114,26 +114,19 @@ def rm_useless_spaces(text: str) -> str:
 
 def replace_rep_after(text: str, with_num: bool = True) -> str:
     """
-    Replace repetitions at the character level in `text` after the repetition.
-    This is done to prevent such case as 'น้อยยยยยยยย' becoming 'น้อ xxrep 8 ย'
-    ;instead it will retain the word as 'น้อย xxrep 8'
+    Replace repetitions at the character level in `text`
     :param str text: input text to replace character repetition
-    :param bool with_num: add number of repetitions
-    :return: text with repetitive token **<rep>** and the counter
-             after character repetition if `with_num` is True
+    :return: text with repetitive tokens removed.
     :rtype: str
     :Example:
         >>> text = "กาาาาาาา"
         >>> replace_rep_after(text)
-        'กา<rep>7 '
+        'กา'
     """
 
     def _replace_rep(m):
         c, cc = m.groups()
-        if with_num:
-            return f"{c}{_TK_REP}{len(cc)+1}"
-        else:
-            return f"{c}{_TK_REP}"
+        return f"{c}"
 
     re_rep = re.compile(r"(\S)(\1{3,})")
     return re_rep.sub(_replace_rep, text)
@@ -161,19 +154,17 @@ def ungroup_emoji(toks: Collection[str]) -> Collection[str]:
     return res
 
 
-def replace_wrep_post(toks: Collection[str], with_num: bool = True) -> Collection[str]:
+def replace_wrep_post(toks: Collection[str]) -> Collection[str]:
     """
     Replace reptitive words post tokenization;
     fastai `replace_wrep` does not work well with Thai.
     :param Collection[str] toks: list of tokens
-    :param bool with_num: add number of repetitions
-    :return: list of tokens where **<wrep>** token and the counter
-             is added after repetitive words if `with_num` is True.
+    :return: list of tokens where repetitive words are removed.
     :rtype: Collection[str]
     :Example:
         >>> toks = ["กา", "น้ำ", "น้ำ", "น้ำ", "น้ำ"]
         >>> replace_wrep_post(toks)
-        ['กา', 'น้ำ','<wrep>', '3']
+        ['กา', 'น้ำ']
     """
     previous_word = None
     rep_count = 0
@@ -182,10 +173,7 @@ def replace_wrep_post(toks: Collection[str], with_num: bool = True) -> Collectio
         if current_word == previous_word:
             rep_count += 1
         elif (current_word != previous_word) & (rep_count > 0):
-            if with_num:
-                res += [previous_word, _TK_WREP, str(rep_count)]
-            else:
-                res += [previous_word, _TK_WREP]
+            res += [previous_word]
             rep_count = 0
         else:
             res.append(previous_word)
@@ -217,7 +205,6 @@ def process_transformers(
     text: str,
     pre_rules: Collection[Callable] = [
         fix_html,
-        replace_url,
         rm_brackets,
         replace_newlines,
         rm_useless_spaces,
@@ -226,6 +213,7 @@ def process_transformers(
     tok_func: Callable = word_tokenize,
     post_rules: Collection[Callable] = [ungroup_emoji, replace_wrep_post],
 ):
+    text = text.lower()
     for rule in pre_rules:
         text = rule(text)
     toks = tok_func(text)
