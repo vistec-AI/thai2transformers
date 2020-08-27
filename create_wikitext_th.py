@@ -12,14 +12,14 @@ import csv
 
 from shutil import copyfile
 from pythainlp.tokenize import word_tokenize
-from thai2transformers.preprocess import process_tranformers
+from thai2transformers.preprocess import process_transformers
 
 class ThaiTokenizer:
     def __init__(self, tokenize_func):
         self.tokenize_func = tokenize_func
 
     def clean_wiki(self,text):
-        return process_tranformers(res)
+        return process_transformers(text)
 
     def tokenize(self,text):
         return self.tokenize_func(text)

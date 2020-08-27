@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 # argparse
 import argparse
 
-# python3 preprocess_corpus.py --input_dir raw_data/wisesight-large --output_dir cleaned_data/wisesight-large-cleaned
+# python3 preprocess_wisesight_large.py --input_dir raw_data/wisesight-large --output_dir cleaned_data/wisesight-large-cleaned
 
 def process_one(fname, min_seq_length, max_seq_length):
     with open(fname, "r") as f:
@@ -24,7 +24,7 @@ def process_one(fname, min_seq_length, max_seq_length):
             texts.append(process_transformers(text))
             word_counts.append(len(word_tokenize(text)))
             line_count += 1
-    df = pd.DataFrame({"text": texts[1:], "wc": word_counts[1:]})
+    df = pd.DataFrame({"text": texts, "wc": word_counts})
     print(np.percentile(df.wc, 5), np.percentile(df.wc, 95))
     df = df[(df.wc >= min_seq_length) & (df.wc <= max_seq_length)]
     return list(df.text)

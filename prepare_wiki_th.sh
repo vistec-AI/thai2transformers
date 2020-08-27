@@ -23,17 +23,19 @@ fi
 
 # Check if directory exists
 if [ ! -d "${EXTR}" ]; then
-  git clone https://github.com/attardi/wikiextractor.git
+  wget https://github.com/attardi/wikiextractor/archive/e4abb4cbd019b0257824ee47c23dd163919b731b.zip
+  unzip e4abb4cbd019b0257824ee47c23dd163919b731b.zip
+  mv wikiextractor-e4abb4cbd019b0257824ee47c23dd163919b731b wikiextractor
   cd "${EXTR}"
-  python setup.py install
+  python3 setup.py install
   cd ..
 fi
 
 EXTR_PATH="${EXTR_DIR}/${LANG}"
 if [ ! -d "${EXTR_PATH}" ]; then
-  python wikiextractor/WikiExtractor.py -s --json -o "${EXTR_PATH}" "${DUMP_PATH}"
+  python3 wikiextractor/WikiExtractor.py -s --json -o "${EXTR_PATH}" "${DUMP_PATH}"
 else
   echo "${EXTR_PATH} already exists. Skipping extraction."
 fi
 
-python create_wikitext_th.py -i "${EXTR_PATH}"  -l "${LANG}" -o "${WIKI_DIR}"
+python3 create_wikitext_th.py -i "${EXTR_PATH}"  -l "${LANG}" -o "${WIKI_DIR}"
