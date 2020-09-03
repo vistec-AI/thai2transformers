@@ -1,4 +1,7 @@
+from functools import partial
 import glob
+import multiprocessing
+nb_cores = multiprocessing.cpu_count()
 from thai2transformers.preprocess import process_transformers
 from pythainlp.tokenize import word_tokenize
 from tqdm.auto import tqdm
@@ -29,6 +32,18 @@ def process_one(fname, min_seq_length, max_seq_length):
     df = df[(df.wc >= min_seq_length) & (df.wc <= max_seq_length)]
     return list(df.text)
 
+def preprocess_fname_wisesight(fname, min_seq_length=5, max_seq_length=300, output_dir=None):
+    print(f"Processing {fname}")
+    texts = process_one(
+        fname,
+        min_seq_length=min_seq_length,
+        max_seq_length=max_seq_length,
+    )
+    output_fname = f"{output_dir}/{fname.split('/')[-1].split('.')[0]}.txt"
+    print(f"Saving to {output_fname}")
+    with open(output_fname, "w") as f:
+        f.writelines([f"{i}\n" for i in texts])
+
 
 def main():
     # argparser
@@ -51,19 +66,13 @@ def main():
     args = parser.parse_args()
     print(f"{args.input_dir}/*{args.ext}")
     fnames = [str(x) for x in glob.glob(f"{args.input_dir}/*{args.ext}")]
-
     print(f"There are {len(fnames)} files.")
-    for fname in tqdm(fnames):
-        print(f"Processing {fname}")
-        texts = process_one(
-            fname,
-            min_seq_length=args.min_seq_length,
-            max_seq_length=args.max_seq_length,
-        )
-        output_fname = f"{args.output_dir}/{fname.split('/')[-1].split('.')[0]}.txt"
-        print(f"Saving to {output_fname}")
-        with open(output_fname, "w") as f:
-            f.writelines([f"{i}\n" for i in texts])
+    
+    with multiprocessing.Pool(nb_cores) as pool:
+        results = pool.map(partial(preprocess_fname_wisesight,
+                                   min_seq_length=args.min_seq_length,
+                                   max_seq_length=args.max_seq_length,
+                                   output_dir=args.output_dir), fnames)
 
 
 if __name__ == "__main__":
