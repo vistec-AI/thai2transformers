@@ -68,9 +68,7 @@ class SequenceClassificationDataset(Dataset):
     def __getitem__(self, i):
         return {
             "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
-            "attention_mask": torch.tensor(
-                self.attention_masks[i], dtype=torch.long
-            ),
+            "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
             "label": torch.tensor(self.labels[i], dtype=torch.long),
         }
 
@@ -98,9 +96,7 @@ class SequenceClassificationDataset(Dataset):
                 # add to list
                 self.input_ids += tokenized_inputs["input_ids"]
                 self.attention_masks += tokenized_inputs["attention_mask"]
-                self.labels += list(
-                    df.iloc[i * self.bs : (i + 1) * self.bs, 1]
-                )
+                self.labels += list(df.iloc[i * self.bs : (i + 1) * self.bs, 1])
 
 
 class TokenClassificationDataset(Dataset):
@@ -108,7 +104,7 @@ class TokenClassificationDataset(Dataset):
         self,
         tokenizer,
         data_dir,
-        max_length=512,
+        max_length=128,
         ext=".csv",
         label_pad_token="0",
         label_first_subword=False,
@@ -130,65 +126,45 @@ class TokenClassificationDataset(Dataset):
         feature = self.features[i]
         return {
             "input_ids": torch.tensor(feature["input_ids"], dtype=torch.long),
-            "attention_mask": torch.tensor(
-                feature["attention_mask"], dtype=torch.long
-            ),
+            "attention_mask": torch.tensor(feature["attention_mask"], dtype=torch.long),
             "label": torch.tensor(feature["label"], dtype=torch.long),
+            "subword_df": feature["subword_df"],
         }
 
-    def _build_one(self, src_, lbl_):
-        # encode-decode to make sure characters are the same as in tokenizer vocab; e.g. เ เ and แ
-        src_ = "".join(
-            [
+    def normalize(self, src_):
+        sub_1 = [
                 self.tokenizer.decode(i)
                 for i in self.tokenizer.encode(
                     src_,
                     add_special_tokens=False,
-                    max_length=self.max_length,
-                    truncation=True,
+                    truncation=False,
                     pad_to_max_length=False,
                 )
             ]
-        )
-        src_ = src_.split("|")
-        lbl_ = lbl_.split("|")[: len(src_)]
-        src = (
-            [self.tokenizer.bos_token, " "] + src_ + [self.tokenizer.eos_token]
+
+        #keep subwords only up to max length plus 3 special tokens <s>, space, </s>
+        sub_2 = []
+        cnt = 0
+        for s in sub_1:
+            if cnt > self.max_length - 3: break
+            sub_2.append(s)
+            if s!='|': cnt+=1
+
+        res = "".join(sub_2) 
+        res = res[:-1] if res[-1]=='|' else res #remove last space
+        res = res[1:] if res[0]=='|' else res #remove first space
+        res = [" " if i == "" else i for i in res.split("|")]
+        return res
+
+    def add_special_tokens(self, src_, lbl_):
+        src = [self.tokenizer.bos_token, " "] + src_ + [self.tokenizer.eos_token]
+        lbl = (
+            [self.label_pad_token, self.label_pad_token] + lbl_ + [self.label_pad_token]
         )
         txt = "".join(src)
-        lbl = (
-            [self.label_pad_token, self.label_pad_token]
-            + lbl_
-            + [self.label_pad_token]
-        )
+        return src, lbl, txt
 
-        # totkenize
-        tokenized_inputs = self.tokenizer(txt, add_special_tokens=False,)
-
-        # pad subwords
-        ids = tokenized_inputs["input_ids"]
-        to_pad = self.max_length - len(ids)
-        ids += [self.tokenizer.pad_token_id] * to_pad
-        attn = tokenized_inputs["attention_mask"]
-        attn += [0] * to_pad
-        sub = [
-            i.replace("▁", " ")
-            for i in self.tokenizer.convert_ids_to_tokens(ids)
-        ]
-        sub_txt = "".join(sub)
-
-        # pad labels and words
-        lbl += [self.label_pad_token] * to_pad
-        src += [self.tokenizer.pad_token] * to_pad
-        txt += self.tokenizer.pad_token * to_pad
-
-        assert len(attn) == len(ids)  # attention mask matches ids
-        assert len(lbl) == len(src)  # labels match ids
-        assert len(ids) == len(sub)  # ids match subwords
-        assert len(txt) == len(
-            sub_txt
-        )  # reconstructed source text matches reconstruct subword text
-
+    def get_subword_df(self,src,lbl,sub):
         # construct character df; label characters in words
         word_df = []
         for w_i in range(len(src)):
@@ -206,27 +182,56 @@ class TokenClassificationDataset(Dataset):
 
         # map subwords to labels
         subword_df = (
-            word_df.groupby(["sub_i"])
-            .agg({"label": max, "word_i": max})
-            .reset_index()
+            word_df.groupby(["sub_i"]).agg({"label": max, "word_i": max}).reset_index()
         )
 
         # label for only the first subword of token
         if self.label_first_subword:
             subword_df["rnk"] = subword_df.groupby("word_i").cumcount()
             subword_df.loc[subword_df.rnk > 0, "label"] = 0
+        
+        return subword_df[['sub_i','word_i','label']]
 
-        # map subwords to words
-        word_agg = word_df.groupby("word_i").sub_i.max().reset_index()
-        word2sub = {
-            w: s for w, s in zip(word_agg["word_i"], word_agg["sub_i"])
-        }
+    def _build_one(self, src_, lbl_):
+        # encode-decode to make sure characters are the same as in tokenizer vocab; e.g. เ เ and แ
+        src_ = self.normalize(src_)
+        lbl_ = lbl_.split("|")[:len(src_)]
+
+        # # add special tokens
+        src, lbl, txt = self.add_special_tokens(src_, lbl_)
+
+        # tokenize
+        tokenized_inputs = self.tokenizer(txt, add_special_tokens=False,)
+        ids, attn = tokenized_inputs["input_ids"], tokenized_inputs["attention_mask"]
+
+        # pad subwords
+        to_pad = self.max_length - len(ids)
+        ids += [self.tokenizer.pad_token_id] * to_pad
+        attn += [0] * to_pad
+        sub = [i.replace("▁", " ") for i in self.tokenizer.convert_ids_to_tokens(ids)]
+        sub_txt = "".join(sub)
+
+        # pad labels and words
+        lbl += [self.label_pad_token] * to_pad
+        src += [self.tokenizer.pad_token] * to_pad
+        txt += self.tokenizer.pad_token * to_pad
+
+        # checks        
+        assert len(attn) == len(ids)  # attention mask matches ids
+        assert len(lbl) == len(src)  # labels match ids
+        assert len(ids) == len(sub)  # ids match subwords
+        assert len(txt) == len(
+            sub_txt
+        )  # reconstructed source text matches reconstruct subword text
+
+        #get subword_df for metrics and matching subwords to labels
+        subword_df = self.get_subword_df(src,lbl,sub)
 
         return {
             "input_ids": ids,
             "attention_mask": attn,
             "label": list(subword_df.label),
-            "word2sub": word2sub,
+            "subword_df": subword_df,
         }
 
     def _build(self):
@@ -236,5 +241,8 @@ class TokenClassificationDataset(Dataset):
         for fname in tqdm(self.fnames):
             df = pd.read_csv(fname)
             for i, row in tqdm(df.iterrows()):
-                feature = self._build_one(row[0], row[1])
-                self.features.append(feature)
+                try:
+                    feature = self._build_one(row[0], row[1])
+                    self.features.append(feature)
+                except:
+                    print(row[0],row[1])
