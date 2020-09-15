@@ -1,4 +1,5 @@
 import glob
+import numpy as np
 import pandas as pd
 import math
 from tqdm.auto import tqdm
@@ -128,35 +129,37 @@ class TokenClassificationDataset(Dataset):
             "input_ids": torch.tensor(feature["input_ids"], dtype=torch.long),
             "attention_mask": torch.tensor(feature["attention_mask"], dtype=torch.long),
             "label": torch.tensor(feature["label"], dtype=torch.long),
-            "subword_df": feature["subword_df"],
+            "word_ids": np.array(feature["word_ids"]),
         }
 
     def normalize(self, src_):
         sub_1 = [
-                self.tokenizer.decode(i)
-                for i in self.tokenizer.encode(
-                    src_,
-                    add_special_tokens=False,
-                    truncation=False,
-                    pad_to_max_length=False,
-                )
-            ]
+            self.tokenizer.decode(i)
+            for i in self.tokenizer.encode(
+                src_,
+                add_special_tokens=False,
+                truncation=False,
+                pad_to_max_length=False,
+            )
+        ]
 
-        #keep subwords only up to max length plus 3 special tokens <s>, space, </s>
+        # keep subwords only up to max length plus 3 special tokens <s>, space, </s>
         sub_2 = []
         cnt = 0
         for s in sub_1:
-            if cnt > self.max_length - 3: break
+            if cnt > self.max_length - 3:
+                break
             sub_2.append(s)
-            if s!='|': cnt+=1
+            if s != "|":
+                cnt += 1
 
-        res = "".join(sub_2) 
-        res = res[:-1] if res[-1]=='|' else res #remove last space
-        res = res[1:] if res[0]=='|' else res #remove first space
+        res = "".join(sub_2)
+        res = res[:-1] if res[-1] == "|" else res  # remove last space
+        res = res[1:] if res[0] == "|" else res  # remove first space
         res = [" " if i == "" else i for i in res.split("|")]
         return res
 
-    def add_special_tokens(self, src_, lbl_):
+    def _add_special_tokens(self, src_, lbl_):
         src = [self.tokenizer.bos_token, " "] + src_ + [self.tokenizer.eos_token]
         lbl = (
             [self.label_pad_token, self.label_pad_token] + lbl_ + [self.label_pad_token]
@@ -164,7 +167,7 @@ class TokenClassificationDataset(Dataset):
         txt = "".join(src)
         return src, lbl, txt
 
-    def get_subword_df(self,src,lbl,sub):
+    def _get_subword_df(self, src, lbl, sub):
         # construct character df; label characters in words
         word_df = []
         for w_i in range(len(src)):
@@ -189,16 +192,16 @@ class TokenClassificationDataset(Dataset):
         if self.label_first_subword:
             subword_df["rnk"] = subword_df.groupby("word_i").cumcount()
             subword_df.loc[subword_df.rnk > 0, "label"] = 0
-        
-        return subword_df[['sub_i','word_i','label']]
+
+        return subword_df[["sub_i", "word_i", "label"]]
 
     def _build_one(self, src_, lbl_):
         # encode-decode to make sure characters are the same as in tokenizer vocab; e.g. เ เ and แ
         src_ = self.normalize(src_)
-        lbl_ = lbl_.split("|")[:len(src_)]
+        lbl_ = lbl_.split("|")[: len(src_)]
 
         # # add special tokens
-        src, lbl, txt = self.add_special_tokens(src_, lbl_)
+        src, lbl, txt = self._add_special_tokens(src_, lbl_)
 
         # tokenize
         tokenized_inputs = self.tokenizer(txt, add_special_tokens=False,)
@@ -216,7 +219,7 @@ class TokenClassificationDataset(Dataset):
         src += [self.tokenizer.pad_token] * to_pad
         txt += self.tokenizer.pad_token * to_pad
 
-        # checks        
+        # checks
         assert len(attn) == len(ids)  # attention mask matches ids
         assert len(lbl) == len(src)  # labels match ids
         assert len(ids) == len(sub)  # ids match subwords
@@ -224,14 +227,14 @@ class TokenClassificationDataset(Dataset):
             sub_txt
         )  # reconstructed source text matches reconstruct subword text
 
-        #get subword_df for metrics and matching subwords to labels
-        subword_df = self.get_subword_df(src,lbl,sub)
+        # get subword_df for metrics and matching subwords to labels
+        subword_df = self._get_subword_df(src, lbl, sub)
 
         return {
             "input_ids": ids,
             "attention_mask": attn,
             "label": list(subword_df.label),
-            "subword_df": subword_df,
+            "word_ids": list(subword_df.word_i),
         }
 
     def _build(self):
@@ -245,4 +248,5 @@ class TokenClassificationDataset(Dataset):
                     feature = self._build_one(row[0], row[1])
                     self.features.append(feature)
                 except:
-                    print(row[0],row[1])
+                    print(row[0], row[1])
+

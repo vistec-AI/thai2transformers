@@ -21,12 +21,8 @@ class TokenClassificationFinetuner(pl.LightningModule):
         super(TokenClassificationFinetuner, self).__init__()
 
         self.hparams = hparams
-        self.model = AutoModel.from_pretrained(
-            self.hparams.model_name_or_path,
-        )
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.hparams.model_name_or_path,
-        )
+        self.model = AutoModel.from_pretrained(self.hparams.model_name_or_path,)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.hparams.model_name_or_path,)
         self.head = torch.nn.Sequential(
             torch.nn.Linear(self.hparams.num_hidden, self.hparams.num_hidden),
             torch.nn.Dropout(p=self.hparams.drop_p),
@@ -54,8 +50,7 @@ class TokenClassificationFinetuner(pl.LightningModule):
 
     def _flatten_batch(self, batch):
         preds = self.forward(
-            input_ids=batch["input_ids"],
-            attention_mask=batch["attention_mask"],
+            input_ids=batch["input_ids"], attention_mask=batch["attention_mask"],
         )
 
         active_mask = batch["attention_mask"].view(-1) == 1
@@ -101,12 +96,8 @@ class TokenClassificationFinetuner(pl.LightningModule):
         avg_val_precision_macro = np.stack(
             [x["precision_macro"] for x in outputs]
         ).mean()
-        avg_val_recall_micro = np.stack(
-            [x["recall_micro"] for x in outputs]
-        ).mean()
-        avg_val_recall_macro = np.stack(
-            [x["recall_macro"] for x in outputs]
-        ).mean()
+        avg_val_recall_micro = np.stack([x["recall_micro"] for x in outputs]).mean()
+        avg_val_recall_macro = np.stack([x["recall_macro"] for x in outputs]).mean()
 
         tensorboard_logs = {
             "val_loss": avg_val_loss,
@@ -135,12 +126,8 @@ class TokenClassificationFinetuner(pl.LightningModule):
         avg_test_precision_macro = np.stack(
             [x["precision_macro"] for x in outputs]
         ).mean()
-        avg_test_recall_micro = np.stack(
-            [x["recall_micro"] for x in outputs]
-        ).mean()
-        avg_test_recall_macro = np.stack(
-            [x["recall_macro"] for x in outputs]
-        ).mean()
+        avg_test_recall_micro = np.stack([x["recall_micro"] for x in outputs]).mean()
+        avg_test_recall_macro = np.stack([x["recall_macro"] for x in outputs]).mean()
 
         tensorboard_logs = {
             "test_loss": avg_test_loss,
@@ -276,12 +263,8 @@ class SequenceClassificationFinetuner(pl.LightningModule):
         super(SequenceClassificationFinetuner, self).__init__()
 
         self.hparams = hparams
-        self.model = AutoModel.from_pretrained(
-            self.hparams.model_name_or_path,
-        )
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.hparams.model_name_or_path,
-        )
+        self.model = AutoModel.from_pretrained(self.hparams.model_name_or_path,)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.hparams.model_name_or_path,)
         self.head = torch.nn.Sequential(
             torch.nn.Linear(self.hparams.num_hidden, self.hparams.num_hidden),
             torch.nn.Dropout(p=self.hparams.drop_p),
@@ -309,8 +292,7 @@ class SequenceClassificationFinetuner(pl.LightningModule):
 
     def _step(self, batch):
         preds = self.forward(
-            input_ids=batch["input_ids"],
-            attention_mask=batch["attention_mask"],
+            input_ids=batch["input_ids"], attention_mask=batch["attention_mask"],
         )
 
         loss = self.loss_fn(preds, batch["label"])
@@ -325,9 +307,7 @@ class SequenceClassificationFinetuner(pl.LightningModule):
     def validation_step(self, batch, batch_nb):
         loss, preds = self._step(batch)
         labels = batch["label"]
-        pred = argparse.Namespace(
-            label_ids=labels.cpu(), predictions=preds.cpu()
-        )
+        pred = argparse.Namespace(label_ids=labels.cpu(), predictions=preds.cpu())
         results = sequence_classification_metrics(pred)
         results["loss"] = loss.cpu()
         return results
@@ -346,12 +326,8 @@ class SequenceClassificationFinetuner(pl.LightningModule):
         avg_val_precision_macro = np.stack(
             [x["precision_macro"] for x in outputs]
         ).mean()
-        avg_val_recall_micro = np.stack(
-            [x["recall_micro"] for x in outputs]
-        ).mean()
-        avg_val_recall_macro = np.stack(
-            [x["recall_macro"] for x in outputs]
-        ).mean()
+        avg_val_recall_micro = np.stack([x["recall_micro"] for x in outputs]).mean()
+        avg_val_recall_macro = np.stack([x["recall_macro"] for x in outputs]).mean()
 
         tensorboard_logs = {
             "val_loss": avg_val_loss,
@@ -380,12 +356,8 @@ class SequenceClassificationFinetuner(pl.LightningModule):
         avg_test_precision_macro = np.stack(
             [x["precision_macro"] for x in outputs]
         ).mean()
-        avg_test_recall_micro = np.stack(
-            [x["recall_micro"] for x in outputs]
-        ).mean()
-        avg_test_recall_macro = np.stack(
-            [x["recall_macro"] for x in outputs]
-        ).mean()
+        avg_test_recall_micro = np.stack([x["recall_micro"] for x in outputs]).mean()
+        avg_test_recall_macro = np.stack([x["recall_macro"] for x in outputs]).mean()
 
         tensorboard_logs = {
             "test_loss": avg_test_loss,
