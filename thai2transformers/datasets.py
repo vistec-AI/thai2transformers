@@ -1,5 +1,4 @@
 import glob
-import numpy as np
 import pandas as pd
 import math
 from tqdm.auto import tqdm
@@ -92,7 +91,7 @@ class SequenceClassificationDataset(Dataset):
         self._build()
 
     def __len__(self):
-        return len(self.features)
+        return len(self.labels)
 
     def __getitem__(self, i):
         return {
@@ -157,7 +156,7 @@ class TokenClassificationDataset(Dataset):
             "input_ids": torch.tensor(feature["input_ids"], dtype=torch.long),
             "attention_mask": torch.tensor(feature["attention_mask"], dtype=torch.long),
             "label": torch.tensor(feature["label"], dtype=torch.long),
-            "word_ids": np.array(feature["word_ids"]),
+            "word_ids": torch.tensor(feature["word_ids"], dtype=torch.long),
         }
 
     def normalize(self, src_):

@@ -1,9 +1,10 @@
 import numpy as np
+import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 import pytorch_lightning as pl
 import argparse
-from thai2transformers.metrics import sequence_classification_metrics
+from thai2transformers.metrics import classification_metrics
 from thai2transformers.datasets import (
     SequenceClassificationDataset,
     TokenClassificationDataset,
@@ -14,7 +15,6 @@ from transformers import (
     AutoTokenizer,
     AutoModel,
 )
-
 
 class TokenClassificationFinetuner(pl.LightningModule):
     def __init__(self, hparams):
@@ -60,87 +60,106 @@ class TokenClassificationFinetuner(pl.LightningModule):
             batch["label"].view(-1),
             torch.tensor(self.loss_fn.ignore_index).type_as(batch["label"]),
         )
-        return active_preds, active_labels
+        return active_preds, active_labels, preds
 
     def _step(self, batch):
-        active_preds, active_labels = self._flatten_batch(batch)
+        active_preds, active_labels, preds = self._flatten_batch(batch)
         loss = self.loss_fn(active_preds, active_labels)
-        return loss
+        return loss, preds
 
     def training_step(self, batch, batch_nb):
-        loss = self._step(batch)
+        loss, _ = self._step(batch)
         tensorboard_logs = {"train_loss": loss}
         return {"loss": loss, "log": tensorboard_logs}
 
     def validation_step(self, batch, batch_nb):
-        loss = self._step(batch)
-        active_preds, active_labels = self._flatten_batch(batch)
+        loss, preds = self._step(batch)
+        pred_labs = preds.argmax(2).cpu().numpy()
+        
+        #get batch labels and pred_labs
+        dfs = []
+        for i in range(batch['input_ids'].shape[0]):
+            df = pd.DataFrame({'word_ids':batch['word_ids'][i].cpu().numpy(),
+                               'label':batch['label'][i].cpu().numpy(),
+                               'pred_labs':pred_labs[i]})
+            df = df[df.label!=0].groupby('word_ids').max().reset_index(drop=True)
+            dfs.append(df)
+        df_batch = pd.concat(dfs)
+        
+        #get metrics
         pred = argparse.Namespace(
-            label_ids=active_labels.cpu(), predictions=active_preds.cpu()
+            label_ids=df_batch.label, predictions=df_batch.pred_labs,
         )
-        results = sequence_classification_metrics(pred)
+        results = classification_metrics(pred, pred_labs=True)
         results["loss"] = loss.cpu()
         return results
 
     def test_step(self, batch, batch_nb):
         return self.validation_step(batch, batch_nb)
-
-    def validation_epoch_end(self, outputs):
-        avg_val_loss = np.stack([x["loss"] for x in outputs]).mean()
-        avg_val_acc = np.stack([x["accuracy"] for x in outputs]).mean()
-        avg_val_f1_micro = np.stack([x["f1_micro"] for x in outputs]).mean()
-        avg_val_f1_macro = np.stack([x["f1_macro"] for x in outputs]).mean()
-        avg_val_precision_micro = np.stack(
-            [x["precision_micro"] for x in outputs]
-        ).mean()
-        avg_val_precision_macro = np.stack(
+    
+    def _avg_epoch_end(self, outputs):
+        total_samples = np.sum([x["nb_samples"] for x in outputs])
+        avg_loss = np.sum([x["loss"] * x["nb_samples"] for x in outputs]) / total_samples
+        avg_acc = np.sum([x["accuracy"] * x["nb_samples"] for x in outputs]) / total_samples
+        #micro
+        avg_f1_micro = np.sum([x["f1_micro"] * x["nb_samples"] for x in outputs]) / total_samples
+        avg_precision_micro = np.sum(
+            [x["precision_micro"] * x["nb_samples"] for x in outputs]
+        ) / total_samples
+        avg_recall_micro = np.sum([x["recall_micro"] * x["nb_samples"] for x in outputs]) / total_samples
+        #macro
+        avg_f1_macro = np.sum([x["f1_macro"] * x["nb_samples"] for x in outputs]) / total_samples
+        avg_precision_macro = np.sum(
             [x["precision_macro"] for x in outputs]
-        ).mean()
-        avg_val_recall_micro = np.stack([x["recall_micro"] for x in outputs]).mean()
-        avg_val_recall_macro = np.stack([x["recall_macro"] for x in outputs]).mean()
-
+        ) / total_samples
+        avg_recall_macro = np.sum([x["recall_macro"] * x["nb_samples"] for x in outputs]) / total_samples
+        
+        return {
+            "avg_loss": avg_loss,
+            "avg_acc": avg_acc,
+            "avg_f1_micro": avg_f1_micro,
+            "avg_precision_micro": avg_precision_micro,
+            "avg_recall_micro": avg_recall_micro,
+            "avg_f1_macro": avg_f1_macro,
+            "avg_precision_macro": avg_precision_macro,
+            "avg_recall_macro": avg_recall_macro,
+            "total_samples": total_samples,
+        }
+    
+    def validation_epoch_end(self, outputs):
+        results = self._avg_epoch_end(outputs)
         tensorboard_logs = {
-            "val_loss": avg_val_loss,
-            "avg_val_acc": avg_val_acc,
-            "avg_val_f1_micro": avg_val_f1_micro,
-            "avg_val_precision_micro": avg_val_precision_micro,
-            "avg_val_recall_micro": avg_val_recall_micro,
-            "avg_val_f1_macro": avg_val_f1_macro,
-            "avg_val_precision_macro": avg_val_precision_macro,
-            "avg_val_recall_macro": avg_val_recall_macro,
+            "val_loss": results["avg_loss"],
+            "avg_val_acc": results["avg_acc"],
+            "avg_val_f1_micro": results["avg_f1_micro"],
+            "avg_val_precision_micro": results["avg_precision_micro"],
+            "avg_val_recall_micro": results["avg_recall_micro"],
+            "avg_val_f1_macro": results["avg_f1_macro"],
+            "avg_val_precision_macro": results["avg_precision_macro"],
+            "avg_val_recall_macro": results["avg_recall_macro"],
+            "total_samples": results["total_samples"]
         }
         return {
-            "val_loss": avg_val_loss,
+            "val_loss": results["avg_loss"],
             "log": tensorboard_logs,
             "progress_bar": tensorboard_logs,
         }
 
     def test_epoch_end(self, outputs):
-        avg_test_loss = np.stack([x["loss"] for x in outputs]).mean()
-        avg_test_acc = np.stack([x["accuracy"] for x in outputs]).mean()
-        avg_test_f1_micro = np.stack([x["f1_micro"] for x in outputs]).mean()
-        avg_test_f1_macro = np.stack([x["f1_macro"] for x in outputs]).mean()
-        avg_test_precision_micro = np.stack(
-            [x["precision_micro"] for x in outputs]
-        ).mean()
-        avg_test_precision_macro = np.stack(
-            [x["precision_macro"] for x in outputs]
-        ).mean()
-        avg_test_recall_micro = np.stack([x["recall_micro"] for x in outputs]).mean()
-        avg_test_recall_macro = np.stack([x["recall_macro"] for x in outputs]).mean()
-
+        results = self._avg_epoch_end(outputs)
         tensorboard_logs = {
-            "test_loss": avg_test_loss,
-            "avg_test_acc": avg_test_acc,
-            "avg_test_f1_micro": avg_test_f1_micro,
-            "avg_test_precision_micro": avg_test_precision_micro,
-            "avg_test_recall_micro": avg_test_recall_micro,
-            "avg_test_f1_macro": avg_test_f1_macro,
-            "avg_test_precision_macro": avg_test_precision_macro,
-            "avg_test_recall_macro": avg_test_recall_macro,
+            "test_loss": results["avg_loss"],
+            "avg_test_acc": results["avg_acc"],
+            "avg_test_f1_micro": results["avg_f1_micro"],
+            "avg_test_precision_micro": results["avg_precision_micro"],
+            "avg_test_recall_micro": results["avg_recall_micro"],
+            "avg_test_f1_macro": results["avg_f1_macro"],
+            "avg_test_precision_macro": results["avg_precision_macro"],
+            "avg_test_recall_macro": results["avg_recall_macro"],
+            "total_samples": results["total_samples"]
         }
         return {
-            "test_loss": avg_test_loss,
+            "test_loss": results["avg_loss"],
             "log": tensorboard_logs,
             "progress_bar": tensorboard_logs,
         }
@@ -308,69 +327,76 @@ class SequenceClassificationFinetuner(pl.LightningModule):
         loss, preds = self._step(batch)
         labels = batch["label"]
         pred = argparse.Namespace(label_ids=labels.cpu(), predictions=preds.cpu())
-        results = sequence_classification_metrics(pred)
+        results = classification_metrics(pred)
         results["loss"] = loss.cpu()
         return results
 
     def test_step(self, batch, batch_nb):
         return self.validation_step(batch, batch_nb)
 
-    def validation_epoch_end(self, outputs):
-        avg_val_loss = np.stack([x["loss"] for x in outputs]).mean()
-        avg_val_acc = np.stack([x["accuracy"] for x in outputs]).mean()
-        avg_val_f1_micro = np.stack([x["f1_micro"] for x in outputs]).mean()
-        avg_val_f1_macro = np.stack([x["f1_macro"] for x in outputs]).mean()
-        avg_val_precision_micro = np.stack(
-            [x["precision_micro"] for x in outputs]
-        ).mean()
-        avg_val_precision_macro = np.stack(
+    def _avg_epoch_end(self, outputs):
+        total_samples = np.sum([x["nb_samples"] for x in outputs])
+        avg_loss = np.sum([x["loss"] * x["nb_samples"] for x in outputs]) / total_samples
+        avg_acc = np.sum([x["accuracy"] * x["nb_samples"] for x in outputs]) / total_samples
+        #micro
+        avg_f1_micro = np.sum([x["f1_micro"] * x["nb_samples"] for x in outputs]) / total_samples
+        avg_precision_micro = np.sum(
+            [x["precision_micro"] * x["nb_samples"] for x in outputs]
+        ) / total_samples
+        avg_recall_micro = np.sum([x["recall_micro"] * x["nb_samples"] for x in outputs]) / total_samples
+        #macro
+        avg_f1_macro = np.sum([x["f1_macro"] * x["nb_samples"] for x in outputs]) / total_samples
+        avg_precision_macro = np.sum(
             [x["precision_macro"] for x in outputs]
-        ).mean()
-        avg_val_recall_micro = np.stack([x["recall_micro"] for x in outputs]).mean()
-        avg_val_recall_macro = np.stack([x["recall_macro"] for x in outputs]).mean()
-
+        ) / total_samples
+        avg_recall_macro = np.sum([x["recall_macro"] * x["nb_samples"] for x in outputs]) / total_samples
+        
+        return {
+            "avg_loss": avg_loss,
+            "avg_acc": avg_acc,
+            "avg_f1_micro": avg_f1_micro,
+            "avg_precision_micro": avg_precision_micro,
+            "avg_recall_micro": avg_recall_micro,
+            "avg_f1_macro": avg_f1_macro,
+            "avg_precision_macro": avg_precision_macro,
+            "avg_recall_macro": avg_recall_macro,
+            "total_samples": total_samples,
+        }
+    
+    def validation_epoch_end(self, outputs):
+        results = self._avg_epoch_end(outputs)
         tensorboard_logs = {
-            "val_loss": avg_val_loss,
-            "avg_val_acc": avg_val_acc,
-            "avg_val_f1_micro": avg_val_f1_micro,
-            "avg_val_precision_micro": avg_val_precision_micro,
-            "avg_val_recall_micro": avg_val_recall_micro,
-            "avg_val_f1_macro": avg_val_f1_macro,
-            "avg_val_precision_macro": avg_val_precision_macro,
-            "avg_val_recall_macro": avg_val_recall_macro,
+            "val_loss": results["avg_loss"],
+            "avg_val_acc": results["avg_acc"],
+            "avg_val_f1_micro": results["avg_f1_micro"],
+            "avg_val_precision_micro": results["avg_precision_micro"],
+            "avg_val_recall_micro": results["avg_recall_micro"],
+            "avg_val_f1_macro": results["avg_f1_macro"],
+            "avg_val_precision_macro": results["avg_precision_macro"],
+            "avg_val_recall_macro": results["avg_recall_macro"],
+            "total_samples": results["total_samples"]
         }
         return {
-            "val_loss": avg_val_loss,
+            "val_loss": results["avg_loss"],
             "log": tensorboard_logs,
             "progress_bar": tensorboard_logs,
         }
 
     def test_epoch_end(self, outputs):
-        avg_test_loss = np.stack([x["loss"] for x in outputs]).mean()
-        avg_test_acc = np.stack([x["accuracy"] for x in outputs]).mean()
-        avg_test_f1_micro = np.stack([x["f1_micro"] for x in outputs]).mean()
-        avg_test_f1_macro = np.stack([x["f1_macro"] for x in outputs]).mean()
-        avg_test_precision_micro = np.stack(
-            [x["precision_micro"] for x in outputs]
-        ).mean()
-        avg_test_precision_macro = np.stack(
-            [x["precision_macro"] for x in outputs]
-        ).mean()
-        avg_test_recall_micro = np.stack([x["recall_micro"] for x in outputs]).mean()
-        avg_test_recall_macro = np.stack([x["recall_macro"] for x in outputs]).mean()
-
+        results = self._avg_epoch_end(outputs)
         tensorboard_logs = {
-            "test_loss": avg_test_loss,
-            "avg_test_acc": avg_test_acc,
-            "avg_test_f1_micro": avg_test_f1_micro,
-            "avg_test_precision_micro": avg_test_precision_micro,
-            "avg_test_recall_micro": avg_test_recall_micro,
-            "avg_test_f1_macro": avg_test_f1_macro,
-            "avg_test_precision_macro": avg_test_precision_macro,
-            "avg_test_recall_macro": avg_test_recall_macro,
+            "test_loss": results["avg_loss"],
+            "avg_test_acc": results["avg_acc"],
+            "avg_test_f1_micro": results["avg_f1_micro"],
+            "avg_test_precision_micro": results["avg_precision_micro"],
+            "avg_test_recall_micro": results["avg_recall_micro"],
+            "avg_test_f1_macro": results["avg_f1_macro"],
+            "avg_test_precision_macro": results["avg_precision_macro"],
+            "avg_test_recall_macro": results["avg_recall_macro"],
+            "total_samples": results["total_samples"]
         }
         return {
-            "test_loss": avg_test_loss,
+            "test_loss": results["avg_loss"],
             "log": tensorboard_logs,
             "progress_bar": tensorboard_logs,
         }
