@@ -111,6 +111,18 @@ def rm_useless_spaces(text: str) -> str:
     """
     return re.sub(" {2,}", " ", text)
 
+def replace_spaces(text: str) -> str:
+    """
+        Replace spaces with _
+        :param str text: text to replace spaces
+        :return: text where all spaces replaced with _
+        :rtype: str
+        :Example:
+            >>> replace_spaces("oh no")
+            oh_no
+    """
+    return re.sub(" ", "_", text)
+
 
 def replace_rep_after(text: str) -> str:
     """
@@ -208,6 +220,7 @@ def process_transformers(
         rm_brackets,
         replace_newlines,
         rm_useless_spaces,
+        replace_spaces,
         replace_rep_after,
     ],
     tok_func: Callable = word_tokenize,
