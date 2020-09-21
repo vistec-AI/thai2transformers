@@ -1,8 +1,5 @@
-import sys
 import os
 import logging
-
-sys.path.append('..')
 
 logging.basicConfig(level=logging.INFO)
 
@@ -56,7 +53,7 @@ def main():
     parser.add_argument("--per_device_eval_batch_size", type=int, default=64)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
     parser.add_argument("--learning_rate", type=float, default=6e-4)
-    parser.add_argument("--warmup_steps", type=int, default=500)
+    parser.add_argument("--warmup_steps", type=int, default=500)thhe
     parser.add_argument("--weight_decay", type=float, default=0.01)
     parser.add_argument("--adam_epsilon", type=float, default=1e-6)
     parser.add_argument("--max_grad_norm", type=float, default=1.0)
@@ -84,7 +81,7 @@ def main():
     if args.add_space_token:
         logging.info('Special token `<th_roberta_space_token>` will be added to the CamembertTokenizer instance.')
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', '<th_roberta_space_token>']
-        
+
 
     #initialize models
     config = RobertaConfig(
