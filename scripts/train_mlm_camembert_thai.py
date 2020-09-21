@@ -71,12 +71,17 @@ def main():
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
+    parser.add_argument("--add_space_token", action='store_true', default=False)
 
     args = parser.parse_args()
 
     #initialize tokenizer
    
     tokenizer = CamembertTokenizer.from_pretrained(args.tokenizer_name_or_path)
+    if args.add_space_token:
+        logging.info('Special token `<th_roberta_space_token>` will be added to the CamembertTokenizer instance.')
+        tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', '<th_roberta_space_token>']
+        
    
     #initialize models
     config = RobertaConfig(
