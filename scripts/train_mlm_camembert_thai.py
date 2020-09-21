@@ -1,5 +1,8 @@
+import sys
 import os
 import logging
+
+sys.path.append('..')
 
 logging.basicConfig(level=logging.INFO)
 
@@ -82,7 +85,7 @@ def main():
         logging.info('Special token `<th_roberta_space_token>` will be added to the CamembertTokenizer instance.')
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', '<th_roberta_space_token>']
         
-   
+
     #initialize models
     config = RobertaConfig(
         vocab_size=tokenizer.vocab_size,
