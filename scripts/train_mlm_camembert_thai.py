@@ -71,6 +71,7 @@ def main():
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
+    parser.add_argument("--model_path", type=str, default=None) # for resume training
 
     args = parser.parse_args()
 
@@ -150,8 +151,10 @@ def main():
     )
     
     #train
-    trainer.train()
-    
+    if args.model_path != None:
+        trainer.train(model_path=args.model_path)
+    else:
+        trainer.train()
     #save
     trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
     
