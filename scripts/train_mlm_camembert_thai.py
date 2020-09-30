@@ -71,11 +71,8 @@ def main():
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
-<<<<<<< HEAD
     parser.add_argument("--model_path", type=str, default=None) # for resume training
-=======
     parser.add_argument("--add_space_token", action='store_true', default=False)
->>>>>>> fc7be44a78036e7621fdbefb4691abe1dea3b539
 
     args = parser.parse_args()
 
