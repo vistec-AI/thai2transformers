@@ -1,5 +1,8 @@
+
 # Mac
 .DS_Store
+*.zip
+raw_data
 
 #files
 data
@@ -8,10 +11,14 @@ lightning_logs
 results
 logs
 runs
-raw_data/
+raw_data/*.csv
 wikiextractor/
 wikitokenizer/
 *.ckpt
+checkpoints/
+dataset/
+cleaned_data/
+wandb/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -41,6 +48,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.vscode
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
