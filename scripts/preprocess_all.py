@@ -20,6 +20,7 @@ import argparse
 
 _TOKENIZER = word_tokenize
 _TOKENIZER_NAME = 'newmm'
+
 def process_one(fname, min_seq_length, max_seq_length):
     with open(fname, "r") as f:
         line_count = 0
@@ -30,8 +31,12 @@ def process_one(fname, min_seq_length, max_seq_length):
             texts.append(process_transformers(text))
             word_counts.append(len(_TOKENIZER(text)))
             line_count += 1
+
     df = pd.DataFrame({"text": texts, "wc": word_counts})
-    print(np.percentile(df.wc, 5), np.percentile(df.wc, 95))
+    print(f"Token count at 5th percentile: {np.percentile(df.wc, 5)}")
+    print(f"Token count at 50th percentile: {np.percentile(df.wc, 50)}")
+    print(f"Token count at 95th percentile: {np.percentile(df.wc, 95)}")
+    
     df = df[(df.wc >= min_seq_length) & (df.wc <= max_seq_length)]
     return list(df.text)
 
@@ -42,7 +47,7 @@ def preprocess_fname(fname, min_seq_length=5, max_seq_length=300, output_dir=Non
         min_seq_length=min_seq_length,
         max_seq_length=max_seq_length,
     )
-    output_fname = f"{output_dir}/{fname.split('/')[-1].split('.')[0]}_tok-{_TOKENIZER_NAME}_min-{min_seq_length}_max-{max_seq_length}.txt"
+    output_fname = f"{output_dir}/{fname.split('/')[-1].split('.')[0]}.tok-{_TOKENIZER_NAME}_min-{min_seq_length}_max-{max_seq_length}.txt"
     print(f"Saving to {output_fname}")
     with open(output_fname, "w") as f:
         f.writelines([f"{i}\n" for i in texts])
@@ -66,7 +71,7 @@ def main():
     parser.add_argument("--max_seq_length", type=int, default=300)
     
     parser.add_argument("--tokenizer", type=str, default='newmm', help='Tokenizer for sentence length filtering, specify either "newmm" or "spm"')
-    parser.add_argument("--spm_model_path", type=str, default='newmm', help='Specify path of SentencePiece model when arg:tokenizer is "spm"')
+    parser.add_argument("--spm_model_path", type=str, help='Specify path of SentencePiece model when arg:tokenizer is "spm"')
 
     parser.add_argument("--ext", type=str, default="")
 
