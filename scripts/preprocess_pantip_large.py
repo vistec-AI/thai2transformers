@@ -88,7 +88,8 @@ def main():
 
     if args.tokenizer.lower() == "spm":
         sp = spm.SentencePieceProcessor(model_file=args.spm_model_path)
-        _TOKENIZER = partial(lambda x: x.replace(' ', '<th_roberta_space_token>'), partial(sp.encode, out_tyoe=str))
+        repr_space_token_fn = lambda x: x.replace(' ', '<th_roberta_space_token>')
+        _TOKENIZER =lambda x: sp.encode(repr_space_token_fn(x), out_tyoe=str)
         _TOKENIZER_NAME = 'spm'
     
     print(f"{args.input_dir}/*{args.ext}")
