@@ -111,7 +111,7 @@ def main():
     tokenizer=tokenizer, mlm=True, mlm_probability=args.mlm_probability)
     
     #training args
-    training_args = TrainingArguments(
+    training_args = TrainingArguments(        
         num_train_epochs=args.num_train_epochs,
         max_steps=args.max_steps,
         per_device_train_batch_size=args.per_device_train_batch_size,
@@ -144,10 +144,16 @@ def main():
     logging.info(" Device: %s", training_args.device)
     logging.info(" Local rank: %s", training_args.local_rank)
     logging.info(" FP16 Training: %s", training_args.fp16)
-    
+
+    model_init = None 
+    if args.model_path != None:
+        print(f'[INFO] Load pretrianed model from {args.model_path}')
+        model_init = RobertaForMaskedLM.from_pretrained(args.model_path)
+
     #initiate trainer
     trainer = Trainer(
         model=model,
+        model_init=model_init,
         args=training_args,
         data_collator=data_collator,
         train_dataset=train_dataset,
