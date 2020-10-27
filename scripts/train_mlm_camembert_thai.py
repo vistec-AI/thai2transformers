@@ -145,15 +145,14 @@ def main():
     logging.info(" Local rank: %s", training_args.local_rank)
     logging.info(" FP16 Training: %s", training_args.fp16)
 
-    model_init = None 
+    
     if args.model_path != None:
         print(f'[INFO] Load pretrianed model from {args.model_path}')
-        model_init = RobertaForMaskedLM.from_pretrained(args.model_path)
+        model = RobertaForMaskedLM.from_pretrained(args.model_path)
 
     #initiate trainer
     trainer = Trainer(
         model=model,
-        model_init=model_init,
         args=training_args,
         data_collator=data_collator,
         train_dataset=train_dataset,
