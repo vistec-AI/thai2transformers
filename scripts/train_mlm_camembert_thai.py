@@ -76,8 +76,8 @@ def main():
 
     parser.add_argument("--add_space_token", action='store_true', default=False)
     
-    parser.add_argument("--binarized_dir_train",  type=str, default=None)
-    parser.add_argument("--binarized_dir_val",  type=str, default=None)
+    parser.add_argument("--binarized_path_train",  type=str, default=None)
+    parser.add_argument("--binarized_path_val",  type=str, default=None)
 
     args = parser.parse_args()
 
@@ -108,8 +108,8 @@ def main():
     model = RobertaForMaskedLM(config=config)
 
     #datasets
-    train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length, binarized_dir=args.binarized_dir_train)
-    eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length, binarized_dir=args.binarized_dir_val)
+    train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length, binarized_path=args.binarized_path_train)
+    eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length, binarized_path=args.binarized_path_val)
     
     #data collator
     data_collator = DataCollatorForLanguageModeling(

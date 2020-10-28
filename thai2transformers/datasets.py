@@ -12,7 +12,7 @@ import pickle
 
 class MLMDataset(Dataset):
     def __init__(
-        self, tokenizer, data_dir, binarized_dir, max_length=512, ext=".txt", bs=10000,
+        self, tokenizer, data_dir, binarized_path, max_length=512, ext=".txt", bs=10000,
         parallelize=True, 
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
@@ -33,7 +33,7 @@ class MLMDataset(Dataset):
         return torch.tensor(self.features[i], dtype=torch.long)
 
     def _build(self):
-        if os.path.exists(self.binarized_dir):
+        if os.path.exists(self.binarized_path):
             print('The binarized directory exists, load the binarized data.')
             self.features = pickle.load(open(self.binarized_dir, 'rb'))
             return
@@ -53,7 +53,7 @@ class MLMDataset(Dataset):
                     # add to list
                     self.features += tokenized_inputs["input_ids"]
         
-        with open(self.binarized_dir, 'wb') as fp:
+        with open(self.binarized_path, 'wb') as fp:
             pickle.dump(self.features, fp)
 
     def _build_one(self, fname):
