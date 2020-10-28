@@ -7,11 +7,12 @@ nb_cores = multiprocessing.cpu_count()
 import torch
 from torch.utils.data import Dataset
 from transformers.data.processors.utils import InputFeatures
+import pickle
 
 class MLMDataset(Dataset):
     def __init__(
-        self, tokenizer, data_dir, max_length=512, ext=".txt", bs=10000,
-        parallelize=True,
+        self, tokenizer, data_dir, binarized_dir, max_length=512, ext=".txt", bs=10000,
+        parallelize=True, 
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
@@ -31,6 +32,11 @@ class MLMDataset(Dataset):
         return torch.tensor(self.features[i], dtype=torch.long)
 
     def _build(self):
+        if os.path.exists(self.binarized_dir):
+            print('The binarized directory exists, load the binarized data.')
+            self.features = pickle.load(open(self.binarized_dir, 'rb'))
+            return
+
         for fname in tqdm(self.fnames):
             with open(fname, "r") as f:
                 df = f.readlines()
@@ -45,7 +51,10 @@ class MLMDataset(Dataset):
                     )
                     # add to list
                     self.features += tokenized_inputs["input_ids"]
-                    
+        
+        with open(self.binarized_dir, 'wb') as fp:
+            pickle.dump(self.features, fp)
+
     def _build_one(self, fname):
         features = []
         with open(fname, "r") as f:
