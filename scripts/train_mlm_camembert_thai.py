@@ -167,7 +167,7 @@ def main():
     
     #train
     if args.model_path != None:
-        trainer.train(model_path=args.model_path)
+        trainer.train(model_path=args.model_dir)
     else:
         trainer.train()
     #save
