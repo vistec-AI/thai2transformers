@@ -20,6 +20,7 @@ class MLMDataset(Dataset):
         self.tokenizer = tokenizer
         self.bs = bs
         self.features = []
+        self.binarized_path = binarized_path
         if parallelize:
             self._build_parallel()
         else:
