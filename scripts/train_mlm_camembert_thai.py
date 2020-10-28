@@ -153,7 +153,7 @@ def main():
     
     if args.model_path != None:
         print(f'[INFO] Load pretrianed model from {args.model_path}')
-        model_init = RobertaForMaskedLM.from_pretrained(args.model_path)
+        model = RobertaForMaskedLM.from_pretrained(args.model_path)
 
     #initiate trainer
     trainer = Trainer(
