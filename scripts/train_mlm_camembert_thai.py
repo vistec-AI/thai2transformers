@@ -158,7 +158,6 @@ def main():
     #initiate trainer
     trainer = Trainer(
         model=model,
-        model_init=model_init,
         args=training_args,
         data_collator=data_collator,
         train_dataset=train_dataset,
