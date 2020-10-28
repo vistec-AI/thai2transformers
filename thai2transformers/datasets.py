@@ -286,4 +286,3 @@ class TokenClassificationDataset(Dataset):
                     self.features.append(feature)
                 except:
                     print(row[0], row[1])
-
