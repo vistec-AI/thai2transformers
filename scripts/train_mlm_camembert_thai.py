@@ -72,7 +72,12 @@ def main():
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
     parser.add_argument("--model_path", type=str, default=None) # for resume training
+    parser.add_argument("--model_dir", type=str, default=None) # for resume training
+
     parser.add_argument("--add_space_token", action='store_true', default=False)
+    
+    parser.add_argument("--binarized_dir_train",  type=str, default=None)
+    parser.add_argument("--binarized_dir_val",  type=str, default=None)
 
     args = parser.parse_args()
 
@@ -89,10 +94,10 @@ def main():
         vocab_size=tokenizer.vocab_size,
         type_vocab_size=1,
         #roberta base as default
-        num_hidden_layers=args.num_hidden_layers,
-        hidden_size=args.hidden_size, 
-        intermediate_size=args.intermediate_size,
-        num_attention_head=args.num_attention_head,
+        num_hidden_layers=args.num_hidden_layers, # L
+        hidden_size=args.hidden_size,  # H
+        intermediate_size=args.intermediate_size, 
+        num_attention_head=args.num_attention_head, # A
     #     #roberta large
     #     num_hidden_layers=24,
     #     hidden_size=1024, 
@@ -103,8 +108,8 @@ def main():
     model = RobertaForMaskedLM(config=config)
 
     #datasets
-    train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length)
-    eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length)
+    train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length, binarized_dir=args.binarized_dir_train)
+    eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length, binarized_dir=args.binarized_dir_val)
     
     #data collator
     data_collator = DataCollatorForLanguageModeling(
