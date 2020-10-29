@@ -76,18 +76,18 @@ class MLMDataset(Dataset):
         return features
                 
     def _build_parallel(self):
-        if self.binarized_path != None and os.path.exists(self.binarized_path):
-            print('The binarized directory exists, load the binarized data.')
-            self.features = pickle.load(open(self.binarized_dir, 'rb'))
-            assert type(self.features) == list
-            return
+        # if self.binarized_path != None and os.path.exists(self.binarized_path):
+        #     print('The binarized directory exists, load the binarized data.')
+        #     self.features = pickle.load(open(self.binarized_dir, 'rb'))
+        #     assert type(self.features) == list
+        #     return
 
         with multiprocessing.Pool(nb_cores) as pool:
             results = pool.map(self._build_one, self.fnames)
         self.features = [i for l in results for i in l]
 
-        with open(self.binarized_path, 'wb') as fp:
-            pickle.dump(self.features, fp)
+        # with open(self.binarized_path, 'wb') as fp:
+        #     pickle.dump(self.features, fp)
 
 class SequenceClassificationDataset(Dataset):
     def __init__(
