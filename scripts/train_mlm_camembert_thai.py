@@ -150,9 +150,9 @@ def main():
     logging.info(" FP16 Training: %s", training_args.fp16)
 
     
-    if args.model_path != None:
-        print(f'[INFO] Load pretrianed model from {args.model_path}')
-        model = RobertaForMaskedLM.from_pretrained(args.model_path)
+    if args.model_dir != None:
+        print(f'[INFO] Load pretrianed model from {args.model_dir}')
+        model = RobertaForMaskedLM.from_pretrained(args.model_dir)
 
     #initiate trainer
     trainer = Trainer(
