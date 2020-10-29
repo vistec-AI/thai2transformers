@@ -12,7 +12,7 @@ import pickle
 
 class MLMDataset(Dataset):
     def __init__(
-        self, tokenizer, data_dir, max_length=512, binarized_path=None,ext=".txt", bs=90000,
+        self, tokenizer, data_dir, max_length=512, binarized_path=None,ext=".txt", bs=25000,
         parallelize=True
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
