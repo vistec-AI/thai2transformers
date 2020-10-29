@@ -71,7 +71,6 @@ def main():
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
-    parser.add_argument("--model_path", type=str, default=None) # for resume training
     parser.add_argument("--model_dir", type=str, default=None) # for resume training
 
     parser.add_argument("--add_space_token", action='store_true', default=False)
@@ -166,7 +165,7 @@ def main():
     )
     
     #train
-    if args.model_path != None:
+    if args.model_dir != None:
         trainer.train(model_path=args.model_dir)
     else:
         trainer.train()
