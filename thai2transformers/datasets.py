@@ -36,7 +36,7 @@ class MLMDataset(Dataset):
     def _build(self):
         if self.binarized_path != None and os.path.exists(self.binarized_path):
             print('The binarized directory exists, load the binarized data.')
-            self.features = pickle.load(open(self.binarized_dir, 'rb'))
+            self.features = pickle.load(open(self.binarized_path, 'rb'))
             assert type(self.features) == list
             return
 
@@ -78,7 +78,7 @@ class MLMDataset(Dataset):
     def _build_parallel(self):
         if self.binarized_path != None and os.path.exists(self.binarized_path):
             print('The binarized directory exists, load the binarized data.')
-            self.features = pickle.load(open(self.binarized_dir, 'rb'))
+            self.features = pickle.load(open(self.binarized_path, 'rb'))
             assert type(self.features) == list
             return
 
