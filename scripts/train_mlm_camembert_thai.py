@@ -165,12 +165,17 @@ def main():
     )
     
     #train
+    logging.info(" Start training.")
+
     if args.model_dir != None:
         trainer.train(model_path=args.model_dir)
     else:
         trainer.train()
     #save
-    trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
+    
+    output_model_dir = os.path.join(args.output_dir, 'roberta_thai')
+    logging.info(" Save final model to '%s'.", output_model_dir)
+    trainer.save_model(output_model_dir)
     
     #evaluate
     trainer.evaluate()
