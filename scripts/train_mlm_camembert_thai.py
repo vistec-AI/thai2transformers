@@ -1,5 +1,6 @@
 import os
 import logging
+import torch
 
 logging.basicConfig(level=logging.INFO)
 
@@ -71,6 +72,8 @@ def main():
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
+    
+    parser.add_argument("--model_path", type=str, default=None) # for resume training
     parser.add_argument("--model_dir", type=str, default=None) # for resume training
 
     parser.add_argument("--add_space_token", action='store_true', default=False)
@@ -151,8 +154,8 @@ def main():
 
     
     if args.model_dir != None:
-        print(f'[INFO] Load pretrianed model from {args.model_dir}')
-        model = RobertaForMaskedLM.from_pretrained(args.model_dir)
+        print(f'[INFO] Load pretrianed model (state_dict) from {args.model_path}')
+        model.load_state_dict(state_dict=torch.load(args.model_path))
 
     #initiate trainer
     trainer = Trainer(

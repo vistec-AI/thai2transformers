@@ -12,7 +12,7 @@ import pickle
 
 class MLMDataset(Dataset):
     def __init__(
-        self, tokenizer, data_dir, max_length=512, binarized_path=None,ext=".txt", bs=10000,
+        self, tokenizer, data_dir, max_length=512, binarized_path=None,ext=".txt", bs=90000,
         parallelize=True
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
@@ -84,7 +84,12 @@ class MLMDataset(Dataset):
 
         with multiprocessing.Pool(nb_cores) as pool:
             results = pool.map(self._build_one, self.fnames)
+
+        print('[INFO] Start groupping results.')   
         self.features = [i for l in results for i in l]
+
+        print('[INFO] Done.')
+        print(f'[INFO] Start writing binarized data to `{self.binarized_path}`.')
 
         with open(self.binarized_path, 'wb') as fp:
             pickle.dump(self.features, fp)
