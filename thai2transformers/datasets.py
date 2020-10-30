@@ -4,15 +4,16 @@ import pandas as pd
 import math
 from tqdm.auto import tqdm
 import multiprocessing
-nb_cores = multiprocessing.cpu_count()
 import torch
 from torch.utils.data import Dataset
-from transformers.data.processors.utils import InputFeatures
 import pickle
+
+nb_cores = multiprocessing.cpu_count()
+
 
 class MLMDataset(Dataset):
     def __init__(
-        self, tokenizer, data_dir, max_length=512, binarized_path=None,ext=".txt", bs=5000,
+        self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=5000,
         parallelize=True
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
@@ -21,11 +22,16 @@ class MLMDataset(Dataset):
         self.bs = bs
         self.features = []
         self.binarized_path = binarized_path
-        if parallelize:
-            self._build_parallel()
+        if self.binarized_path is not None and os.path.exists(self.binarized_path):
+            print('The binarized directory exists, load the binarized data.')
+            self.features = pickle.load(open(self.binarized_path, 'rb'))
+            assert type(self.features) == list
         else:
-            self._build()
-            
+            print('Build features.')
+            if parallelize:
+                self._build_parallel()
+            else:
+                self._build()
 
     def __len__(self):
         return len(self.features)
@@ -34,17 +40,11 @@ class MLMDataset(Dataset):
         return torch.tensor(self.features[i], dtype=torch.long)
 
     def _build(self):
-        if self.binarized_path != None and os.path.exists(self.binarized_path):
-            print('The binarized directory exists, load the binarized data.')
-            self.features = pickle.load(open(self.binarized_path, 'rb'))
-            assert type(self.features) == list
-            return
-
         for fname in tqdm(self.fnames):
             with open(fname, "r") as f:
                 df = f.readlines()
                 for i in tqdm(range(math.ceil(len(df) / self.bs))):
-                    texts = list(df[i * self.bs : (i + 1) * self.bs])
+                    texts = list(df[i * self.bs: (i + 1) * self.bs])
                     # tokenize
                     tokenized_inputs = self.tokenizer(
                         texts,
@@ -54,16 +54,15 @@ class MLMDataset(Dataset):
                     )
                     # add to list
                     self.features += tokenized_inputs["input_ids"]
-        
-        with open(self.binarized_path, 'wb') as fp:
-            pickle.dump(self.features, fp)
+
+        self.write_binarized_features()
 
     def _build_one(self, fname):
         features = []
         with open(fname, "r") as f:
             df = f.readlines()
             for i in tqdm(range(math.ceil(len(df) / self.bs))):
-                texts = list(df[i * self.bs : (i + 1) * self.bs])
+                texts = list(df[i * self.bs: (i + 1) * self.bs])
                 # tokenize
                 tokenized_inputs = self.tokenizer(
                     texts,
@@ -74,25 +73,24 @@ class MLMDataset(Dataset):
                 # add to list
                 features += tokenized_inputs["input_ids"]
         return features
-                
-    def _build_parallel(self):
-        if self.binarized_path != None and os.path.exists(self.binarized_path):
-            print('The binarized directory exists, load the binarized data.')
-            self.features = pickle.load(open(self.binarized_path, 'rb'))
-            assert type(self.features) == list
-            return
 
+    def _build_parallel(self):
         with multiprocessing.Pool(nb_cores) as pool:
             results = pool.map(self._build_one, self.fnames)
 
-        print('[INFO] Start groupping results.')   
+        print('[INFO] Start groupping results.')
         self.features = [i for l in results for i in l]
-
         print('[INFO] Done.')
-        print(f'[INFO] Start writing binarized data to `{self.binarized_path}`.')
+        self.write_binarized_features()
 
-        with open(self.binarized_path, 'wb') as fp:
-            pickle.dump(self.features, fp)
+    def write_binarized_features(self):
+        if self.binarized_path is not None and \
+                not os.path.exists(self.binarized_path):
+            os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
+            print(f'[INFO] Start writing binarized data to `{self.binarized_path}`.')
+            with open(self.binarized_path, 'wb') as fp:
+                pickle.dump(self.features, fp)
+
 
 class SequenceClassificationDataset(Dataset):
     def __init__(
@@ -131,12 +129,12 @@ class SequenceClassificationDataset(Dataset):
             for i in tqdm(range(math.ceil(df.shape[0] / self.bs))):
                 if self.preprocessor:
                     texts = list(
-                        df.iloc[i * self.bs : (i + 1) * self.bs, 0].map(
+                        df.iloc[i * self.bs: (i + 1) * self.bs, 0].map(
                             self.preprocessor
                         )
                     )
                 else:
-                    texts = list(df.iloc[i * self.bs : (i + 1) * self.bs, 0])
+                    texts = list(df.iloc[i * self.bs: (i + 1) * self.bs, 0])
 
                 # tokenize
                 tokenized_inputs = self.tokenizer(
@@ -149,7 +147,7 @@ class SequenceClassificationDataset(Dataset):
                 # add to list
                 self.input_ids += tokenized_inputs["input_ids"]
                 self.attention_masks += tokenized_inputs["attention_mask"]
-                self.labels += list(df.iloc[i * self.bs : (i + 1) * self.bs, 1])
+                self.labels += list(df.iloc[i * self.bs: (i + 1) * self.bs, 1])
 
 
 class TokenClassificationDataset(Dataset):
