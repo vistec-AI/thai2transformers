@@ -17,7 +17,7 @@ python3 train_mlm_camembert_thai.py \
  --gradient_accumulation_steps 1 \
  --warmup_steps 24000 \
  --seed 2020 \
- --save_steps 10000 \
+ --save_steps 100 \
  --logging_steps 5 \
  --save_total_limit 50 \
  --evaluate_during_training True \
@@ -26,7 +26,7 @@ python3 train_mlm_camembert_thai.py \
  --output_dir ../data/output/zo_test/model \
  --overwrite_output_dir False \
  --add_space_token \
- --model_dir ../data/input/zo_test/model/
+ --model_dir ../data/input/zo_test/model/model_only
 ```
 
 ```bash
