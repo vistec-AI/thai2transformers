@@ -67,8 +67,7 @@ class MLMDataset(Dataset):
                         pad_to_max_length=False,
                     )
                     # add to list
-                    self.features += [torch.tensor(e, dtype=torch.long)
-                                      for e in tokenized_inputs['input_ids']]
+                    self.features += [torch.tensor(e, dtype=torch.long) for e in tokenized_inputs['input_ids']]
 
         self.write_binarized_features()
 
@@ -86,8 +85,7 @@ class MLMDataset(Dataset):
                     pad_to_max_length=False,
                 )
                 # add to list
-                self.features += [torch.tensor(e, dtype=torch.long)
-                                  for e in tokenized_inputs['input_ids']]
+                self.features += [torch.tensor(e, dtype=torch.long) for e in tokenized_inputs['input_ids']]
         return features
 
     def _build_parallel(self):
