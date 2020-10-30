@@ -27,8 +27,8 @@ class MLMDataset(Dataset):
             self.features = pickle.load(open(self.binarized_path, 'rb'))
             assert type(self.features) == list
             if type(self.features[0]) != torch.Tensor:
-                self.features = [torch.tensor(
-                    ids, dtype=torch.long) for ids in self.features]
+                print('[INFO] Begin converting to torch.LongTensor.')
+                self.features = [torch.tensor(ids, dtype=torch.long) for ids in self.features]
         else:
             print('Build features.')
             if parallelize:
