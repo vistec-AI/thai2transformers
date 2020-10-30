@@ -7,6 +7,7 @@ import multiprocessing
 import torch
 from torch.utils.data import Dataset
 import pickle
+import gc
 
 nb_cores = multiprocessing.cpu_count()
 
@@ -14,7 +15,7 @@ nb_cores = multiprocessing.cpu_count()
 class MLMDataset(Dataset):
     def __init__(
         self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=5000,
-        parallelize=True
+        parallelize=True, chunksize=1000
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
@@ -22,13 +23,14 @@ class MLMDataset(Dataset):
         self.bs = bs
         self.features = []
         self.binarized_path = binarized_path
-        if self.binarized_path is not None and os.path.exists(self.binarized_path):
-            print('The binarized directory exists, load the binarized data.')
-            self.features = pickle.load(open(self.binarized_path, 'rb'))
+        self.chunksize = chunksize
+
+        if self.binarized_path is not None and self.load_binarized_features():
             assert type(self.features) == list
             if type(self.features[0]) != torch.Tensor:
                 print('[INFO] Loaded data is not a list of torch.LongTensor.')
                 print('[INFO] Begin converting to torch.LongTensor.\n')
+<<<<<<< HEAD
                 
                 for idx in tqdm(range(len(self.features)), total=len(self.features)):
                     self.features[idx] = torch.tensor(self.features[idx] , dtype=torch.long)
@@ -36,6 +38,12 @@ class MLMDataset(Dataset):
                 print('[INFO] \nDone.')
                 print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
                 self.write_binarized_features()
+=======
+                self.convert()
+                print('[INFO] \nDone.')
+                print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
+                self.write_binarized_features(self.chunksize, overwrite=True)
+>>>>>>> b18feae270f6d08e54743c276880e9b53c5d658e
                 print('[INFO] \nDone.')
         else:
             print('Build features.')
@@ -67,9 +75,14 @@ class MLMDataset(Dataset):
                         pad_to_max_length=False,
                     )
                     # add to list
+<<<<<<< HEAD
                     self.features += [torch.tensor(e, dtype=torch.long) for e in tokenized_inputs['input_ids']]
+=======
+                    self.features += [torch.tensor(e, dtype=torch.long)
+                                      for e in tokenized_inputs['input_ids']]
+>>>>>>> b18feae270f6d08e54743c276880e9b53c5d658e
 
-        self.write_binarized_features()
+        self.write_binarized_features(self.chunksize)
 
     def _build_one(self, fname):
         features = []
@@ -85,7 +98,12 @@ class MLMDataset(Dataset):
                     pad_to_max_length=False,
                 )
                 # add to list
+<<<<<<< HEAD
                 self.features += [torch.tensor(e, dtype=torch.long) for e in tokenized_inputs['input_ids']]
+=======
+                features += [torch.tensor(e, dtype=torch.long)
+                             for e in tokenized_inputs['input_ids']]
+>>>>>>> b18feae270f6d08e54743c276880e9b53c5d658e
         return features
 
     def _build_parallel(self):
@@ -93,17 +111,73 @@ class MLMDataset(Dataset):
             results = pool.map(self._build_one, self.fnames)
 
         print('[INFO] Start groupping results.')
-        self.features = [i for l in results for i in l]
-        print('[INFO] Done.')
-        self.write_binarized_features()
+        self.features = [i for lst in results for i in lst]
 
-    def write_binarized_features(self):
+        print('[INFO] Done.')
+        self.write_binarized_features(self.chunksize)
+
+    def convert(self):
+        for i in range(len(self.features)):
+            self.features[i] = torch.tensor(self.features[i], dtype=torch.long)
+            if i % 1_000_000 == 0:
+                gc.collect()
+
+    def dump_chunk(self, start, stop):
+        dirname = os.path.dirname(self.binarized_path)
+        basename = os.path.basename(self.binarized_path)
+        ext = os.path.splitext(self.binarized_path)[-1]
+        basename = basename[:-len(ext)]
+        fname = os.path.join(dirname, f'{basename}_{start}_{stop}{ext}')
+        print(f'[INFO] Start writing binarized data to `{fname}`.')
+        with open(fname, 'wb') as fp:
+            pickle.dump(self.features[start:stop], fp)
+
+    def write_binarized_features(self, chunksize=None, overwrite=False):
         if self.binarized_path is not None and \
-                not os.path.exists(self.binarized_path):
-            os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
-            print(f'[INFO] Start writing binarized data to `{self.binarized_path}`.')
-            with open(self.binarized_path, 'wb') as fp:
-                pickle.dump(self.features, fp)
+                (len(self.get_bin_fnames()) == 0 or overwrite):
+            if chunksize is None:
+                os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
+                print(f'[INFO] Start writing binarized data to `{self.binarized_path}`.')
+                with open(self.binarized_path, 'wb') as fp:
+                    pickle.dump(self.features, fp)
+            else:
+                os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
+
+                chunks = [(start, start + chunksize)
+                          for start in range(0, len(self.features), chunksize)]
+                for chunk in chunks:
+                    self.dump_chunk(*chunk)
+
+    def _load_binarized_features(self, binarized_path):
+        print(f'[INFO] Start loading binarized data from `{binarized_path}`.')
+        with open(binarized_path, 'rb') as fp:
+            return pickle.load(fp)
+
+    def load_binarized_features(self):
+        print('[INFO] Load binarized data')
+        bin_fnames = self.get_bin_fnames()
+        if self.binarized_path is not None and \
+                len(bin_fnames) > 0:
+            if len(bin_fnames) == 1:
+                os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
+                self.features = self._load_binarized_features(bin_fnames[0])
+            else:
+                os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
+                with multiprocessing.Pool(nb_cores) as pool:
+                    results = pool.map(self._load_binarized_features, bin_fnames)
+                for lst in results:
+                    self.features.extend(lst)
+                # print(len(self.features), len(self.features[0]))
+        return len(bin_fnames) > 0
+
+    def get_bin_fnames(self):
+        dirname = os.path.dirname(self.binarized_path)
+        basename = os.path.basename(self.binarized_path)
+        ext = os.path.splitext(self.binarized_path)[-1]
+        basename = basename[:-len(ext)]
+        bin_fnames = glob.glob(self.binarized_path) + \
+            glob.glob(os.path.join(dirname, f'{basename}_*_*{ext}'))
+        return bin_fnames
 
 
 class SequenceClassificationDataset(Dataset):
