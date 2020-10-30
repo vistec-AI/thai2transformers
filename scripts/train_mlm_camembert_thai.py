@@ -1,6 +1,7 @@
 import os
 import logging
 import torch
+import argparse
 
 from transformers import (
     CamembertTokenizer,
@@ -12,10 +13,12 @@ from transformers import (
 )
 
 # thai2transformers
-from thai2transformers.datasets import MLMDataset
-
-# argparse
-import argparse
+try:
+    from thai2transformers.datasets import MLMDataset
+except ModuleNotFoundError:
+    import sys
+    sys.path.append('..')  # path hacking
+    from thai2transformers.datasets import MLMDataset
 
 logging.basicConfig(level=logging.INFO)
 
@@ -153,9 +156,10 @@ def main():
     logging.info(" Local rank: %s", training_args.local_rank)
     logging.info(" FP16 Training: %s", training_args.fp16)
 
+    model_path = os.path.join(args.model_dir, 'pytorch_model.bin')
     if args.model_dir is not None:
-        print(f'[INFO] Load pretrianed model (state_dict) from {args.model_path}')
-        model.load_state_dict(state_dict=torch.load(args.model_path))
+        print(f'[INFO] Load pretrianed model (state_dict) from {model_path}')
+        model.load_state_dict(state_dict=torch.load(model_path))
 
     # initiate trainer
     trainer = Trainer(
