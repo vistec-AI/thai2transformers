@@ -30,20 +30,10 @@ class MLMDataset(Dataset):
             if type(self.features[0]) != torch.Tensor:
                 print('[INFO] Loaded data is not a list of torch.LongTensor.')
                 print('[INFO] Begin converting to torch.LongTensor.\n')
-<<<<<<< HEAD
-                
-                for idx in tqdm(range(len(self.features)), total=len(self.features)):
-                    self.features[idx] = torch.tensor(self.features[idx] , dtype=torch.long)
-
-                print('[INFO] \nDone.')
-                print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
-                self.write_binarized_features()
-=======
                 self.convert()
                 print('[INFO] \nDone.')
                 print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
                 self.write_binarized_features(self.chunksize, overwrite=True)
->>>>>>> b18feae270f6d08e54743c276880e9b53c5d658e
                 print('[INFO] \nDone.')
         else:
             print('Build features.')
@@ -75,12 +65,8 @@ class MLMDataset(Dataset):
                         pad_to_max_length=False,
                     )
                     # add to list
-<<<<<<< HEAD
-                    self.features += [torch.tensor(e, dtype=torch.long) for e in tokenized_inputs['input_ids']]
-=======
                     self.features += [torch.tensor(e, dtype=torch.long)
                                       for e in tokenized_inputs['input_ids']]
->>>>>>> b18feae270f6d08e54743c276880e9b53c5d658e
 
         self.write_binarized_features(self.chunksize)
 
@@ -98,12 +84,8 @@ class MLMDataset(Dataset):
                     pad_to_max_length=False,
                 )
                 # add to list
-<<<<<<< HEAD
-                self.features += [torch.tensor(e, dtype=torch.long) for e in tokenized_inputs['input_ids']]
-=======
                 features += [torch.tensor(e, dtype=torch.long)
                              for e in tokenized_inputs['input_ids']]
->>>>>>> b18feae270f6d08e54743c276880e9b53c5d658e
         return features
 
     def _build_parallel(self):
