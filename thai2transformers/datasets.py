@@ -26,6 +26,9 @@ class MLMDataset(Dataset):
             print('The binarized directory exists, load the binarized data.')
             self.features = pickle.load(open(self.binarized_path, 'rb'))
             assert type(self.features) == list
+            if type(self.features[0]) != torch.Tensor:
+                self.features = [torch.tensor(
+                    ids, dtype=torch.long) for ids in self.features]
         else:
             print('Build features.')
             if parallelize:
@@ -37,9 +40,12 @@ class MLMDataset(Dataset):
         return len(self.features)
 
     def __getitem__(self, i):
-        return torch.tensor(self.features[i], dtype=torch.long)
+        return self.features[i]
 
     def _build(self):
+        """
+            Sequentially read files
+        """
         for fname in tqdm(self.fnames):
             with open(fname, "r") as f:
                 df = f.readlines()
@@ -53,7 +59,8 @@ class MLMDataset(Dataset):
                         pad_to_max_length=False,
                     )
                     # add to list
-                    self.features += tokenized_inputs["input_ids"]
+                    self.features += [torch.tensor(e, dtype=torch.long)
+                                      for e in tokenized_inputs['input_ids']]
 
         self.write_binarized_features()
 
@@ -71,7 +78,8 @@ class MLMDataset(Dataset):
                     pad_to_max_length=False,
                 )
                 # add to list
-                features += tokenized_inputs["input_ids"]
+                self.features += [torch.tensor(e, dtype=torch.long)
+                                  for e in tokenized_inputs['input_ids']]
         return features
 
     def _build_parallel(self):
@@ -210,9 +218,11 @@ class TokenClassificationDataset(Dataset):
         return res
 
     def _add_special_tokens(self, src_, lbl_):
-        src = [self.tokenizer.bos_token, " "] + src_ + [self.tokenizer.eos_token]
+        src = [self.tokenizer.bos_token, " "] + \
+            src_ + [self.tokenizer.eos_token]
         lbl = (
-            [self.label_pad_token, self.label_pad_token] + lbl_ + [self.label_pad_token]
+            [self.label_pad_token, self.label_pad_token] +
+            lbl_ + [self.label_pad_token]
         )
         txt = "".join(src)
         return src, lbl, txt
@@ -235,7 +245,8 @@ class TokenClassificationDataset(Dataset):
 
         # map subwords to labels
         subword_df = (
-            word_df.groupby(["sub_i"]).agg({"label": max, "word_i": max}).reset_index()
+            word_df.groupby(["sub_i"]).agg(
+                {"label": max, "word_i": max}).reset_index()
         )
 
         # label for only the first subword of token
@@ -261,7 +272,8 @@ class TokenClassificationDataset(Dataset):
         to_pad = self.max_length - len(ids)
         ids += [self.tokenizer.pad_token_id] * to_pad
         attn += [0] * to_pad
-        sub = [i.replace("▁", " ") for i in self.tokenizer.convert_ids_to_tokens(ids)]
+        sub = [i.replace("▁", " ")
+               for i in self.tokenizer.convert_ids_to_tokens(ids)]
         sub_txt = "".join(sub)
 
         # pad labels and words
