@@ -86,6 +86,7 @@ class MLMDataset(Dataset):
     def write_binarized_features(self):
         if self.binarized_path is not None and \
                 not os.path.exists(self.binarized_path):
+            os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
             print(f'[INFO] Start writing binarized data to `{self.binarized_path}`.')
             with open(self.binarized_path, 'wb') as fp:
                 pickle.dump(self.features, fp)
