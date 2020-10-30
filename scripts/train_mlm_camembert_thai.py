@@ -84,6 +84,7 @@ def main():
 
     parser.add_argument("--binarized_path_train",  type=str, default=None)
     parser.add_argument("--binarized_path_val",  type=str, default=None)
+    parser.add_argument("--local_rank",  type=int, default=-1)
 
     args = parser.parse_args()
 
