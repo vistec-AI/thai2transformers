@@ -29,7 +29,10 @@ class MLMDataset(Dataset):
             if type(self.features[0]) != torch.Tensor:
                 print('[INFO] Loaded data is not a list of torch.LongTensor.')
                 print('[INFO] Begin converting to torch.LongTensor.\n')
-                self.features = [ torch.tensor(ids, dtype=torch.long) for ids in tqdm(self.features) ]
+                
+                for idx in tqdm(range(len(self.features)), total=len(self.features)):
+                    self.features[idx] = torch.tensor(self.features[idx] , dtype=torch.long)
+
                 print('[INFO] \nDone.')
                 print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
                 self.write_binarized_features()
