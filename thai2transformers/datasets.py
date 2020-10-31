@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import Dataset
 import pickle
 import gc
-import cPickle
+import _pickle as cPickle
 
 nb_cores = multiprocessing.cpu_count()
 
