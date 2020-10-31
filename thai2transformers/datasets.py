@@ -83,8 +83,7 @@ class MLMDataset(Dataset):
                     pad_to_max_length=False,
                 )
                 # add to list
-                features += [torch.tensor(e, dtype=torch.long)
-                             for e in tokenized_inputs['input_ids']]
+                features += tokenized_inputs['input_ids']
         print(f'[INFO] _build_one() : Done reading from {fname}')
         return features
 
@@ -93,7 +92,7 @@ class MLMDataset(Dataset):
             results = pool.map(self._build_one, self.fnames)
 
         print('[INFO] Start groupping results.')
-        self.features = [i for lst in results for i in lst]
+        self.features = [ torch.tensor(i,dtype=torch.long) for lst in results for i in lst]
 
         print('[INFO] Done.')
         self.write_binarized_features(None)
