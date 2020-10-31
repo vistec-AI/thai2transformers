@@ -101,7 +101,7 @@ class MLMDataset(Dataset):
     def convert(self):
         for i in tqdm(range(len(self.features))):
             self.features[i] = torch.tensor(self.features[i], dtype=torch.long)
-            if i % 10_000_000 == 0:
+            if i % 25_000_000 == 0:
                 gc.collect()
 
     def dump_chunk(self, start, stop):
