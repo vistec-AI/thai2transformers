@@ -161,7 +161,7 @@ class MLMDataset(Dataset):
                 len(bin_fnames) > 0:
             if len(bin_fnames) == 1:
                 os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
-                self.features = self._load_binarized_features(bin_fnames[0])
+                self._load_binarized_features(bin_fnames[0])
             else:
                 os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
                 with multiprocessing.Pool(nb_cores) as pool:
