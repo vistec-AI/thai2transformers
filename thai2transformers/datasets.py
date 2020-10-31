@@ -10,13 +10,6 @@ import pickle
 import gc
 
 nb_cores = multiprocessing.cpu_count()
-
-def unpickle_iter(file):
-    try:
-        while True:
-             yield cPickle.load(file)
-    except EOFError:
-        raise StopIteration
     
 class MLMDataset(Dataset):
     def __init__(
