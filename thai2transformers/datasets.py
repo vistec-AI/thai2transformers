@@ -8,9 +8,16 @@ import torch
 from torch.utils.data import Dataset
 import pickle
 import gc
+import cPickle
 
 nb_cores = multiprocessing.cpu_count()
 
+def unpickle_iter(file):
+    try:
+        while True:
+             yield cPickle.load(file)
+    except EOFError:
+        raise StopIteration
 
 class MLMDataset(Dataset):
     def __init__(
@@ -27,14 +34,14 @@ class MLMDataset(Dataset):
 
         if self.binarized_path is not None and self.load_binarized_features():
             assert type(self.features) == list
-            if type(self.features[0]) != torch.Tensor:
-                print('[INFO] Loaded data is not a list of torch.LongTensor.')
-                print('[INFO] Begin converting to torch.LongTensor.\n')
-                self.convert()
-                print('[INFO] \nDone.')
-                print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
-                self.write_binarized_features(self.chunksize, overwrite=True)
-                print('[INFO] \nDone.')
+            # if type(self.features[0]) != torch.Tensor:
+            #     print('[INFO] Loaded data is not a list of torch.LongTensor.')
+            #     print('[INFO] Begin converting to torch.LongTensor.\n')
+            #     self.convert()
+            #     print('[INFO] \nDone.')
+            #     print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
+            #     self.write_binarized_features(self.chunksize, overwrite=True)
+            #     print('[INFO] \nDone.')
         else:
             print('Build features.')
             if parallelize:
@@ -46,7 +53,7 @@ class MLMDataset(Dataset):
         return len(self.features)
 
     def __getitem__(self, i):
-        return self.features[i]
+        return torch.tensor(self.features[i], dtype=torch.long)
 
     def _build(self):
         """
@@ -134,8 +141,15 @@ class MLMDataset(Dataset):
 
     def _load_binarized_features(self, binarized_path):
         print(f'[INFO] Start loading binarized data from `{binarized_path}`.')
+        is_non_tensor = False
         with open(binarized_path, 'rb') as fp:
-            return pickle.load(fp)
+            for item in unpickle_iter(fp):
+                if type(item) != torch.Tensor and is_non_tensor == False:
+                    is_non_tensor == True
+                if is_non_tensor:
+                    self.features.append(torch.tensor(item, dtype=torch.long))
+                else: 
+                    self.features.append(item)
 
     def load_binarized_features(self):
         print('[INFO] Load binarized data')
