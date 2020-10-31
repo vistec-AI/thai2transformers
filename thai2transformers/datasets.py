@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import Dataset
 import pickle
 import gc
-import _pickle as cPickle
+import cPickle
 
 nb_cores = multiprocessing.cpu_count()
 
@@ -18,7 +18,7 @@ def unpickle_iter(file):
              yield cPickle.load(file)
     except EOFError:
         raise StopIteration
-
+    
 class MLMDataset(Dataset):
     def __init__(
         self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=5000,
@@ -141,18 +141,8 @@ class MLMDataset(Dataset):
 
     def _load_binarized_features(self, binarized_path):
         print(f'[INFO] Start loading binarized data from `{binarized_path}`.')
-        is_non_tensor = False
         with open(binarized_path, 'rb') as fp:
-            while fp.peek(1):
-                item = cPickle.load(fp)
-            
-                if type(item) != torch.Tensor and is_non_tensor == False:
-                    print(' INFO: Found non-tensor item , convert to torch.LongTensor ')
-                    is_non_tensor == True
-                if is_non_tensor:
-                    self.features.append(torch.tensor(item, dtype=torch.long))
-                else: 
-                    self.features.append(item)
+            return pickle.load(fp)
 
     def load_binarized_features(self):
         print('[INFO] Load binarized data')
@@ -161,7 +151,7 @@ class MLMDataset(Dataset):
                 len(bin_fnames) > 0:
             if len(bin_fnames) == 1:
                 os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
-                self._load_binarized_features(bin_fnames[0])
+                self.features = self._load_binarized_features(bin_fnames[0])
             else:
                 os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
                 with multiprocessing.Pool(nb_cores) as pool:
