@@ -101,7 +101,7 @@ class MLMDataset(Dataset):
     def convert(self):
         for i in tqdm(range(len(self.features))):
             self.features[i] = torch.tensor(self.features[i], dtype=torch.long)
-            if i % 100_000_000 == 0 and i != 0:
+            if i % 25_000_000 == 0 and i != 0:
                 print('[INFO] Apply gc.collect()')
                 gc.collect()
                 print('[INFO] Done applying gc.collect()')
