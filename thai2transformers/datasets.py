@@ -21,7 +21,7 @@ def unpickle_iter(file):
     
 class MLMDataset(Dataset):
     def __init__(
-        self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=5000,
+        self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=10000,
         parallelize=True, chunksize=1000
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
@@ -93,6 +93,7 @@ class MLMDataset(Dataset):
                 # add to list
                 features += [torch.tensor(e, dtype=torch.long)
                              for e in tokenized_inputs['input_ids']]
+        print(f'[INFO] _build_one() : Done reading from {fname}')
         return features
 
     def _build_parallel(self):
