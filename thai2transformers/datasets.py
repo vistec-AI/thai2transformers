@@ -143,8 +143,11 @@ class MLMDataset(Dataset):
         print(f'[INFO] Start loading binarized data from `{binarized_path}`.')
         is_non_tensor = False
         with open(binarized_path, 'rb') as fp:
-            for item in unpickle_iter(fp):
+            while fp.peek(1):
+                item = cPickle.load(fp)
+            
                 if type(item) != torch.Tensor and is_non_tensor == False:
+                    print(' INFO: Found non-tensor item , convert to torch.LongTensor ')
                     is_non_tensor == True
                 if is_non_tensor:
                     self.features.append(torch.tensor(item, dtype=torch.long))
