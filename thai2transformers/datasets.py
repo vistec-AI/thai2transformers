@@ -99,9 +99,9 @@ class MLMDataset(Dataset):
         self.write_binarized_features(self.chunksize)
 
     def convert(self):
-        for i in range(len(self.features)):
+        for i in tqdm(range(len(self.features))):
             self.features[i] = torch.tensor(self.features[i], dtype=torch.long)
-            if i % 1_000_000 == 0:
+            if i % 10_000_000 == 0:
                 gc.collect()
 
     def dump_chunk(self, start, stop):
