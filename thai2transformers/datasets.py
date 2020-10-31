@@ -53,7 +53,7 @@ class MLMDataset(Dataset):
         return len(self.features)
 
     def __getitem__(self, i):
-        return torch.tensor(self.features[i], dtype=torch.long)
+        return self.features[i]
 
     def _build(self):
         """
