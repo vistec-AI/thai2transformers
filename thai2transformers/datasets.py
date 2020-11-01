@@ -85,7 +85,7 @@ class MLMDataset(Dataset):
                     return_tensors='pt'
                 )
                 # add to list
-                features += tokenized_inputs['input_ids']
+                features.append(tokenized_inputs['input_ids'])
         print(f'[INFO] _build_one() : Done reading from {fname}')
         return features
 
