@@ -61,14 +61,12 @@ class MLMDataset(Dataset):
                         texts,
                         max_length=self.max_length,
                         truncation=True,
-                        pad_to_max_length=False,
-                        return_tensors='pt'
+                        pad_to_max_length=False
                     )
                     # add to list
-                    self.features += [torch.tensor(e, dtype=torch.long)
-                                      for e in tokenized_inputs['input_ids']]
+                    self.features += tokenized_inputs['input_ids']
 
-        self.write_binarized_features(self.chunksize)
+        self.write_binarized_features(None)
 
     def _build_one(self, fname):
         features = []
