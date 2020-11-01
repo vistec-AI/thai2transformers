@@ -62,6 +62,7 @@ class MLMDataset(Dataset):
                         max_length=self.max_length,
                         truncation=True,
                         pad_to_max_length=False,
+                        return_tensors='pt'
                     )
                     # add to list
                     self.features += [torch.tensor(e, dtype=torch.long)
@@ -81,6 +82,7 @@ class MLMDataset(Dataset):
                     max_length=self.max_length,
                     truncation=True,
                     pad_to_max_length=False,
+                    return_tensors='pt'
                 )
                 # add to list
                 features += tokenized_inputs['input_ids']
@@ -92,17 +94,17 @@ class MLMDataset(Dataset):
             results = pool.map(self._build_one, self.fnames)
 
         print('[INFO] Start groupping results.')
-        for i, result in enumerate(results):
-            for j, lst in enumerate(result):
-                temp = results[i][j]
-                results[i][j] = torch.tensor(temp, dtype=torch.long)
-                del temp
+        # for i, result in enumerate(results):
+        #     for j, lst in enumerate(result):
+        #         temp = results[i][j]
+        #         results[i][j] = torch.tensor(temp, dtype=torch.long)
+        #         del temp
                 
                 
         self.features = [ i for lst in results for i in lst ]
 
         print('[INFO] Done.')
-        self.write_binarized_features(None)
+        # self.write_binarized_features(None)
 
     def convert(self):
         for i in tqdm(range(len(self.features))):
