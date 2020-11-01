@@ -30,10 +30,10 @@ class MLMDataset(Dataset):
             #     print('[INFO] Loaded data is not a list of torch.LongTensor.')
             #     print('[INFO] Begin converting to torch.LongTensor.\n')
             #     self.convert()
-            #     print('[INFO] \nDone.')
-            #     print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
-            #     self.write_binarized_features(self.chunksize, overwrite=True)
-            #     print('[INFO] \nDone.')
+            print('[INFO] \nDone.')
+            print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
+            self.write_binarized_features(None, overwrite=True)
+            print('[INFO] \nDone.')
         else:
             print('Build features.')
             if parallelize:
@@ -45,7 +45,7 @@ class MLMDataset(Dataset):
         return len(self.features)
 
     def __getitem__(self, i):
-        return self.features[i]
+        return torch.tensor(self.features[i], dtype=torch.long)
 
     def _build(self):
         """
@@ -82,10 +82,10 @@ class MLMDataset(Dataset):
                     max_length=self.max_length,
                     truncation=True,
                     padding=True,
-                    return_tensors='pt'
+                    pad_to_max_length=False
                 )
                 # add to list
-                features.append(tokenized_inputs['input_ids'])
+                features += tokenized_inputs['input_ids']
         print(f'[INFO] _build_one() : Done reading from {fname}')
         return features
 
