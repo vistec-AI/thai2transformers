@@ -30,10 +30,10 @@ class MLMDataset(Dataset):
             #     print('[INFO] Loaded data is not a list of torch.LongTensor.')
             #     print('[INFO] Begin converting to torch.LongTensor.\n')
             #     self.convert()
-            print('[INFO] \nDone.')
-            print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
-            self.write_binarized_features(None, overwrite=True)
-            print('[INFO] \nDone.')
+            # print('[INFO] \nDone.')
+            # print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
+            # self.write_binarized_features(None, overwrite=True)
+            # print('[INFO] \nDone.')
         else:
             print('Build features.')
             if parallelize:
