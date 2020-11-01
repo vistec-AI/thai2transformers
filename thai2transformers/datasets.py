@@ -81,7 +81,6 @@ class MLMDataset(Dataset):
                     texts,
                     max_length=self.max_length,
                     truncation=True,
-                    padding=True,
                     pad_to_max_length=False
                 )
                 # add to list
