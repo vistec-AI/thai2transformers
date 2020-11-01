@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 import pickle
 import gc
 
-nb_cores = 24 # multiprocessing.cpu_count()
+nb_cores = multiprocessing.cpu_count()
     
 class MLMDataset(Dataset):
     def __init__(
