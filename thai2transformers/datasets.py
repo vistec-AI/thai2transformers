@@ -92,7 +92,14 @@ class MLMDataset(Dataset):
             results = pool.map(self._build_one, self.fnames)
 
         print('[INFO] Start groupping results.')
-        self.features = [ torch.tensor(i,dtype=torch.long) for lst in results for i in lst]
+        for i, result in enumerate(results):
+            for j, lst in enumerate(result):
+                temp = results[i][j]
+                results[i][j] = torch.tensor(temp, dtype=torch.long)
+                del temp
+                
+                
+        self.features = [ i for lst in results for i in lst ]
 
         print('[INFO] Done.')
         self.write_binarized_features(None)
