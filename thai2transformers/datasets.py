@@ -81,7 +81,7 @@ class MLMDataset(Dataset):
                     texts,
                     max_length=self.max_length,
                     truncation=True,
-                    pad_to_max_length=False,
+                    padding=True,
                     return_tensors='pt'
                 )
                 # add to list
