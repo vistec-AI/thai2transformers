@@ -9,13 +9,14 @@ from torch.utils.data import Dataset
 import pickle
 import gc
 
+
 nb_cores = multiprocessing.cpu_count()
 
 
 class MLMDataset(Dataset):
     def __init__(
         self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=5000,
-        parallelize=True, chunksize=1000
+        parallelize=True, chunksize=1_000_000
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
@@ -30,23 +31,24 @@ class MLMDataset(Dataset):
             if type(self.features[0]) != torch.Tensor:
                 print('[INFO] Loaded data is not a list of torch.LongTensor.')
                 print('[INFO] Begin converting to torch.LongTensor.\n')
-                self.convert()
-                print('[INFO] \nDone.')
-                print('[INFO] \nStart writing new binarized data (torch.LongTensor)')
-                self.write_binarized_features(self.chunksize, overwrite=True)
-                print('[INFO] \nDone.')
+                self.convert()  # convert on load is actually faster
+                                # if we try pickling torch.tensor directly
+                                # there are some weird too many files open bug.
+                print('[INFO] Done.')
         else:
             print('Build features.')
             if parallelize:
                 self._build_parallel()
             else:
                 self._build()
+            self.convert()
+            self.write_binarized_features(self.chunksize)
 
     def __len__(self):
         return len(self.features)
 
     def __getitem__(self, i):
-        return torch.tensor(self.features[i], dtype=torch.long)
+        return self.features[i]
 
     def _build(self):
         for fname in tqdm(self.fnames):
@@ -62,10 +64,7 @@ class MLMDataset(Dataset):
                         pad_to_max_length=False,
                     )
                     # add to list
-                    self.features += [torch.tensor(e, dtype=torch.long)
-                                      for e in tokenized_inputs['input_ids']]
-
-        self.write_binarized_features(self.chunksize)
+                    self.features += [e for e in tokenized_inputs['input_ids']]
 
     def _build_one(self, fname):
         features = []
@@ -81,8 +80,7 @@ class MLMDataset(Dataset):
                     pad_to_max_length=False,
                 )
                 # add to list
-                features += [torch.tensor(e, dtype=torch.long)
-                             for e in tokenized_inputs['input_ids']]
+                features += [e for e in tokenized_inputs['input_ids']]
         return features
 
     def _build_parallel(self):
@@ -91,25 +89,28 @@ class MLMDataset(Dataset):
 
         print('[INFO] Start groupping results.')
         self.features = [i for lst in results for i in lst]
-
         print('[INFO] Done.')
-        self.write_binarized_features(self.chunksize)
 
     def convert(self):
+        # Implementing this as multiprocessing might be slower since we will need to
+        # pickle the result and sent it back later.
         for i in range(len(self.features)):
             self.features[i] = torch.tensor(self.features[i], dtype=torch.long)
-            if i % 1_000_000 == 0:
+            if i % 2_000_000 == 0:
+                # force garbage collection.
                 gc.collect()
 
-    def dump_chunk(self, start, stop):
-        dirname = os.path.dirname(self.binarized_path)
-        basename = os.path.basename(self.binarized_path)
-        ext = os.path.splitext(self.binarized_path)[-1]
+    @staticmethod
+    def dump_chunk(data, start, stop, binarized_path):
+        # Implemented as static method to pickle on chunks of data instead of entire class
+        dirname = os.path.dirname(binarized_path)
+        basename = os.path.basename(binarized_path)
+        ext = os.path.splitext(binarized_path)[-1]
         basename = basename[:-len(ext)]
         fname = os.path.join(dirname, f'{basename}_{start}_{stop}{ext}')
         print(f'[INFO] Start writing binarized data to `{fname}`.')
         with open(fname, 'wb') as fp:
-            pickle.dump(self.features[start:stop], fp)
+            pickle.dump(data, fp)
 
     def write_binarized_features(self, chunksize=None, overwrite=False):
         if self.binarized_path is not None and \
@@ -122,10 +123,11 @@ class MLMDataset(Dataset):
             else:
                 os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
 
-                chunks = [(start, start + chunksize)
+                chunks = [(self.features[start: start + chunksize], start, start + chunksize,
+                           self.binarized_path)
                           for start in range(0, len(self.features), chunksize)]
-                for chunk in chunks:
-                    self.dump_chunk(*chunk)
+                with multiprocessing.Pool(nb_cores) as pool:
+                    pool.starmap(self.dump_chunk, chunks)
 
     def _load_binarized_features(self, binarized_path):
         print(f'[INFO] Start loading binarized data from `{binarized_path}`.')
@@ -146,7 +148,6 @@ class MLMDataset(Dataset):
                     results = pool.map(self._load_binarized_features, bin_fnames)
                 for lst in results:
                     self.features.extend(lst)
-                # print(len(self.features), len(self.features[0]))
         return len(bin_fnames) > 0
 
     def get_bin_fnames(self):
