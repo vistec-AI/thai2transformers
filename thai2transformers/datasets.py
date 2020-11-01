@@ -103,7 +103,7 @@ class MLMDataset(Dataset):
         self.features = [ i for lst in results for i in lst ]
 
         print('[INFO] Done.')
-        # self.write_binarized_features(None)
+        self.write_binarized_features(None)
 
     def convert(self):
         for i in tqdm(range(len(self.features))):
