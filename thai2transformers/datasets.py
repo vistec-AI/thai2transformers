@@ -9,11 +9,11 @@ from torch.utils.data import Dataset
 import pickle
 import gc
 
-nb_cores = 64 # multiprocessing.cpu_count()
+nb_cores = 24 # multiprocessing.cpu_count()
     
 class MLMDataset(Dataset):
     def __init__(
-        self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=5000,
+        self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=2500,
         parallelize=True, chunksize=1000
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
