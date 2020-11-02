@@ -1,2 +1,7 @@
 transformers==3.0.2
 sentencepiece==0.1.94
+tqdm
+pandas
+pytorch_lightning
+emoji
+pythainlp

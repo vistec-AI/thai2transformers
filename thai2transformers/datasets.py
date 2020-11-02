@@ -8,15 +8,25 @@ import torch
 from torch.utils.data import Dataset
 import pickle
 import gc
+from contextlib import contextmanager
 
 
 nb_cores = multiprocessing.cpu_count()
 
 
+@contextmanager
+def disable_gc():
+    gc.disable()
+    try:
+        yield
+    finally:
+        gc.enable()
+
+
 class MLMDataset(Dataset):
     def __init__(
-        self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=5000,
-        parallelize=True, chunksize=1_000_000
+        self, tokenizer, data_dir, max_length=512, binarized_path=None, ext=".txt", bs=20000,
+        parallelize=True, chunksize=1_000_000, chunk_process=False
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
@@ -25,24 +35,25 @@ class MLMDataset(Dataset):
         self.features = []
         self.binarized_path = binarized_path
         self.chunksize = chunksize
+        self.chunk_process = chunk_process
 
         if self.binarized_path is not None and self.load_binarized_features():
             assert type(self.features) == list
             if type(self.features[0]) != torch.Tensor:
                 print('[INFO] Loaded data is not a list of torch.LongTensor.')
                 print('[INFO] Begin converting to torch.LongTensor.\n')
-                self.convert()  # convert on load is actually faster
-                                # if we try pickling torch.tensor directly
-                                # there are some weird too many files open bug.
+                # convert on load is actually faster
+                # if we try pickling torch.tensor directly
+                # there are some weird too many files open bug.
+                self.convert()
                 print('[INFO] Done.')
         else:
-            print('Build features.')
             if parallelize:
-                self._build_parallel()
+                self._build_parallel(self.chunk_process)
             else:
                 self._build()
+                self.write_binarized_features(self.chunksize)
             self.convert()
-            self.write_binarized_features(self.chunksize)
 
     def __len__(self):
         return len(self.features)
@@ -51,6 +62,7 @@ class MLMDataset(Dataset):
         return self.features[i]
 
     def _build(self):
+        print('[INFO] Build features (non parallel).')
         for fname in tqdm(self.fnames):
             with open(fname, "r") as f:
                 df = f.readlines()
@@ -83,22 +95,40 @@ class MLMDataset(Dataset):
                 features += [e for e in tokenized_inputs['input_ids']]
         return features
 
-    def _build_parallel(self):
-        with multiprocessing.Pool(nb_cores) as pool:
-            results = pool.map(self._build_one, self.fnames)
-
-        print('[INFO] Start groupping results.')
-        self.features = [i for lst in results for i in lst]
-        print('[INFO] Done.')
+    def _build_parallel(self, chunk_process=False):
+        if chunk_process:
+            print('[INFO] Build features (parallel-chunk_process).')
+            # Half the core count and bumping batch size this should get
+            # the same performance as small batch size but lots of cores.
+            # This should save memory?
+            with multiprocessing.Pool(nb_cores // 2) as pool:
+                # Use imap instead this allow us to iterate on the results
+                # the order is still preserved. This method save memory.
+                results = pool.imap(self._build_one, self.fnames)
+                start = 0
+                for chunk in results:
+                    self.dump_chunk(chunk, start, start + len(chunk), self.binarized_path)
+                    start += len(chunk)
+            print('[INFO] Start groupping results.')
+            self.load_binarized_features()
+            print('[INFO] Done.')
+        else:
+            print('[INFO] Build features (parallel).')
+            with multiprocessing.Pool(nb_cores // 2) as pool:
+                results = pool.map(self._build_one, self.fnames)
+            print('[INFO] Start groupping results.')
+            self.features = [i for lst in results for i in lst]
+            print('[INFO] Done.')
 
     def convert(self):
         # Implementing this as multiprocessing might be slower since we will need to
         # pickle the result and sent it back later.
-        for i in range(len(self.features)):
-            self.features[i] = torch.tensor(self.features[i], dtype=torch.long)
-            if i % 2_000_000 == 0:
-                # force garbage collection.
-                gc.collect()
+        with disable_gc():
+            for i in tqdm(range(len(self.features))):
+                self.features[i] = torch.tensor(self.features[i], dtype=torch.long)
+                if i % 10_000_000 == 0:
+                    # Manually garbage collection.
+                    gc.collect()
 
     @staticmethod
     def dump_chunk(data, start, stop, binarized_path):
@@ -122,10 +152,11 @@ class MLMDataset(Dataset):
                     pickle.dump(self.features, fp)
             else:
                 os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
-
                 chunks = [(self.features[start: start + chunksize], start, start + chunksize,
                            self.binarized_path)
                           for start in range(0, len(self.features), chunksize)]
+                # Writing list of list of int out in parallel should be fine.
+                # Writing list of tensors is not working.
                 with multiprocessing.Pool(nb_cores) as pool:
                     pool.starmap(self.dump_chunk, chunks)
 
@@ -140,14 +171,20 @@ class MLMDataset(Dataset):
         if self.binarized_path is not None and \
                 len(bin_fnames) > 0:
             if len(bin_fnames) == 1:
-                os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
                 self.features = self._load_binarized_features(bin_fnames[0])
             else:
-                os.makedirs(os.path.dirname(self.binarized_path), exist_ok=True)
-                with multiprocessing.Pool(nb_cores) as pool:
-                    results = pool.map(self._load_binarized_features, bin_fnames)
-                for lst in results:
-                    self.features.extend(lst)
+                # This can not be parallelized for now. Since the multiprocessing
+                # will need to serialize back and forth, so it will be as fast as
+                # single core implementation.
+                with disable_gc():
+                    # Disable garbage collector for speed.
+                    for i, fname in enumerate(bin_fnames):
+                        self.features.extend(self._load_binarized_features(fname))
+                        if (i + 1) % 10 == 0:
+                            # Manually collect garbage.
+                            # Do we need this?
+                            gc.collect()
+                            break
         return len(bin_fnames) > 0
 
     def get_bin_fnames(self):
@@ -157,6 +194,14 @@ class MLMDataset(Dataset):
         basename = basename[:-len(ext)]
         bin_fnames = glob.glob(self.binarized_path) + \
             glob.glob(os.path.join(dirname, f'{basename}_*_*{ext}'))
+        starts = []
+        for fname in bin_fnames:
+            start, _ = os.path.basename(fname).split('_')[-2:]
+            starts.append(int(start))
+        # Sort by starting point.
+        bin_fnames = list(sorted(zip(starts, bin_fnames)))
+        # Get only filenames.
+        bin_fnames = [e[1] for e in bin_fnames]
         return bin_fnames
 
 
