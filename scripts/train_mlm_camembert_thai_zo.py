@@ -56,7 +56,9 @@ class DataTrainingArguments:
     eval_dir: str = field(
         metadata={"help": "The input evaluation data dir (dir that contain text files)."},
     )  # Non-standard
-
+    datasets_cache_dir: str = field(
+        default=None, metadata={'help': 'The directory for datasets cache.'}
+    )  # Non-standard
     mlm: bool = field(
         default=False,
         metadata={"help": "Train with masked-language modeling loss instead of language modeling."}
@@ -313,7 +315,7 @@ def main():
         datasets = load_dataset(dataset_processing_path,
                                 data_files={'train': data_args.train_files,
                                             'validation': data_args.validation_files},
-                                cache_dir='../cache')
+                                cache_dir=data_args.datasets_cache_dir)
     else:
         raise NotImplementedError(f'not supprt {custom_args.ext},'
                                   f'but this should be possible to support.')
