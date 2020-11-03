@@ -1,7 +1,8 @@
-transformers==3.0.2
+transformers==3.4.0
 sentencepiece==0.1.94
 tqdm
 pandas
 pytorch_lightning
 emoji
 pythainlp
+datasets=1.1.2

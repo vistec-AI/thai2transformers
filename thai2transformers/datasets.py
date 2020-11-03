@@ -124,7 +124,7 @@ class MLMDataset(Dataset):
         # Implementing this as multiprocessing might be slower since we will need to
         # pickle the result and sent it back later.
         with disable_gc():
-            for i in tqdm(range(len(self.features))):
+            for i in range(len(self.features)):
                 self.features[i] = torch.tensor(self.features[i], dtype=torch.long)
                 if i % 10_000_000 == 0:
                     # Manually garbage collection.
