@@ -350,6 +350,7 @@ def main():
     # line by line
     
     padding = False
+    import pdb; pdb.set_trace()
 
     def tokenize_function(examples):
             # Remove empty lines
