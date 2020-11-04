@@ -67,14 +67,14 @@ class DataTrainingArguments:
         default=0.15, metadata={"help": "Ratio of tokens to mask for masked language modeling loss"}
     )
 
-    # block_size: int = field(
-    #     default=512,
-    #     metadata={
-    #         "help": "Optional input sequence length after tokenization."
-    #         "The training dataset will be truncated in block of this size for training."
-    #         "Default to the model max input length for single sentence inputs (take into account special tokens)."
-    #     },
-    # )
+    block_size: int = field(
+        default=512,
+        metadata={
+            "help": "Optional input sequence length after tokenization."
+            "The training dataset will be truncated in block of this size for training."
+            "Default to the model max input length for single sentence inputs (take into account special tokens)."
+        },
+    )
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
     )
