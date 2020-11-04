@@ -26,9 +26,7 @@ from transformers import (
     Trainer
 )
 from typing import Optional
-from helper import (
-    get_field, check_depreciated, check_required
-    )
+from helper import ( get_field, check_depreciated, check_required)
 
 
 @dataclass
@@ -38,11 +36,8 @@ class ModelArguments:
     """
 
     tokenizer_name_or_path: str = field(
-        metadata={
-            "help": "The model checkpoint for weights initialization."
-        },
-    )
-
+        metadata={"help": "The model checkpoint for weights initialization."}
+    ) # Non-standard
 
 @dataclass
 class DataTrainingArguments:
