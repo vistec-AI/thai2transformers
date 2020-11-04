@@ -350,11 +350,16 @@ def main():
     # line by line
     
     padding = False
-    import pdb; pdb.set_trace()
 
     def tokenize_function(examples):
             # Remove empty lines
-            return tokenizer(examples["text"], pad_to_max_length=padding, truncation=True, max_length=data_args.block_size)
+            import pdb; pdb.set_trace()
+
+            examples["text"] = [line for line in examples["text"] if len(line) > 0 and not line.isspace()]
+            return tokenizer(examples["text"],
+                             pad_to_max_length=padding,
+                             truncation=True,
+                             max_length=data_args.block_size)
 
     tokenized_datasets = datasets.map(
         tokenize_function,
