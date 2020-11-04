@@ -5,7 +5,7 @@ RUN apt-get install -y python3 python3-pip
 RUN pip3 install torch 
 RUN pip3 install -U pip
 RUN pip3 install transformers==3.4.0
-RUN pip3 install datasets=1.1.2
+RUN pip3 install datasets==1.1.2
 RUN pip3 install pandas
 RUN pip3 install tqdm emoji pythainlp
 
