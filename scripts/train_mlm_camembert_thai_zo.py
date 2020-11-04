@@ -78,8 +78,8 @@ class DataTrainingArguments:
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
     )
-    preprocessing_num_workers: Optional[int] = field(
-        default=None,
+    preprocessing_num_workers: int = field(
+        default=1,
         metadata={"help": "The number of processes to use for the preprocessing."},
     )
 
@@ -350,7 +350,7 @@ def main():
             return tokenizer(examples["text"],
                              pad_to_max_length=False,
                              truncation=True,
-                             max_length=data_args.max_seq_length)
+                             max_length=int(data_args.max_seq_length))
 
     tokenized_datasets = datasets.map(
         tokenize_function,
