@@ -82,10 +82,11 @@ class DataTrainingArguments:
         default=None,
         metadata={"help": "The number of processes to use for the preprocessing."},
     )
-    max_seq_length: Optional[int] = field(
-        default=None,
+
+    max_seq_length: int = field(
+        default=512,
         metadata={'help': 'Maximum length of sequence '}
-        )  # Non-standard
+    )  
 
 @dataclass
 class ArchitectureArguments:
