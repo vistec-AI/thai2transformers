@@ -67,14 +67,14 @@ class DataTrainingArguments:
         default=0.15, metadata={"help": "Ratio of tokens to mask for masked language modeling loss"}
     )
 
-    block_size: int = field(
-        default=512,
-        metadata={
-            "help": "Optional input sequence length after tokenization."
-            "The training dataset will be truncated in block of this size for training."
-            "Default to the model max input length for single sentence inputs (take into account special tokens)."
-        },
-    )
+    # block_size: int = field(
+    #     default=512,
+    #     metadata={
+    #         "help": "Optional input sequence length after tokenization."
+    #         "The training dataset will be truncated in block of this size for training."
+    #         "Default to the model max input length for single sentence inputs (take into account special tokens)."
+    #     },
+    # )
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
     )
@@ -82,18 +82,10 @@ class DataTrainingArguments:
         default=None,
         metadata={"help": "The number of processes to use for the preprocessing."},
     )
-
-    train_max_length: Optional[int] = field(
+    max_seq_length: Optional[int] = field(
         default=None,
-        metadata={'help': 'Optional training input sequence length after tokenization.'
-                          'Use block_size instead'}
+        metadata={'help': 'Maximum length of sequence '}
         )  # Non-standard
-    eval_max_length: Optional[int] = field(
-        default=None,
-        metadata={'help': 'Optional evaluation input sequence length after tokenization.'
-                          'Use block_size instead'}
-        )  # Non-standard
-
 
 @dataclass
 class ArchitectureArguments:
@@ -228,12 +220,12 @@ class CustomTrainingArgument(TrainingArguments):
 
 # Arguments that will be removed but kept for now.
 # We should suggest alternative or explain the reason for removing.
-COMPAT_WARN_LIST = [('train_max_length',
-                     DataTrainingArguments.train_max_length,
-                     FutureWarning('train_max_length will be removed, use `block_size` instead.')),
-                    ('eval_max_length',
-                     DataTrainingArguments.eval_max_length,
-                     FutureWarning('eval_max_length will be removed, use `block_size` instead.'))]
+# COMPAT_WARN_LIST = [('train_max_length',
+#                      DataTrainingArguments.train_max_length,
+#                      FutureWarning('train_max_length will be removed, use `block_size` instead.')),
+#                     ('eval_max_length',
+#                      DataTrainingArguments.eval_max_length,
+#                      FutureWarning('eval_max_length will be removed, use `block_size` instead.'))]
 
 
 def main():
@@ -265,17 +257,17 @@ def main():
         arch_args, custom_args) = parser.parse_args_into_dataclasses()
 
     # Check for arguments that we kept for compatibility but we should remove it later
-    check_depreciated(data_args, COMPAT_WARN_LIST)
+    # check_depreciated(data_args, COMPAT_WARN_LIST)
     # Workaround if we inherit class from another dataclass with default value
     # we will not be able to use field with required value.
     check_required(training_args)
 
     # Compatibility
-    if data_args.train_max_length != data_args.eval_max_length:
-        raise ValueError('unable to set different max_length for training and evaluation')
-    else:
-        if data_args.train_max_length is not None:
-            data_args.block_size = data_args.train_max_length
+    # if data_args.train_max_length != data_args.eval_max_length:
+    #     raise ValueError('unable to set different max_length for training and evaluation')
+    # else:
+    #     if data_args.train_max_length is not None:
+    #         data_args.block_size = data_args.train_max_length
 
     # Load tokenizer from pretrained model
     tokenizer = CamembertTokenizer.from_pretrained(model_args.tokenizer_name_or_path)
@@ -357,7 +349,7 @@ def main():
             return tokenizer(examples["text"],
                              pad_to_max_length=False,
                              truncation=True,
-                             max_length=data_args.block_size)
+                             max_length=data_args.max_seq_length)
 
     tokenized_datasets = datasets.map(
         tokenize_function,
