@@ -86,7 +86,7 @@ def main():
     parser.add_argument("--binarized_path_train",  type=str, default=None)
     parser.add_argument("--binarized_path_val",  type=str, default=None)
     parser.add_argument("--local_rank",  type=int, default=-1)
-
+    parser.add_argument('--chunk_process', action='store_true')
     args = parser.parse_args()
 
     # initialize tokenizer
@@ -115,10 +115,12 @@ def main():
 
     # datasets
     train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length,
-                               binarized_path=args.binarized_path_train)
+                               binarized_path=args.binarized_path_train,
+                               chunk_process=args.chunk_process)
     eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length,
-                              binarized_path=args.binarized_path_val)
-
+                              binarized_path=args.binarized_path_val,
+                              chunk_process=args.chunk_process)
+    return
     # data collator
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer, mlm=True, mlm_probability=args.mlm_probability)

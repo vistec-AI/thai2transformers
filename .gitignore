@@ -19,6 +19,7 @@ checkpoints/
 dataset/
 cleaned_data/
 wandb/
+cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
