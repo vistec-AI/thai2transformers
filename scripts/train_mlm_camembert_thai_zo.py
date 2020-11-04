@@ -26,7 +26,9 @@ from transformers import (
     Trainer
 )
 from typing import Optional
-from helper import ( get_field, check_depreciated, check_required)
+from helper import (
+    get_field, check_depreciated, check_required
+    )
 
 
 @dataclass
@@ -36,8 +38,11 @@ class ModelArguments:
     """
 
     tokenizer_name_or_path: str = field(
-        metadata={"help": "The model checkpoint for weights initialization."}
-    ) # Non-standard
+        metadata={
+            "help": "The model checkpoint for weights initialization."
+        },
+    )
+
 
 @dataclass
 class DataTrainingArguments:
@@ -70,15 +75,25 @@ class DataTrainingArguments:
             "Default to the model max input length for single sentence inputs (take into account special tokens)."
         },
     )
-
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
     )
-
     preprocessing_num_workers: Optional[int] = field(
         default=None,
         metadata={"help": "The number of processes to use for the preprocessing."},
     )
+
+    train_max_length: Optional[int] = field(
+        default=None,
+        metadata={'help': 'Optional training input sequence length after tokenization.'
+                          'Use block_size instead'}
+        )  # Non-standard
+    eval_max_length: Optional[int] = field(
+        default=None,
+        metadata={'help': 'Optional evaluation input sequence length after tokenization.'
+                          'Use block_size instead'}
+        )  # Non-standard
+
 
 @dataclass
 class ArchitectureArguments:
@@ -213,12 +228,12 @@ class CustomTrainingArgument(TrainingArguments):
 
 # Arguments that will be removed but kept for now.
 # We should suggest alternative or explain the reason for removing.
-# COMPAT_WARN_LIST = [('train_max_length',
-#                      DataTrainingArguments.train_max_length,
-#                      FutureWarning('train_max_length will be removed, use `block_size` instead.')),
-#                     ('eval_max_length',
-#                      DataTrainingArguments.eval_max_length,
-#                      FutureWarning('eval_max_length will be removed, use `block_size` instead.'))]
+COMPAT_WARN_LIST = [('train_max_length',
+                     DataTrainingArguments.train_max_length,
+                     FutureWarning('train_max_length will be removed, use `block_size` instead.')),
+                    ('eval_max_length',
+                     DataTrainingArguments.eval_max_length,
+                     FutureWarning('eval_max_length will be removed, use `block_size` instead.'))]
 
 
 def main():
@@ -250,17 +265,17 @@ def main():
         arch_args, custom_args) = parser.parse_args_into_dataclasses()
 
     # Check for arguments that we kept for compatibility but we should remove it later
-    # check_depreciated(data_args, COMPAT_WARN_LIST)
+    check_depreciated(data_args, COMPAT_WARN_LIST)
     # Workaround if we inherit class from another dataclass with default value
     # we will not be able to use field with required value.
     check_required(training_args)
 
     # Compatibility
-    # if data_args.train_max_length != data_args.eval_max_length:
-    #     raise ValueError('unable to set different max_length for training and evaluation')
-    # else:
-    #     if data_args.train_max_length is not None:
-    #         data_args.block_size = data_args.train_max_length
+    if data_args.train_max_length != data_args.eval_max_length:
+        raise ValueError('unable to set different max_length for training and evaluation')
+    else:
+        if data_args.train_max_length is not None:
+            data_args.block_size = data_args.train_max_length
 
     # Load tokenizer from pretrained model
     tokenizer = CamembertTokenizer.from_pretrained(model_args.tokenizer_name_or_path)
@@ -331,18 +346,9 @@ def main():
 
     # The following codes are from
     # https://github.com/huggingface/transformers/blob/master/examples/language-modeling/run_clm.py
-    
-    # line by line
 
     def tokenize_function(examples):
-            # Remove empty lines
-            import pdb; pdb.set_trace()
-
-            examples["text"] = [line for line in examples["text"] if len(line) > 0 and not line.isspace()]
-            return tokenizer(examples["text"],
-                             pad_to_max_length=False,
-                             truncation=True,
-                             max_length=int(data_args.block_size))
+        return tokenizer(examples['text'])
 
     tokenized_datasets = datasets.map(
         tokenize_function,
@@ -351,15 +357,58 @@ def main():
         remove_columns=['text'],
         load_from_cache_file=not data_args.overwrite_cache,
     )
-    
+
+    if data_args.block_size <= 0:
+        block_size = tokenizer.model_max_length
+    else:
+        if data_args.block_size > tokenizer.model_max_length:
+            print(
+                f"The block_size passed ({data_args.block_size}) is larger than "
+                f"the maximum length for the model"
+                f"({tokenizer.model_max_length}). Using block_size={tokenizer.model_max_length}."
+            )
+        block_size = min(data_args.block_size, tokenizer.model_max_length)
+
+    # Main data processing function that will concatenate all texts from our dataset
+    # and generate chunks of block_size.
+    def group_texts(examples):
+        # Concatenate all texts.
+        concatenated_examples = {k: sum(examples[k], []) for k in examples.keys()}
+        total_length = len(concatenated_examples[list(examples.keys())[0]])
+        # We drop the small remainder, we could add padding if the model supported it instead of
+        # this drop, you can customize this part to your needs.
+        total_length = (total_length // block_size) * block_size
+        # Split by chunks of max_len.
+        result = {
+            k: [t[i: i + block_size] for i in range(0, total_length, block_size)]
+            for k, t in concatenated_examples.items()
+        }
+        result["labels"] = result["input_ids"].copy()
+        return result
+
+    # Note that with `batched=True`, this map processes 1,000 texts together,
+    # so group_texts throws away a remainder for each of those groups of 1,000 texts.
+    # You can adjust that batch_size here but a higher value might be slower
+    # to preprocess.
+
+    # To speed up this part, we use multiprocessing. See the documentation of
+    # the map method for more information:
+    # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
+    lm_datasets = tokenized_datasets.map(
+        group_texts,
+        batched=True,
+        num_proc=data_args.preprocessing_num_workers,
+        load_from_cache_file=not data_args.overwrite_cache,
+    )
+
     # End datasets processing sections
 
     # Initialize trainer
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=tokenized_datasets["train"],
-        eval_dataset=tokenized_datasets["validation"],
+        train_dataset=lm_datasets["train"],
+        eval_dataset=lm_datasets["validation"],
         data_collator=data_collator,
         prediction_loss_only=True
     )
