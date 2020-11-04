@@ -342,7 +342,7 @@ def main():
             return tokenizer(examples["text"],
                              pad_to_max_length=False,
                              truncation=True,
-                             max_length=int(data_args.max_seq_length))
+                             max_length=int(data_args.block_size))
 
     tokenized_datasets = datasets.map(
         tokenize_function,
