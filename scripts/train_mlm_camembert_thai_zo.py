@@ -355,7 +355,7 @@ def main():
     def tokenize_function(examples):
             # Remove empty lines
             examples["text"] = [line for line in examples["text"] if len(line) > 0 and not line.isspace()]
-            return tokenizer(examples["text"], padding=padding, truncation=True, max_length=data_args.block_size)
+            return tokenizer(examples["text"], pad_to_max_length=padding, truncation=True, max_length=data_args.block_size)
 
     tokenized_datasets = datasets.map(
         tokenize_function,
