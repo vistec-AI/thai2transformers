@@ -11,8 +11,12 @@ from transformers import (
     RobertaForMaskedLM,
     DataCollatorForLanguageModeling,
     Trainer, 
-    TrainingArguments
+    TrainingArguments,
+    set_seed
 )
+
+logger = logging.getLogger(__name__)
+
 
 #thai2transformers
 from thai2transformers.datasets import MLMDatasetOneFile
@@ -28,6 +32,7 @@ def main():
     )
     #distributed training
     parser.add_argument("--local_rank", type=int, default=-1)
+    parser.add_argument("--n_gpu", type=int, default=0)
 
     #required
     parser.add_argument("--tokenizer_name_or_path", type=str,)
@@ -85,8 +90,11 @@ def main():
 
     args = parser.parse_args()
 
+    #set seed
+    set_seed(args.seed)
+
     #initialize tokenizer
-   
+
     tokenizer = CamembertTokenizer.from_pretrained(args.tokenizer_name_or_path)
     if args.add_space_token:
         logging.info('Special token `<th_roberta_space_token>` will be added to the CamembertTokenizer instance.')
@@ -128,7 +136,8 @@ def main():
     tokenizer=tokenizer, mlm=True, mlm_probability=args.mlm_probability)
     
     #training args
-    training_args = TrainingArguments(        
+    training_args = TrainingArguments(    
+
         num_train_epochs=args.num_train_epochs,
         max_steps=args.max_steps,
         per_device_train_batch_size=args.per_device_train_batch_size,
@@ -155,6 +164,8 @@ def main():
         fp16=args.fp16,
         fp16_opt_level=args.fp16_opt_level,
         dataloader_drop_last=args.dataloader_drop_last,
+
+        local_rank=args.local_rank
     )
 
     logging.info(" Number of devices: %d", training_args.n_gpu)
