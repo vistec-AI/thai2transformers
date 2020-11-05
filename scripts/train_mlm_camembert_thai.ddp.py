@@ -194,8 +194,11 @@ def main():
     else:
         trainer.train()
     #save
+    
     trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
     
+    if trainer.is_world_master():
+        tokenizer.save_pretrained(os.path.join(args.output_dir, 'roberta_thai_tokenizer'))
     #evaluate
     trainer.evaluate()
 
