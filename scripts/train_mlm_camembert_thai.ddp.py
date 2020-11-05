@@ -12,6 +12,7 @@ from transformers import (
     DataCollatorForLanguageModeling,
     Trainer, 
     TrainingArguments,
+    HfArgumentParser,
     set_seed
 )
 
@@ -164,7 +165,7 @@ def main():
         fp16=args.fp16,
         fp16_opt_level=args.fp16_opt_level,
         dataloader_drop_last=args.dataloader_drop_last,
-        prediction_loss_only=args.prediction_loss_only
+        prediction_loss_only=args.prediction_loss_only,
         local_rank=args.local_rank
     )
 
