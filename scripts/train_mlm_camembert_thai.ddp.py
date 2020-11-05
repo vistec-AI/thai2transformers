@@ -15,7 +15,7 @@ from transformers import (
 )
 
 #thai2transformers
-from thai2transformers.datasets import MLMDataset
+from thai2transformers.datasets import MLMDatasetOneFile
 
 #argparse
 import argparse
@@ -29,8 +29,8 @@ def main():
     
     #required
     parser.add_argument("--tokenizer_name_or_path", type=str,)
-    parser.add_argument("--train_dir", type=str,)
-    parser.add_argument("--eval_dir", type=str,)
+    parser.add_argument("--train_path", type=str,)
+    parser.add_argument("--eval_path", type=str,)
     parser.add_argument("--num_train_epochs", type=int,)
     parser.add_argument("--max_steps", type=int,)
 
@@ -78,8 +78,8 @@ def main():
 
     parser.add_argument("--add_space_token", action='store_true', default=False)
     
-    parser.add_argument("--binarized_path_train",  type=str, default=None)
-    parser.add_argument("--binarized_path_val",  type=str, default=None)
+    parser.add_argument("--binarized_dir_train",  type=str, default=None)
+    parser.add_argument("--binarized_dir_val",  type=str, default=None)
 
     args = parser.parse_args()
 
@@ -110,8 +110,16 @@ def main():
     model = RobertaForMaskedLM(config=config)
 
     #datasets
-    train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length, binarized_path=args.binarized_path_train)
-    eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length, binarized_path=args.binarized_path_val)
+    train_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
+                                     file_path=args.train_path,
+                                     block_size=args.train_max_length,
+                                     overwrite_cache=False,
+                                     cache_dir=args.binarized_dir_train)
+    eval_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
+                                     file_path=args.eval_path,
+                                     block_size=args.eval_max_length,
+                                     overwrite_cache=False,
+                                     cache_dir=args.binarized_dir_val)
     
     #data collator
     data_collator = DataCollatorForLanguageModeling(
