@@ -11,6 +11,7 @@ import gc
 from contextlib import contextmanager
 from filelock import FileLock
 import logging, time
+from typing import Optional
 
 nb_cores = multiprocessing.cpu_count()
 
