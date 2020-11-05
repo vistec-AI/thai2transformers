@@ -173,7 +173,7 @@ def main():
     logging.info(" Device: %s", training_args.device)
     logging.info(" Local rank: %s", training_args.local_rank)
     logging.info(" FP16 Training: %s", training_args.fp16)
-
+  
     
     if args.model_path != None:
         print(f'[INFO] Load pretrianed model from {args.model_path}')
@@ -187,7 +187,10 @@ def main():
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
     )
-    
+
+    logging.info(" Is world process zero: %s", trainer.is_world_process_zero())
+    logging.info(" Is local process zero: %s", trainer.is_local_process_zero())
+
     #train
     if args.model_path != None:
         trainer.train(model_path=args.model_dir)
