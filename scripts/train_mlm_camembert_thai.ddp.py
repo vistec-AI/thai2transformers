@@ -55,6 +55,8 @@ def main():
     #eval
     parser.add_argument('--evaluation_strategy', default='steps', type=str)
     parser.add_argument("--eval_steps", type=int, default=500)
+    parser.add_argument("--prediction_loss_only", default=True)
+
     
     #train hyperparameters
     parser.add_argument("--train_max_length", type=int, default=512)
