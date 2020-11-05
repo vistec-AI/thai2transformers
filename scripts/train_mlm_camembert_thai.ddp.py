@@ -52,7 +52,7 @@ def main():
     parser.add_argument("--logging_steps", type=int, default=200)
     
     #eval
-    parser.add_argument('--evaluate_during_training', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
+    parser.add_argument('--evaluation_strategy', default='steps', type=str)
     parser.add_argument("--eval_steps", type=int, default=500)
     
     #train hyperparameters
@@ -157,7 +157,7 @@ def main():
         logging_dir=args.logging_dir,
         logging_steps=args.logging_steps,
         #eval
-        evaluate_during_training=args.evaluate_during_training,
+        evaluation_strategy=args.evaluation_strategy,
         eval_steps=args.eval_steps,
         #others
         seed=args.seed,
