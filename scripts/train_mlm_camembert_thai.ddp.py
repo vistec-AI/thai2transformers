@@ -26,7 +26,9 @@ def main():
         prog="train_mlm_roberthai.py",
         description="train mlm for roberta with huggingface Trainer",
     )
-    
+    #distributed training
+    parser.add_argument("--local_rank", type=int, default=-1)
+
     #required
     parser.add_argument("--tokenizer_name_or_path", type=str,)
     parser.add_argument("--train_path", type=str,)
