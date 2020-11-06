@@ -3,7 +3,7 @@ N_NODES=$1
 NODE_RANK=${SLURM_PROCID}
 HOSTNAME=$2
 N_GPU_NODE=$3
-
+JOBID=$4
 echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.4.11.2020.rank-$NODE_RANK.out
 
 MASTER_PORT=9999
@@ -42,4 +42,4 @@ python -m torch.distributed.launch \
     --output_dir ../checkpoints/exp011_thwiki-for-ddp_4.11.2020_spm_vs-24k_fp16_bz16_nepochs-10_ngpus-8_maxseqlen-512_mlmdataset_nnodes-2 \
     --add_space_token \
     --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_4.11.2020 \
-    --preprocessing_num_workers 20 |& tee -a ./slurm_logs/thwiki.ddp.4.11.2020.rank-$NODE_RANK.out
+    --preprocessing_num_workers 20 |& tee -a ./slurm_logs/thwiki.ddp.4.11.2020.j-$JOBID.rank-$NODE_RANK.out
