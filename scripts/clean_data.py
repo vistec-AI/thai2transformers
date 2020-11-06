@@ -147,6 +147,17 @@ if __name__ == '__main__':
     print(f'INFO: df.shape (after): {df.shape}')    
     print('\nINFO: Done sentence length filtering.\n')
     
+
+    print('\nINFO: Replace space token with <th_roberta_space_token>')
+    df['text'] = df['text'].apply(lambda x: x.replace(' ', '<th_roberta_space_token>'))
+    print('INFO: Done.>')
+
+
+    print('\nINFO: Recompute nv_tokens')
+    df['nb_tokens'] = df['text'].swifter.apply(lambda x: len(word_tokenize(x)))
+
+    print('INFO: Done.')
+
     print(f'INFO: Write preprocessed data to {args.output_path}.\n')
     df.to_csv(args.output_path, index=False, encoding='utf-8')
     print(f'INFO: Done.')
