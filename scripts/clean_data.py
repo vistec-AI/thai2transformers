@@ -66,11 +66,11 @@ if __name__ == '__main__':
 
     parser.add_argument('input_path', type=str)
     parser.add_argument('output_path', type=str)
-    parser.add_argument('--drop_na', action='store_true')
-    parser.add_argument('--break_long_sentence', action='store_true')
+    parser.add_argument('--drop_na', action='store_true', default=True)
+    parser.add_argument('--break_long_sentence', action='store_true', default=True)
     parser.add_argument('--max_sentence_length', type=int, default=300)
 
-    parser.add_argument('--drop_no_thai_char', action='store_true')
+    parser.add_argument('--drop_no_thai_char', action='store_true', default=True)
     parser.add_argument('--min_newmm_token_len', type=int, default=4)
     parser.add_argument('--max_newmm_token_len', type=int, default=500)
 
