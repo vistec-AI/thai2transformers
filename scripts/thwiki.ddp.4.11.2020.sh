@@ -1,12 +1,13 @@
-export N_NODES=$1
-export NODE_RANK=${SLURM_PROCID}
-export HOSTNAME=$2
-export N_GPU_NODE=$3
+#!/bin/bash
+N_NODES=$1
+NODE_RANK=${SLURM_PROCID}
+HOSTNAME=$2
+N_GPU_NODE=$3
 
-echo "Node rank $NODE_RANK"
+echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.4.11.2020.rank-$NODE_RANK.out
 
-export MASTER_PORT=9999
-export MASTER_ADDR=$HOSTNAME
+MASTER_PORT=9999
+MASTER_ADDR=$HOSTNAME
 
 python -m torch.distributed.launch \
     --nproc_per_node=$N_GPU_NODE \
