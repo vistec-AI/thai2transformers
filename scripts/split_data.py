@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import csv
+import os
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -40,7 +41,8 @@ if __name__ == '__main__':
     for split in ['train', 'val', 'test']:
 
         print(f'INFO: Begin writing {split} split to "{args.output_dir}/train/train.txt".')
-         
+        if os.path.exists(f'{args.output_dir}/{split}') == False:
+            os.mkdir(f'{args.output_dir}/{split}/')
         split_df[split][['text']].to_csv(f'{args.output_dir}/{split}/{split}.txt',
                                                              encoding='utf-8', sep="\t", index=False, header=None,
                                                              escapechar="", quotechar="", quoting=csv.QUOTE_NONE)
