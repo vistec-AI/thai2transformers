@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
 
     print('INFO: Perform sentnece breakdown. ')
-    print(f'    max_sentence_length: {max_sentence_length}')
+    print(f'    max_sentence_length: {args.max_sentence_length}')
     print(f'INFO: df.shape (before): {df.shape}')    
 
     # split short and long sentences:
