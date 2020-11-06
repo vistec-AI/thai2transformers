@@ -17,7 +17,7 @@ python -m torch.distributed.launch \
     --node_rank $NODE_RANK \
     --master_addr $MASTER_ADDR \
     --master_port $MASTER_PORT \
-    ./train_mlm_camembert_thai_ddp.py \
+    ./train_mlm_camembert_thai.ddp.py \
     --tokenizer_name_or_path ../dataset/spm/thwiki-for-ddp_4.11.2020_spm_vs-24k/sentencepiece.bpe.model \
     --ext txt \
     --train_dir ../dataset/split/thwiki-for-ddp_4.11.2020/train/ \
