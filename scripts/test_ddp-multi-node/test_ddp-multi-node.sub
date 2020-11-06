@@ -1,0 +1,28 @@
+#!/bin/bash -l
+#SBATCH --mem=250mb
+#SBATCH --nodes=2
+#SBATCH --gres=gpu:4
+#SBATCH --partition=gpu-cluster
+#SBATCH --account=scads
+#SBATCH --time=0-01:00:00
+
+
+
+# -------------------------
+# OPTIONAL
+# -------------------------
+# debugging flags (optional)
+export NCCL_DEBUG=INFO
+export PYTHONFAULTHANDLER=1
+
+# PyTorch comes with prebuilt NCCL support... but if you have issues with it
+# you might need to load the latest version from your  modules
+#module load NCCL/2.4.7-1-cuda.10.0
+
+# on your cluster you might need these:
+# set the network interface
+export NCCL_SOCKET_IFNAME=^docker0,lo
+# -------------------------
+
+# random port between 12k and 20k
+export MASTER_PORT=$((12000 + RANDOM % 20000))

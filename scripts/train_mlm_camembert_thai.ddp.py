@@ -11,11 +11,16 @@ from transformers import (
     RobertaForMaskedLM,
     DataCollatorForLanguageModeling,
     Trainer, 
-    TrainingArguments
+    TrainingArguments,
+    HfArgumentParser,
+    set_seed
 )
 
+logger = logging.getLogger(__name__)
+
+
 #thai2transformers
-from thai2transformers.datasets import MLMDataset
+from thai2transformers.datasets import MLMDatasetOneFile
 
 #argparse
 import argparse
@@ -26,11 +31,14 @@ def main():
         prog="train_mlm_roberthai.py",
         description="train mlm for roberta with huggingface Trainer",
     )
-    
+    #distributed training
+    parser.add_argument("--local_rank", type=int, default=-1)
+    parser.add_argument("--n_gpu", type=int, default=0)
+
     #required
     parser.add_argument("--tokenizer_name_or_path", type=str,)
-    parser.add_argument("--train_dir", type=str,)
-    parser.add_argument("--eval_dir", type=str,)
+    parser.add_argument("--train_path", type=str,)
+    parser.add_argument("--eval_path", type=str,)
     parser.add_argument("--num_train_epochs", type=int,)
     parser.add_argument("--max_steps", type=int,)
 
@@ -45,8 +53,10 @@ def main():
     parser.add_argument("--logging_steps", type=int, default=200)
     
     #eval
-    parser.add_argument('--evaluate_during_training', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
+    parser.add_argument('--evaluation_strategy', default='steps', type=str)
     parser.add_argument("--eval_steps", type=int, default=500)
+    parser.add_argument("--prediction_loss_only", default=True)
+
     
     #train hyperparameters
     parser.add_argument("--train_max_length", type=int, default=512)
@@ -78,13 +88,16 @@ def main():
 
     parser.add_argument("--add_space_token", action='store_true', default=False)
     
-    parser.add_argument("--binarized_path_train",  type=str, default=None)
-    parser.add_argument("--binarized_path_val",  type=str, default=None)
+    parser.add_argument("--binarized_dir_train",  type=str, default=None)
+    parser.add_argument("--binarized_dir_val",  type=str, default=None)
 
     args = parser.parse_args()
 
+    #set seed
+    set_seed(args.seed)
+
     #initialize tokenizer
-   
+
     tokenizer = CamembertTokenizer.from_pretrained(args.tokenizer_name_or_path)
     if args.add_space_token:
         logging.info('Special token `<th_roberta_space_token>` will be added to the CamembertTokenizer instance.')
@@ -110,15 +123,24 @@ def main():
     model = RobertaForMaskedLM(config=config)
 
     #datasets
-    train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length, binarized_path=args.binarized_path_train)
-    eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length, binarized_path=args.binarized_path_val)
+    train_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
+                                     file_path=args.train_path,
+                                     block_size=args.train_max_length,
+                                     overwrite_cache=False,
+                                     cache_dir=args.binarized_dir_train)
+    eval_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
+                                     file_path=args.eval_path,
+                                     block_size=args.eval_max_length,
+                                     overwrite_cache=False,
+                                     cache_dir=args.binarized_dir_val)
     
     #data collator
     data_collator = DataCollatorForLanguageModeling(
     tokenizer=tokenizer, mlm=True, mlm_probability=args.mlm_probability)
     
     #training args
-    training_args = TrainingArguments(        
+    training_args = TrainingArguments(    
+
         num_train_epochs=args.num_train_epochs,
         max_steps=args.max_steps,
         per_device_train_batch_size=args.per_device_train_batch_size,
@@ -138,20 +160,22 @@ def main():
         logging_dir=args.logging_dir,
         logging_steps=args.logging_steps,
         #eval
-        evaluate_during_training=args.evaluate_during_training,
+        evaluation_strategy=args.evaluation_strategy,
         eval_steps=args.eval_steps,
         #others
         seed=args.seed,
         fp16=args.fp16,
         fp16_opt_level=args.fp16_opt_level,
         dataloader_drop_last=args.dataloader_drop_last,
+        prediction_loss_only=args.prediction_loss_only,
+        local_rank=args.local_rank
     )
 
     logging.info(" Number of devices: %d", training_args.n_gpu)
     logging.info(" Device: %s", training_args.device)
     logging.info(" Local rank: %s", training_args.local_rank)
     logging.info(" FP16 Training: %s", training_args.fp16)
-
+  
     
     if args.model_path != None:
         print(f'[INFO] Load pretrianed model from {args.model_path}')
@@ -164,17 +188,22 @@ def main():
         data_collator=data_collator,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
-        prediction_loss_only=True,
     )
-    
+
+    logging.info(" Is world process zero: %s", trainer.is_world_process_zero())
+    logging.info(" Is local process zero: %s", trainer.is_local_process_zero())
+
     #train
     if args.model_path != None:
         trainer.train(model_path=args.model_dir)
     else:
         trainer.train()
     #save
+    
     trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
     
+    if trainer.is_world_master():
+        tokenizer.save_pretrained(os.path.join(args.output_dir, 'roberta_thai_tokenizer'))
     #evaluate
     trainer.evaluate()
 
