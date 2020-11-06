@@ -44,6 +44,11 @@ def drop_no_thai_char(df):
 def drop_by_min_max_newmm_tokens(df, min_tokens:int, max_tokens:int):
     return df[(df['nb_tokens'] >= min_tokens) & (df['nb_tokens'] <= max_tokens)]
 
+def strip_text(text: str):
+    if type(text) != str:
+        return text
+    return text.strip()
+
 def replace_nbspace(text: str):
     if type(text) != str:
         return text
@@ -94,7 +99,7 @@ if __name__ == '__main__':
 
     print('\nDone all text filtering rules. \n')
 
-    TEXT_CLEANING_RULES = [replace_nbspace, remove_soft_hyphen, remove_zero_width_nbspace]
+    TEXT_CLEANING_RULES = [replace_nbspace, remove_soft_hyphen, remove_zero_width_nbspace, strip_text]
 
     for fn in TEXT_CLEANING_RULES:
         print(f'INFO: Start cleaning rule: {fn.__name__}')
