@@ -20,8 +20,8 @@ python -m torch.distributed.launch \
     ./train_mlm_camembert_thai.ddp.py \
     --tokenizer_name_or_path ../dataset/spm/thwiki-for-ddp_4.11.2020_spm_vs-24k/sentencepiece.bpe.model \
     --ext txt \
-    --train_dir ../dataset/split/thwiki-for-ddp_4.11.2020/train/ \
-    --eval_dir ../dataset/split/thwiki-for-ddp_4.11.2020/val/ \
+    --train_path ../dataset/split/thwiki-for-ddp_4.11.2020/train/train.txt \
+    --eval_path ../dataset/split/thwiki-for-ddp_4.11.2020/val/val.txt \
     --block_size 512 \
     --learning_rate 3e-4 --weight_decay 0.01 \
     --adam_epsilon 1e-6 \
@@ -33,11 +33,11 @@ python -m torch.distributed.launch \
     --gradient_accumulation_steps 16 \
     --warmup_steps 50 \
     --seed 2020 \
-    --save_steps 2500 \
+    --save_steps 100 \
     --logging_steps 1 \
     --save_total_limit 50 \
     --evaluate_during_training \
-    --eval_steps 1000 \
+    --eval_steps 50 \
     --logging_dir ../logs/exp011_thwiki-for-ddp_4.11.2020_spm_vs-24k_fp16_bz16_nepochs-10_ngpus-8_maxseqlen-512_mlmdataset_nnodes-2 \
     --output_dir ../checkpoints/exp011_thwiki-for-ddp_4.11.2020_spm_vs-24k_fp16_bz16_nepochs-10_ngpus-8_maxseqlen-512_mlmdataset_nnodes-2 \
     --add_space_token \
