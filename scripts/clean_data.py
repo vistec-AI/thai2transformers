@@ -152,10 +152,6 @@ if __name__ == '__main__':
     df['text'] = df['text'].apply(lambda x: x.replace(' ', '<th_roberta_space_token>'))
     print('INFO: Done.>')
 
-
-    print('\nINFO: Recompute nv_tokens')
-    df['nb_tokens'] = df['text'].swifter.apply(lambda x: len(word_tokenize(x)))
-
     print('INFO: Done.')
 
     print(f'INFO: Write preprocessed data to {args.output_path}.\n')
