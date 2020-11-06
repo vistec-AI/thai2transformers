@@ -127,7 +127,7 @@ if __name__ == '__main__':
     print('\nINFO: Recompute Number of tokens.')
     df['nb_tokens'] = df['text'].swifter.apply(lambda x: len(word_tokenize(x)))
 
-    print['INFO: Done.']
+    print('INFO: Done.')
 
     
     print('\nINFO: Perform sentence length filtering.')
