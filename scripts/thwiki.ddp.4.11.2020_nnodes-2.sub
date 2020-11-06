@@ -1,5 +1,4 @@
-#!/bin/bash -l
-
+#!/bin/bash
 #SBATCH --output=./slurm_output/thwiki_ddp_4.11.2020.job-%j.node-%n.out
 #SBATCH --nodes=2
 #SBATCH --partition=gpu-cluster
@@ -25,4 +24,3 @@ fi
 HOSTNAME=$(hostname -s)
 
 srun ./thwiki.ddp.4.11.2020.sh 2 $HOSTNAME 4
-

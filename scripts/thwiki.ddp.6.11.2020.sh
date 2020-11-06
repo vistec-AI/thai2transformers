@@ -1,7 +1,7 @@
 export N_NODES=$1
-export NODE_RANK=$2
-export HOSTNAME=$3
-export N_GPU_NODE=$4
+export NODE_RANK=${SLURM_PROCID}
+export HOSTNAME=$2
+export N_GPU_NODE=$3
 
 echo "Rank $NODE_RANK"
 
