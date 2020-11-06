@@ -84,7 +84,7 @@ if __name__ == '__main__':
     for fn in TEXT_FILTERING_RULES:
         print(f'INFO: Perform filtering rule: {fn.__name__}')
         print(f'INFO: df.shape (before): {df.shape}')
-        
+        df = fn(df)  
         print(f'INFO: df.shape (after): {df.shape}')
         print(f'INFO: Done.')
 
