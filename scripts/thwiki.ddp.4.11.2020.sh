@@ -11,8 +11,8 @@ MASTER_ADDR=$HOSTNAME
 
 
 
-# module load Anaconda3
-# source activate transformers
+module load Anaconda3
+source activate transformers
 module load CUDA/10.0
 
 python -m torch.distributed.launch \
