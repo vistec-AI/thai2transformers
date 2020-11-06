@@ -11,7 +11,7 @@ MASTER_ADDR=$HOSTNAME
 
 module load Anaconda3
 module load CUDA/10.2
-module load cuDNN/y
+module load cuDNN/7
 source activate transformers
 
 python -m torch.distributed.launch \
