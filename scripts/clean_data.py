@@ -138,7 +138,7 @@ if __name__ == '__main__':
     print(f'    Minimum number of newmm tokens: {args.min_newmm_token_len}')
     print(f'    Maximum number of newmm tokens: {args.max_newmm_token_len}\n')
     print(f'INFO: df.shape (before): {df.shape}')
-    df = drop_by_min_max_newmm_tokens(df, min_tokens=args.min_tokens, max_tokens=args.max_tokens)  
+    df = drop_by_min_max_newmm_tokens(df, min_tokens=args.min_newmm_token_len, max_tokens=args.max_newmm_token_len)  
     print(f'INFO: df.shape (after): {df.shape}')    
     print('\nINFO: Done sentence length filtering.\n')
     
