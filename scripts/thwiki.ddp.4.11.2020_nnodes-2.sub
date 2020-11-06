@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-#SBATCH --output=thwiki_ddp_6.11.2020_out.%j
+#SBATCH --output=./slurm_output/thwiki_ddp_4.11.2020.job-%j.node-%n.out
 #SBATCH --nodes=2
 #SBATCH --partition=gpu-cluster
 #SBATCH --account=scads
@@ -28,8 +28,6 @@ N_NODES=2
 HOSTNAME=master_hostname
 N_GPU_NODE=4
 
-srun thwiki.ddp.4.11.2020.sh N_NODES 0 HOSTNAME N_GPU_NODE
-srun thwiki.ddp.4.11.2020.sh N_NODES 1 HOSTNAME N_GPU_NODE
 
-
+srun ./thwiki.ddp.4.11.2020.sh $N_NODES $HOSTNAME $N_GPU_NODE
 
