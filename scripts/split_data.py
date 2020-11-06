@@ -7,7 +7,6 @@ if __name__ == '__main__':
 
     parser.add_argument('input_path', type=str)
     parser.add_argument('output_dir', type=str)
-    parser.add_argument('--seed', type=int, default=2020)
     parser.add_argument('--train_ratio', type=float, default=0.95)
     parser.add_argument('--val_ratio', type=float, default=0.025)
     parser.add_argument('--test_ratio', type=float, default=0.025)
@@ -22,13 +21,13 @@ if __name__ == '__main__':
 
     df = pd.read_csv(args.input_path, encoding='utf-8')
 
-    print('INFO: Begin splitting data.')
-    print(f'\tseed: {args.seed}')
+    print('INFO: Begin splitting data. ๖ืนะ ห้ีดดสำห๘')
+    
     print(f'\ttrain_ratio: {args.train_ratio}')
     print(f'\tval_ratio: {args.val_ratio}')
     print(f'\ttest_ratio: {args.test_ratio}')
     
-    train_df, valid_df, test_df = np.split(df.sample(frac=1, random_state=args.seed), [int(.95*len(df)), int(.975*len(df))])
+    train_df, valid_df, test_df = np.split(df, [int(.95*len(df)), int(.975*len(df))])
     
     print(f'\nINFO: Train/val/test statistics.')
     print(f'\ttrain set: {train_df.shape[0]}')
@@ -41,7 +40,7 @@ if __name__ == '__main__':
 
         print(f'INFO: Begin writing {split} split to "{args.output_dir}/train/train.txt".')
          
-        split_df[split][['text']].dropna().sample(frac=1, random_state=args.seed).to_csv(f'{output_dir}/{split}/{split}.txt',
+        split_df[split][['text']].to_csv(f'{args.output_dir}/{split}/{split}.txt',
                                                              encoding='utf-8', sep="\t", index=False, header=None,
                                                              escapechar="", quotechar="", quoting=csv.QUOTE_NONE)
 
