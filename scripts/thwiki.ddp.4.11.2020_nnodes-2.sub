@@ -8,8 +8,8 @@
 #SBATCH --mem=100GB
 #SBATCH --job-name=thwiki_ddp_4.11.2020_nnodes-2
   
-# module load Anaconda3
-# source activate transformers
+module load Anaconda3
+source activate transformers
 module load CUDA/10.0
 
 
