@@ -124,12 +124,12 @@ def main():
     #datasets
     train_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
                                      file_path=args.train_path,
-                                     block_size=args.train_max_length,
+                                     block_size=args.block_size,
                                      overwrite_cache=False,
                                      cache_dir=args.binarized_dir_train)
     eval_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
                                      file_path=args.eval_path,
-                                     block_size=args.eval_max_length,
+                                     block_size=args.block_size,
                                      overwrite_cache=False,
                                      cache_dir=args.binarized_dir_val)
     
