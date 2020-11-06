@@ -36,7 +36,7 @@ python -m torch.distributed.launch \
     --save_steps 100 \
     --logging_steps 1 \
     --save_total_limit 50 \
-    --evaluation_strategy \
+    --evaluation_strategy steps \
     --eval_steps 50 \
     --logging_dir ../logs/exp011_thwiki-for-ddp_4.11.2020_spm_vs-24k_fp16_bz16_nepochs-10_ngpus-8_maxseqlen-512_mlmdataset_nnodes-2 \
     --output_dir ../checkpoints/exp011_thwiki-for-ddp_4.11.2020_spm_vs-24k_fp16_bz16_nepochs-10_ngpus-8_maxseqlen-512_mlmdataset_nnodes-2 \

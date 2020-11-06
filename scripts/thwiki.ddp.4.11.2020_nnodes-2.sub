@@ -19,5 +19,5 @@ fi
 
 
 HOSTNAME=$(hostname -s)
-JOBID=%j
+JOBID=${SLURM_JOB_ID}
 srun ./thwiki.ddp.4.11.2020.sh 2 $HOSTNAME 4 $JOBID
