@@ -41,5 +41,4 @@ python -m torch.distributed.launch \
     --logging_dir ../logs/exp011_thwiki-for-ddp_4.11.2020_spm_vs-24k_fp16_bz16_nepochs-10_ngpus-8_maxseqlen-512_mlmdataset_nnodes-2 \
     --output_dir ../checkpoints/exp011_thwiki-for-ddp_4.11.2020_spm_vs-24k_fp16_bz16_nepochs-10_ngpus-8_maxseqlen-512_mlmdataset_nnodes-2 \
     --add_space_token \
-    --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_4.11.2020 \
-    --preprocessing_num_workers 20 |& tee -a ./slurm_logs/thwiki.ddp.4.11.2020.j-$JOBID.rank-$NODE_RANK.out
+    --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_4.11.2020 |& tee -a ./slurm_logs/thwiki.ddp.4.11.2020.j-$JOBID.rank-$NODE_RANK.out
