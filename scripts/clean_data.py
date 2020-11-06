@@ -45,21 +45,25 @@ def drop_by_min_max_newmm_tokens(df, min_tokens:int, max_tokens:int):
     return df[(df['nb_tokens'] >= min_tokens) & (df['nb_tokens'] <= max_tokens)]
 
 def replace_nbspace(text: str):
+    if type(text) != str:
+        return text
     nbspace = '\xa0'
-    cleaned_text = re.sub(nbspace, ' ', text)
+    cleaned_text = re.sub(fr'{nbspace}', ' ', text)
     return cleaned_text
 
 def remove_soft_hyphen(text: str):
+    if type(text) != str:
+        return text
     soft_hyphen = '\u00ad' # discretionary hyphen 
-    cleaned_text = re.sub(soft_hyphen, '', text)
+    cleaned_text = re.sub(fr'{soft_hyphen}', '', text)
     return cleaned_text
 
 def remove_zero_width_nbspace(text: str):
+    if type(text) != str:
+        return text
     zero_width_nbspace = '\ufeff'
-    cleaned_text = re.sub(zero_width_nbspace, '', text)
+    cleaned_text = re.sub(fr'{zero_width_nbspace}', '', text)
     return cleaned_text
-
-remove_zero_width_nbspace(f'A\ufeffada.')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
