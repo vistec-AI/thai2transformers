@@ -9,9 +9,6 @@ echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.4.11.2020.rank-$NO
 MASTER_PORT=9999
 MASTER_ADDR=$HOSTNAME
 
-
-
-module load Anaconda3
 source activate transformers
 module load CUDA/10.0
 
