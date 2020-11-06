@@ -5,6 +5,36 @@ Pretraining transformers in Thai and English
 
 Developing. See this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06FT2RvBE8twKzvXeSe4w5CHnU29f8ZWMUcJdmRks/edit?usp=sharing). Download current version of cleaned datasets [here](https://drive.google.com/file/d/1oF7_COZJqGdIaDGMNI1rKdDCOEzVoZHq/view?usp=sharing).
 
+
+## Preprocess dataset:
+
+### Text cleaning/filtering
+
+The text preprocessing rules applied are as follows:
+
+Filtering rules:
+- Drop rows with NaN/Na
+- Drop rows with no Thai character
+
+Cleaning rules:
+- Replace Non-breaking space with an space token
+- Remove soft-hyphen
+- Remove zero width non-breaking space
+
+Example:
+```
+python clean_data.py \
+../cleaned_data/thwiki.csv \
+../dataset/cleaned/thwiki-for-ddp_6.11.2020/thwiki.csv \
+--drop_na \
+--break_long_sentence \
+--max_sentence_length 300 \
+--drop_no_thai_char \
+--min_newmm_token_len 4 \
+--max_newmm_token_len 300
+```
+
+
 ## Tran MLM
 
 1. Download and process wikipedia dump
