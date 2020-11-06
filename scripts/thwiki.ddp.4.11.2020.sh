@@ -9,15 +9,17 @@ echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.4.11.2020.rank-$NO
 MASTER_PORT=9999
 MASTER_ADDR=$HOSTNAME
 
+module load Anaconda3
+source activate transformers
 module load CUDA/10.0
 
-python3 -m torch.distributed.launch \
+python -m torch.distributed.launch \
     --nproc_per_node=$N_GPU_NODE \
     --nnodes=$N_NODES \
     --node_rank $NODE_RANK \
     --master_addr $MASTER_ADDR \
     --master_port $MASTER_PORT \
-    python train_mlm_camembert_thai_ddp.py \
+    train_mlm_camembert_thai_ddp.py \
     --tokenizer_name_or_path ../dataset/spm/thwiki-for-ddp_4.11.2020_spm_vs-24k/sentencepiece.bpe.model \
     --ext txt \
     --train_dir ../dataset/split/thwiki-for-ddp_4.11.2020/train/ \
