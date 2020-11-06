@@ -87,8 +87,7 @@ def main():
 
     parser.add_argument("--add_space_token", action='store_true', default=False)
     
-    parser.add_argument("--binarized_dir_train",  type=str, default=None)
-    parser.add_argument("--binarized_dir_val",  type=str, default=None)
+    parser.add_argument("--datasets_cache_dir",  type=str, default=None)
 
     args = parser.parse_args()
 
@@ -126,12 +125,12 @@ def main():
                                      file_path=args.train_path,
                                      block_size=args.block_size,
                                      overwrite_cache=False,
-                                     cache_dir=args.binarized_dir_train)
+                                     cache_dir=args.datasets_cache_dir)
     eval_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
                                      file_path=args.eval_path,
                                      block_size=args.block_size,
                                      overwrite_cache=False,
-                                     cache_dir=args.binarized_dir_val)
+                                     cache_dir=args.datasets_cache_dir)
     
     #data collator
     data_collator = DataCollatorForLanguageModeling(
