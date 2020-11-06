@@ -59,8 +59,7 @@ def main():
 
     
     #train hyperparameters
-    parser.add_argument("--train_max_length", type=int, default=512)
-    parser.add_argument("--eval_max_length", type=int, default=512)
+    parser.add_argument("--block_size", type=int, default=512)
     parser.add_argument("--per_device_train_batch_size", type=int, default=32)
     parser.add_argument("--per_device_eval_batch_size", type=int, default=64)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
