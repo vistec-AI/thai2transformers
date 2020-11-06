@@ -1,0 +1,35 @@
+#!/bin/bash -l
+
+#SBATCH --output=thwiki_ddp_6.11.2020_out.%j
+#SBATCH --nodes=2
+#SBATCH --partition=gpu-cluster
+#SBATCH --account=scads
+#SBATCH --time=2:0:0
+#SBATCH --gres=gpu:4
+#SBATCH --mem=100GB
+#SBATCH --job-name=thwiki_ddp_4.11.2020
+  
+module load Anaconda3
+module load CUDA/10.2
+module load cuDNN/7
+
+source activate transformers
+
+
+port=9999
+master_hostname=$(hostname -s)
+
+unset XDG_RUNTIME_DIR
+if [ "$SLURM_JOBTMP" != "" ]; then
+     export XDG_RUNTIME_DIR=$SLURM_JOBTMP
+fi
+
+N_NODES=2
+HOSTNAME=master_hostname
+N_GPU_NODE=4
+
+srun thwiki.ddp.6.11.2020.sh N_NODES 0 HOSTNAME N_GPU_NODE
+srun thwiki.ddp.6.11.2020.sh N_NODES 1 HOSTNAME N_GPU_NODE
+
+
+
