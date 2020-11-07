@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     df = pd.read_csv(args.input_path, encoding='utf-8')
 
-    print('INFO: Begin splitting data. ๖ืนะ ห้ีดดสำห๘')
+    print('INFO: Begin splitting data.')
     
     print(f'\ttrain_ratio: {args.train_ratio}')
     print(f'\tval_ratio: {args.val_ratio}')
