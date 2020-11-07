@@ -57,7 +57,8 @@ def replace_nbspace(text: str):
     return cleaned_text
 
 def remove_thwiki_section(text:str):
-    
+    if type(text) != str:
+        return text
     search_obj = re.search(r'Section::::', text)
     cleaned_text = text
     if search_obj:
