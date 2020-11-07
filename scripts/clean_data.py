@@ -86,6 +86,7 @@ if __name__ == '__main__':
     parser.add_argument('input_path', type=str)
     parser.add_argument('output_path', type=str)
     parser.add_argument('--drop_na', action='store_true', default=True)
+    parser.add_argument('--remove_thwiki_section', action='store_true', default=True)
     parser.add_argument('--break_long_sentence', action='store_true', default=True)
     parser.add_argument('--max_sentence_length', type=int, default=300)
 
@@ -109,7 +110,7 @@ if __name__ == '__main__':
 
     print('\nDone all text filtering rules. \n')
 
-    TEXT_CLEANING_RULES = [replace_nbspace, remove_soft_hyphen, remove_zero_width_nbspace, strip_text, remove_section]
+    TEXT_CLEANING_RULES = [replace_nbspace, remove_soft_hyphen, remove_zero_width_nbspace, strip_text, remove_section if args.remove_thwiki_section ]
 
     for fn in TEXT_CLEANING_RULES:
         print(f'INFO: Start cleaning rule: {fn.__name__}')
