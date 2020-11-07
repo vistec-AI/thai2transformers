@@ -14,8 +14,9 @@ echo "--learning_rate 6e-4 "
 
 EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset
 
-WANDBpython -m torch.distributed.launch \
-    --nproc_per_node=$N_GPU_NODE \
+WANDB_WATCH=true WANDB_MODE=dryrun WANDB_PROJECT=thai2transformers WANDB_ENTITY=lalital WANDB_DIR=/ist/ist-share/scads/aires/thai2transformers_store/wandb_logs/ \
+WANDB_NAME=$EXP_NAME python -m torch.distributed.launch \
+		--nproc_per_node=$N_GPU_NODE \
     --nnodes=$N_NODES \
     --node_rank $NODE_RANK \
     --master_addr $MASTER_ADDR \
