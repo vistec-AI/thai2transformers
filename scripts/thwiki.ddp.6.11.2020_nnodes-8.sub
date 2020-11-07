@@ -1,35 +1,26 @@
-#!/bin/bash -l
-
-#SBATCH --output=thwiki_ddp_6.11.2020_out.%j
-#SBATCH --nodes=2
+#!/bin/bash
+#SBATCH --output=./slurm_output/thwiki_ddp_6.11.2020.job-%j.node-%n.out
+#SBATCH --nodes=8
 #SBATCH --partition=gpu-cluster
 #SBATCH --account=scads
-#SBATCH --time=2:0:0
+#SBATCH --time=48:0:0
 #SBATCH --gres=gpu:4
-#SBATCH --mem=100GB
-#SBATCH --job-name=thwiki_ddp_4.11.2020
+#SBATCH --mem=300GB
+#SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-8
   
-module load Anaconda3
-module load CUDA/10.2
-module load cuDNN/7
 
-source activate transformers
-
-
-port=9999
-master_hostname=$(hostname -s)
+module load CUDA/10.0
 
 unset XDG_RUNTIME_DIR
 if [ "$SLURM_JOBTMP" != "" ]; then
      export XDG_RUNTIME_DIR=$SLURM_JOBTMP
 fi
 
-N_NODES=2
-HOSTNAME=master_hostname
-N_GPU_NODE=4
 
-srun thwiki.ddp.6.11.2020.sh N_NODES 0 HOSTNAME N_GPU_NODE
-srun thwiki.ddp.6.11.2020.sh N_NODES 1 HOSTNAME N_GPU_NODE
-
+HOSTNAME=$(hostname -s)
+JOBID=${SLURM_JOB_ID}
+N_PROC_PER_NODE=4
+N_NODES=8
 
 
+srun ./thwiki.ddp.4.11.2020.sh $N_NODES $HOSTNAME $N_PROC_PER_NODE $JOBID
