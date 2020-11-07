@@ -56,6 +56,16 @@ def replace_nbspace(text: str):
     cleaned_text = re.sub(fr'{nbspace}', ' ', text)
     return cleaned_text
 
+def remove_section(text:str):
+    
+    search_obj = re.search(r'Section::::', text)
+    cleaned_text = text
+    if search_obj:
+        cleaned_text = re.sub(r'^Section::::', '', text)
+        cleaned_text = re.sub(r'\.$', '', cleaned_text)
+
+    return cleaned_text
+
 def remove_soft_hyphen(text: str):
     if type(text) != str:
         return text
@@ -99,7 +109,7 @@ if __name__ == '__main__':
 
     print('\nDone all text filtering rules. \n')
 
-    TEXT_CLEANING_RULES = [replace_nbspace, remove_soft_hyphen, remove_zero_width_nbspace, strip_text]
+    TEXT_CLEANING_RULES = [replace_nbspace, remove_soft_hyphen, remove_zero_width_nbspace, strip_text, remove_section]
 
     for fn in TEXT_CLEANING_RULES:
         print(f'INFO: Start cleaning rule: {fn.__name__}')
