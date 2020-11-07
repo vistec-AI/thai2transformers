@@ -63,6 +63,7 @@ def remove_thwiki_section(text:str):
     cleaned_text = text
     if search_obj:
         cleaned_text = re.sub(r'^Section::::', '', text)
+        cleaned_text = re.sub(r'Section::::', '', text)
         cleaned_text = re.sub(r'\.$', '', cleaned_text)
 
     return cleaned_text
