@@ -40,9 +40,10 @@ if __name__ == '__main__':
     split_df = { 'train': train_df, 'val': valid_df, 'test': test_df }
     for split in ['train', 'val', 'test']:
 
-        print(f'INFO: Begin writing {split} split to "{args.output_dir}/train/train.txt".')
+        print(f'INFO: Begin writing {split} split to "{args.output_dir}/{split}/{split}.txt".')
         if os.path.exists(f'{args.output_dir}/{split}') == False:
             os.makedirs(f'{args.output_dir}/{split}', exist_ok=True)
+
         split_df[split][['text']].to_csv(f'{args.output_dir}/{split}/{split}.txt',
                                                              encoding='utf-8', sep="\t", index=False, header=None,
                                                              escapechar="", quotechar="", quoting=csv.QUOTE_NONE)
