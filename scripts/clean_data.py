@@ -111,7 +111,7 @@ if __name__ == '__main__':
     print('\nDone all text filtering rules. \n')
 
     TEXT_CLEANING_RULES = [replace_nbspace, remove_soft_hyphen, remove_zero_width_nbspace, strip_text ]
-    if args.remove_thwiki_section
+    if args.remove_thwiki_section:
         TEXT_CLEANING_RULES.append(remove_thwiki_section)
 
     for fn in TEXT_CLEANING_RULES:
