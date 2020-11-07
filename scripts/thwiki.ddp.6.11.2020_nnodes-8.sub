@@ -16,11 +16,10 @@ if [ "$SLURM_JOBTMP" != "" ]; then
      export XDG_RUNTIME_DIR=$SLURM_JOBTMP
 fi
 
-
 HOSTNAME=$(hostname -s)
 JOBID=${SLURM_JOB_ID}
 N_PROC_PER_NODE=4
 N_NODES=8
 
 
-srun ./thwiki.ddp.4.11.2020.sh $N_NODES $HOSTNAME $N_PROC_PER_NODE $JOBID
+srun ./thwiki.ddp.6.11.2020.sh $N_NODES $HOSTNAME $N_PROC_PER_NODE $JOBID
