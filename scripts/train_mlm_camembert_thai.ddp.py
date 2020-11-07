@@ -72,6 +72,7 @@ def main():
     parser.add_argument('--dataloader_drop_last', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     
     #model architecture
+    parser.add_argument("--architecture", type=str, default='roberta-base')
     parser.add_argument("--num_hidden_layers", type=int, default=12)
     parser.add_argument("--hidden_size", type=int, default=768)
     parser.add_argument("--intermediate_size", type=int, default=3072)
@@ -103,20 +104,30 @@ def main():
 
 
     #initialize models
-    config = RobertaConfig(
-        vocab_size=tokenizer.vocab_size,
-        type_vocab_size=1,
-        #roberta base as default
-        num_hidden_layers=args.num_hidden_layers, # L
-        hidden_size=args.hidden_size,  # H
-        intermediate_size=args.intermediate_size, 
-        num_attention_head=args.num_attention_head, # A
-    #     #roberta large
-    #     num_hidden_layers=24,
-    #     hidden_size=1024, 
-    #     intermediate_size=4096,
-    #     num_attention_head=16
+    ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+        "roberta-base": "../roberta_config/roberta-baseonfig.json",
+        "roberta-large": "../roberta_config/roberta-large-config.json",
+    }
+
+    config = RobertaConfig.from_pretrained(
+        pretrained_model_name_or_path = ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[args.architecture]
     )
+    # Change vocab size
+    config.vocab_size = tokenizer.vocab_size
+    # config = RobertaConfig(
+    #     vocab_size=tokenizer.vocab_size,
+    #     type_vocab_size=1,
+    #     #roberta base as default
+    #     num_hidden_layers=args.num_hidden_layers, # L
+    #     hidden_size=args.hidden_size,  # H
+    #     intermediate_size=args.intermediate_size, 
+    #     num_attention_head=args.num_attention_head, # A
+    # #     #roberta large
+    # #     num_hidden_layers=24,
+    # #     hidden_size=1024, 
+    # #     intermediate_size=4096,
+    # #     num_attention_head=16
+    # )
     
     model = RobertaForMaskedLM(config=config)
 
