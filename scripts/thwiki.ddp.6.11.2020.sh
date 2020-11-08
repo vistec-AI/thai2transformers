@@ -39,8 +39,7 @@ WANDB_NAME=$EXP_NAME CUDA_VISBLE_DEVICES=0,1,2,3 python -m torch.distributed.lau
     --learning_rate 6e-4 --weight_decay 0.01 \
     --adam_epsilon 1e-6 \
     --fp16 True \
-    --max_steps 0 \
-    --num_train_epochs 2048000 \
+    --max_steps 15625 \
     --per_device_train_batch_size 16 \
     --per_device_eval_batch_size 16 \
     --gradient_accumulation_steps 16 \
@@ -49,8 +48,7 @@ WANDB_NAME=$EXP_NAME CUDA_VISBLE_DEVICES=0,1,2,3 python -m torch.distributed.lau
     --save_steps 5000 \
     --logging_steps 5 \
     --save_total_limit 100 \
-    --evaluation_strategy steps \
-    --eval_steps 1000 \
+    --evaluation_strategy no \
     --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp012thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --add_space_token \
