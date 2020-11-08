@@ -9,7 +9,7 @@ echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.4.11.2020.rank-$NO
 MASTER_PORT=9999
 MASTER_ADDR=$HOSTNAME
 
-module load CUDA/10.0
+module load CUDA/10.2
 
 python -m torch.distributed.launch \
     --nproc_per_node=$N_GPU_NODE \

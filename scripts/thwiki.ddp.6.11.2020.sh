@@ -12,7 +12,7 @@ export MASTER_ADDR=$HOSTNAME
 echo "Total steps = 500,000 / 8 (15,625 steps per GPU)"
 echo "--learning_rate 6e-4 "
 
-module load CUDA/10.0
+module load CUDA/10.2
 
 EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset
 

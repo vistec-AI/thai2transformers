@@ -9,7 +9,7 @@
 #SBATCH --job-name=thwiki_ddp_4.11.2020_nnodes-2
   
 
-module load CUDA/10.0
+module load CUDA/10.2
 
 unset XDG_RUNTIME_DIR
 if [ "$SLURM_JOBTMP" != "" ]; then
