@@ -135,22 +135,22 @@ def main():
     model = RobertaForMaskedLM(config=config)
 
     #datasets
-    # train_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
-    #                                   file_path=args.train_path,
-    #                                   block_size=args.block_size,
-    #                                  overwrite_cache=False,
-    #                                  cache_dir=args.datasets_cache_dir)
-    # eval_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
-    #                                  file_path=args.eval_path,
-    #                                  block_size=args.block_size,
-    #                                  overwrite_cache=False,
-    #                                  cache_dir=args.datasets_cache_dir)
-    train_dataset = LineByLineTextDataset(tokenizer=tokenizer,
-                                          file_path=args.train_path,
-                                          block_size=args.block_size)
-    eval_dataset = LineByLineTextDataset(tokenizer=tokenizer,
-                                          file_path=args.eval_path,
-                                          block_size=args.block_size)
+    train_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
+                                      file_path=args.train_path,
+                                      block_size=args.block_size,
+                                     overwrite_cache=False,
+                                     cache_dir=args.datasets_cache_dir)
+    eval_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
+                                     file_path=args.eval_path,
+                                     block_size=args.block_size,
+                                     overwrite_cache=False,
+                                     cache_dir=args.datasets_cache_dir)
+    # train_dataset = LineByLineTextDataset(tokenizer=tokenizer,
+    #                                       file_path=args.train_path,
+    #                                       block_size=args.block_size)
+    # eval_dataset = LineByLineTextDataset(tokenizer=tokenizer,
+    #                                       file_path=args.eval_path,
+    #                                       block_size=args.block_size)
     #data collator
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer, mlm=True,
