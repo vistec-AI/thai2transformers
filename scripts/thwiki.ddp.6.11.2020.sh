@@ -51,6 +51,6 @@ WANDB_NAME=$EXP_NAME CUDA_VISBLE_DEVICES=0,1,2,3 python -m torch.distributed.lau
     --evaluation_strategy steps \
     --eval_steps 500 \
     --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
-    --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp012thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
+    --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --add_space_token \
     --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_6.11.2020/ |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.j-$JOBID.rank-$NODE_RANK.out
