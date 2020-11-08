@@ -8,7 +8,7 @@
 #SBATCH --mem=300GB
 #SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-8
 
-module load CUDA/10.2
+module load CUDA/10.0
 
 unset XDG_RUNTIME_DIR
 if [ "$SLURM_JOBTMP" != "" ]; then
