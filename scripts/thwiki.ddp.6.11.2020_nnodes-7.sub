@@ -18,7 +18,7 @@ fi
 HOSTNAME=$(hostname -s)
 JOBID=${SLURM_JOB_ID}
 N_PROC_PER_NODE=4
-N_NODES=8
+N_NODES=7
 
 
 srun ./thwiki.ddp.6.11.2020.sh $N_NODES $HOSTNAME $N_PROC_PER_NODE $JOBID
