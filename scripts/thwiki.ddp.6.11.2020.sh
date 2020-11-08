@@ -14,8 +14,7 @@ echo "--learning_rate 6e-4 "
 
 EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset
 
-if [[ $NODE_RANK -neq 0 ]]
-then
+if [[ "$NODE_RANK" != "0" ]]; then
   delay=`expr 5 + $NODE_RANK `     # Whitespace for expr is important
   echo "Node: $NODE_RANK is mot the master node, wait for $delay secs"
   sleep $delay
