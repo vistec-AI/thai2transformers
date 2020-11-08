@@ -12,7 +12,7 @@ from contextlib import contextmanager
 from filelock import FileLock
 import logging, time
 from typing import Optional
-
+import joblib
 nb_cores = multiprocessing.cpu_count()
 
 
@@ -56,7 +56,7 @@ class MLMDatasetOneFile(Dataset):
             if os.path.exists(cached_features_file) and not overwrite_cache:
                 start = time.time()
                 with open(cached_features_file, "rb") as handle:
-                    self.examples = pickle.load(handle)
+                    self.examples = joblib.load(handle)
                 logging.info(
                     f"Loading features from cached file {cached_features_file} [took %.3f s]", time.time() - start
                 )
@@ -80,7 +80,7 @@ class MLMDatasetOneFile(Dataset):
 
                 start = time.time()
                 with open(cached_features_file, "wb") as handle:
-                    pickle.dump(self.examples, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    joblib.dump(self.examples, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 logging.info(
                     "Saving features into cached file %s [took %.3f s]", cached_features_file, time.time() - start
                 )
