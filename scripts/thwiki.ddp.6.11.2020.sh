@@ -14,6 +14,15 @@ echo "--learning_rate 6e-4 "
 
 EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset
 
+if [[ $NODE_RANK -neq 0 ]]
+then
+  delay=`expr 5 + $NODE_RANK `     # Whitespace for expr is important
+  echo "Node: $NODE_RANK is mot the master node, wait for $delay secs"
+  sleep $delay
+  echo "Done."
+fi
+
+
 WANDB_WATCH=true WANDB_MODE=dryrun WANDB_PROJECT=thai2transformers WANDB_ENTITY=lalital WANDB_DIR=/ist/ist-share/scads/aires/thai2transformers_store/wandb_logs/ \
 WANDB_NAME=$EXP_NAME python -m torch.distributed.launch \
 		--nproc_per_node=$N_GPU_NODE \
@@ -41,7 +50,7 @@ WANDB_NAME=$EXP_NAME python -m torch.distributed.launch \
     --save_total_limit 100 \
     --evaluation_strategy steps \
     --eval_steps 2500 \
-    --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset \
-    --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp011_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset \
+    --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
+    --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp011_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --add_space_token \
     --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_4.11.2020 |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.j-$JOBID.rank-$NODE_RANK.out
