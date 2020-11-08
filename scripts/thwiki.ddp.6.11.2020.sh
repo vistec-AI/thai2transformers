@@ -40,9 +40,9 @@ WANDB_NAME=$EXP_NAME CUDA_VISBLE_DEVICES=0,1,2,3 python -m torch.distributed.lau
     --adam_epsilon 1e-6 \
     --fp16 True \
     --max_steps 17857 \
-    --per_device_train_batch_size 48 \
-    --per_device_eval_batch_size 48 \
-    --gradient_accumulation_steps 6 \
+    --per_device_train_batch_size 32 \
+    --per_device_eval_batch_size 32 \
+    --gradient_accumulation_steps 9 \
     --warmup_steps 24000 \
     --seed 2020 \
     --save_steps 5000 \
