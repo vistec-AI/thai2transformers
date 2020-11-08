@@ -177,6 +177,7 @@ def main():
         fp16_opt_level=args.fp16_opt_level,
         dataloader_drop_last=args.dataloader_drop_last,
         prediction_loss_only=args.prediction_loss_only,
+        
         local_rank=args.local_rank
     )
 
@@ -207,11 +208,11 @@ def main():
         trainer.train(model_path=args.model_dir)
     else:
         trainer.train()
-    #save
     
+    #save
     trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
     
-    if trainer.is_world_master():
+    if trainer.is_world_process_zero():
         tokenizer.save_pretrained(os.path.join(args.output_dir, 'roberta_thai_tokenizer'))
     #evaluate
     trainer.evaluate()
