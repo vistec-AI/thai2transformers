@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --output=./slurm_output/thwiki_ddp_6.11.2020.job-%j.node-%n.out
-#SBATCH --nodes=8
+#SBATCH --nodes=7
 #SBATCH --partition=gpu-cluster
 #SBATCH --account=scads
-#SBATCH --time=2-0:0:0
+#SBATCH --time=1-0:0:0
 #SBATCH --gres=gpu:4
 #SBATCH --mem=300GB
-#SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-8
+#SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-7
 
 module load CUDA/10.2
 
