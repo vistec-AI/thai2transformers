@@ -23,7 +23,7 @@ fi
 
 
 WANDB_WATCH=true WANDB_MODE=dryrun WANDB_PROJECT=thai2transformers WANDB_ENTITY=lalital WANDB_DIR=/ist/ist-share/scads/aires/thai2transformers_store/wandb_logs/ \
-WANDB_NAME=$EXP_NAME python -m torch.distributed.launch \
+WANDB_NAME=$EXP_NAME CUDA_VISBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch \
 		--nproc_per_node=$N_GPU_NODE \
     --nnodes=$N_NODES \
     --node_rank $NODE_RANK \
