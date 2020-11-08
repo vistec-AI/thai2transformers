@@ -110,10 +110,12 @@ def main():
     }
 
     config = RobertaConfig.from_pretrained(
-        pretrained_model_name_or_path = ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[args.architecture]
+        pretrained_model_name_or_path = ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[args.architecture],
+        vocab_size = tokenizer.vocab_size
     )
+    print('\n[INFO] Roberta config: vocab_size = ', config.vocab_size)
     # Change vocab size
-    config.vocab_size = tokenizer.vocab_size
+    # config.vocab_size = tokenizer.vocab_size
     # config = RobertaConfig(
     #     vocab_size=tokenizer.vocab_size,
     #     type_vocab_size=1,
@@ -122,11 +124,11 @@ def main():
     #     hidden_size=args.hidden_size,  # H
     #     intermediate_size=args.intermediate_size, 
     #     num_attention_head=args.num_attention_head, # A
-    # #     #roberta large
-    # #     num_hidden_layers=24,
-    # #     hidden_size=1024, 
-    # #     intermediate_size=4096,
-    # #     num_attention_head=16
+    #     #roberta large
+    #     num_hidden_layers=24,
+    #     hidden_size=1024, 
+    #     intermediate_size=4096,
+    #     num_attention_head=16
     # )
     
     model = RobertaForMaskedLM(config=config)
@@ -177,7 +179,7 @@ def main():
         fp16_opt_level=args.fp16_opt_level,
         dataloader_drop_last=args.dataloader_drop_last,
         prediction_loss_only=args.prediction_loss_only,
-        
+
         local_rank=args.local_rank
     )
 
