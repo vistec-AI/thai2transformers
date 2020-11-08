@@ -105,7 +105,7 @@ def main():
 
     #initialize models
     ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP = {
-        "roberta-base": "../roberta_config/roberta-baseonfig.json",
+        "roberta-base": "../roberta_config/roberta-base-onfig.json",
         "roberta-large": "../roberta_config/roberta-large-config.json",
     }
 
