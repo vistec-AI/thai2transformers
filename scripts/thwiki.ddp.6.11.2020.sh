@@ -14,7 +14,7 @@ echo "--learning_rate 6e-4 "
 
 module load CUDA/10.2
 
-EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-28_maxseqlen-512_mlmdataset
+EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-16_maxseqlen-512_mlmdataset
 
 if [[ "$NODE_RANK" != "0" ]]; then
   delay=`expr 5 + $NODE_RANK `     # Whitespace for expr is important
@@ -39,10 +39,10 @@ WANDB_NAME=$EXP_NAME CUDA_VISBLE_DEVICES=0,1,2,3 python -m torch.distributed.lau
     --learning_rate 6e-4 --weight_decay 0.01 \
     --adam_epsilon 1e-6 \
     --fp16 True \
-    --max_steps 17857 \
+    --max_steps 31250 \
     --per_device_train_batch_size 32 \
     --per_device_eval_batch_size 32 \
-    --gradient_accumulation_steps 9 \
+    --gradient_accumulation_steps 16 \
     --warmup_steps 24000 \
     --seed 2020 \
     --save_steps 5000 \
@@ -50,7 +50,7 @@ WANDB_NAME=$EXP_NAME CUDA_VISBLE_DEVICES=0,1,2,3 python -m torch.distributed.lau
     --save_total_limit 100 \
     --evaluation_strategy steps \
     --eval_steps 500 \
-    --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-28_maxseqlen-512_mlmdataset/ \
-    --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-28_maxseqlen-512_mlmdataset/ \
+    --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-16_maxseqlen-512_mlmdataset/ \
+    --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-16_maxseqlen-512_mlmdataset/ \
     --add_space_token \
     --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_6.11.2020/ |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.j-$JOBID.rank-$NODE_RANK.out

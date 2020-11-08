@@ -3,10 +3,10 @@
 #SBATCH --nodes=7
 #SBATCH --partition=gpu-cluster
 #SBATCH --account=scads
-#SBATCH --time=1-4:0:0
+#SBATCH --time=1-12:0:0
 #SBATCH --gres=gpu:4
 #SBATCH --mem=300GB
-#SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-7
+#SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-4
 
 module load CUDA/10.2
 
