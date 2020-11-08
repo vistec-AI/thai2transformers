@@ -24,8 +24,8 @@ WANDB_NAME=$EXP_NAME python -m torch.distributed.launch \
    ./train_mlm_camembert_thai.ddp.py \
     --tokenizer_name_or_path ../dataset/spm/thwiki-for-ddp_6.11.2020_spm_vs-24k/sentencepiece.bpe.model \
     --ext txt \
-    --train_dir ../dataset/split/thwiki-for-ddp_6.11.2020/train/ \
-    --eval_dir ../dataset/split/thwiki-for-ddp_6.11.2020/val/ \
+    --train_path ../dataset/split/thwiki-for-ddp_6.11.2020/train/train.txt \
+    --eval_path ../dataset/split/thwiki-for-ddp_6.11.2020/val/val.txt \
     --block_size 512 \
     --learning_rate 6e-4 --weight_decay 0.01 \
     --adam_epsilon 1e-6 \
