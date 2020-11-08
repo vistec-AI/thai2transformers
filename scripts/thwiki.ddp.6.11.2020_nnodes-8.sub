@@ -7,7 +7,6 @@
 #SBATCH --gres=gpu:4
 #SBATCH --mem=300GB
 #SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-8
-  
 
 module load CUDA/10.0
 
