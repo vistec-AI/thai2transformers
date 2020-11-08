@@ -35,7 +35,7 @@ WANDB_NAME=$EXP_NAME CUDA_VISBLE_DEVICES=0,1,2,3 python -m torch.distributed.lau
     --ext txt \
     --train_path ../dataset/split/thwiki-for-ddp_6.11.2020/train/train.txt \
     --eval_path ../dataset/split/thwiki-for-ddp_6.11.2020/val/val.txt \
-    --block_size 512 \
+    --block_size 500 \
     --learning_rate 6e-4 --weight_decay 0.01 \
     --adam_epsilon 1e-6 \
     --fp16 True \
