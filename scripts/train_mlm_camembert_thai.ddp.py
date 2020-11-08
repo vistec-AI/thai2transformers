@@ -109,28 +109,28 @@ def main():
         "roberta-large": "../roberta_config/roberta-large-config.json",
     }
 
-    config = RobertaConfig.from_pretrained(
-        pretrained_model_name_or_path = ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[args.architecture],
-        vocab_size = tokenizer.vocab_size
-    )
-    print('\n[INFO] Roberta config: vocab_size = ', config.vocab_size)
+    # config = RobertaConfig.from_pretrained(
+    #     pretrained_model_name_or_path = ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[args.architecture],
+    #     vocab_size = tokenizer.vocab_size
+    # )
     # Change vocab size
     # config.vocab_size = tokenizer.vocab_size
-    # config = RobertaConfig(
-    #     vocab_size=tokenizer.vocab_size,
-    #     type_vocab_size=1,
-    #     #roberta base as default
-    #     num_hidden_layers=args.num_hidden_layers, # L
-    #     hidden_size=args.hidden_size,  # H
-    #     intermediate_size=args.intermediate_size, 
-    #     num_attention_head=args.num_attention_head, # A
-    #     #roberta large
-    #     num_hidden_layers=24,
-    #     hidden_size=1024, 
-    #     intermediate_size=4096,
-    #     num_attention_head=16
-    # )
-    
+    config = RobertaConfig(
+        vocab_size=tokenizer.vocab_size,
+        type_vocab_size=1,
+        #roberta base as default
+        num_hidden_layers=args.num_hidden_layers, # L
+        hidden_size=args.hidden_size,  # H
+        intermediate_size=args.intermediate_size, 
+        num_attention_head=args.num_attention_head, # A
+        #roberta large
+        # num_hidden_layers=24,
+        # hidden_size=1024, 
+        # intermediate_size=4096,
+        # num_attention_head=16
+    )
+    print('\n[INFO] Roberta config: vocab_size = ', config.vocab_size)
+
     model = RobertaForMaskedLM(config=config)
 
     #datasets
