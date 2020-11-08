@@ -52,4 +52,4 @@ WANDB_NAME=$EXP_NAME python -m torch.distributed.launch \
     --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp011_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --add_space_token \
-    --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_4.11.2020 |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.j-$JOBID.rank-$NODE_RANK.out
+    --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_6.11.2020 |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.j-$JOBID.rank-$NODE_RANK.out
