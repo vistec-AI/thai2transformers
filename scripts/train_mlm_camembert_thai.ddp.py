@@ -153,7 +153,8 @@ def main():
                                           block_size=args.block_size)
     #data collator
     data_collator = DataCollatorForLanguageModeling(
-    tokenizer=tokenizer, mlm=True, mlm_probability=args.mlm_probability)
+        tokenizer=tokenizer, mlm=True,
+        mlm_probability=args.mlm_probability)
     
     #training args
     training_args = TrainingArguments(    
