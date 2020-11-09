@@ -158,6 +158,11 @@ def main():
                                          cache_dir=args.datasets_cache_dir)
     else:
         raise f'The args.dataset_loader_name specified `{args.dataset_loader_name}` is not recognized, please select either `linebyline` or `mlmdatasetonefile`.'
+
+    print(f'\n[INFO] The args.dataset_loader_name specified is {args.dataset_loader_name specified }')
+
+    print(f'\n[INFO] Number of examples of train_dataset {len(train_dataset)}')
+    print(f'[INFO] Number of examples of eval_dataset {len(eval_dataset)}\n')
     #datasets
 
     #data collator
