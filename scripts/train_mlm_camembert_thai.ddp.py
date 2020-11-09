@@ -91,6 +91,8 @@ def main():
     
     parser.add_argument("--datasets_cache_dir",  type=str, default=None)
 
+    parser.add_argument("--dataset_loader_name",  type=str, default='linebyline', help='Specify either `linebyline` or `mlmdatasetonefile`.')
+
     args = parser.parse_args()
 
     #set seed
@@ -134,23 +136,30 @@ def main():
 
     model = RobertaForMaskedLM(config=config)
 
-    #datasets
-    # train_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
-    #                                   file_path=args.train_path,
-    #                                   block_size=args.block_size,
-    #                                  overwrite_cache=False,
-    #                                  cache_dir=args.datasets_cache_dir)
-    # eval_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
-    #                                  file_path=args.eval_path,
-    #                                  block_size=args.block_size,
-    #                                  overwrite_cache=False,
-    #                                  cache_dir=args.datasets_cache_dir)
-    train_dataset = LineByLineTextDataset(tokenizer=tokenizer,
+    if args.dataset_loader_name.lower() == 'linebyline':
+        
+        train_dataset = LineByLineTextDataset(tokenizer=tokenizer,
+                                            file_path=args.train_path,
+                                            block_size=args.block_size)
+        eval_dataset = LineByLineTextDataset(tokenizer=tokenizer,
+                                            file_path=args.eval_path,
+                                            block_size=args.block_size)
+    elif args.dataset_loader_name.lower() == 'mlmdatasetonefile':
+
+        train_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
                                           file_path=args.train_path,
-                                          block_size=args.block_size)
-    eval_dataset = LineByLineTextDataset(tokenizer=tokenizer,
-                                          file_path=args.eval_path,
-                                          block_size=args.block_size)
+                                          block_size=args.block_size,
+                                          overwrite_cache=False,
+                                          cache_dir=args.datasets_cache_dir)
+        eval_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
+                                         file_path=args.eval_path,
+                                         block_size=args.block_size,
+                                         overwrite_cache=False,
+                                         cache_dir=args.datasets_cache_dir)
+    else:
+        raise f'The args.dataset_loader_name specified `{args.dataset_loader_name}` is not recognized, please select either `linebyline` or `mlmdatasetonefile`.'
+    #datasets
+
     #data collator
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer, mlm=True,
