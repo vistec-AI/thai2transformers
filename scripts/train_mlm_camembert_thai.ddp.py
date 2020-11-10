@@ -157,7 +157,8 @@ def main():
                                          overwrite_cache=False,
                                          cache_dir=args.datasets_cache_dir)
     else:
-        raise f'The args.dataset_loader_name specified `{args.dataset_loader_name}` is not recognized, please select either `linebyline` or `mlmdatasetonefile`.'
+        print('The args.dataset_loader_name specified {args.dataset_loader_name} is not recognized, please select either `linebyline` or `mlmdatasetonefile`.')
+        raise 'error'
 
     print(f'\n[INFO] The args.dataset_loader_name specified is {args.dataset_loader_name specified }')
 
