@@ -1,4 +1,4 @@
-
+#!/bin/sh
 #SBATCH --output=./slurm_output/thwiki_ddp_6.11.2020.job-%j.node-%n.out
 #SBATCH --nodes=8
 #SBATCH --partition=gpu-cluster
