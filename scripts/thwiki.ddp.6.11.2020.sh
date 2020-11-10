@@ -9,7 +9,7 @@ WARMUP_STEPS=$6
 SAVE_STEPS=$7
 EVAL_STEPS=$8
 EXP_NAME=${9}
-N_GPUS=$(expr $N_NODES * $sN_PROC_PER_NODE)
+N_GPUS=$(expr $N_NODES * $N_PROC_PER_NODE)
 echo "Number of GPU : $N_GPUS"
 echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.rank-$NODE_RANK.out
 
