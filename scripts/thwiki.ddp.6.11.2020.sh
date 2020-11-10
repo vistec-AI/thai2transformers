@@ -33,7 +33,7 @@ fi
 
 LOCAL_MAX_STEPS=`expr $MAX_STEPS / $N_GPUS`
 LOCAL_WARMUP_STEPS=`expr $WARMUP_STEPS / $N_GPUS`
-LOCAL_SAVE_STEPS=`expr $SAVE_STEPS/ $N_GPUS`
+LOCAL_SAVE_STEPS=`expr $SAVE_STEPS / $N_GPUS`  
 LOCAL_EVAL_STEPS=`expr $EVAL_STEPS / $N_GPUS`
 
 
@@ -41,7 +41,6 @@ echo "Global max_steps     = $MAX_STEPS     , local = $LOCAL_MAX_STEPS"
 echo "Global warmup_steps  = $WARMUP_STEPS  , local = $LOCAL_WARMUP_STEPS"
 echo "Global save_steps    = $SAVE_STEPS    , local = $LOCAL_SAVE_STEPS"
 echo "Global eval_steps    = $EVAL_STEPS    , local = $LOCAL_EVAL_STEPS"
-echo "Global logging_steps = $LOGGING_STEPS , local = $LOCAL_MAX_STEPS"
 
 
 WANDB_WATCH=true WANDB_MODE=dryrun WANDB_PROJECT=thai2transformers WANDB_ENTITY=lalital WANDB_DIR=/ist/ist-share/scads/aires/thai2transformers_store/wandb_logs/ \
