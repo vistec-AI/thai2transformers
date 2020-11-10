@@ -10,7 +10,7 @@ SAVE_STEPS=$7
 EVAL_STEPS=$8
 LOGGING_STEPS=$9
 EXP_NAME=${10}
-N_GPUS=expr $N_NODES * N_PROC_PER_NODE
+N_GPUS=`expr $N_NODES * $sN_PROC_PER_NODE`
 
 echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.rank-$NODE_RANK.out
 
@@ -31,10 +31,10 @@ if [[ "$NODE_RANK" != "0" ]]; then
   echo "Done."
 fi
 
-LOCAL_MAX_STEPS=expr $MAX_STEPS / $N_GPUS
-LOCAL_WARMUP_STEPS=expr $WARMUP_STEPS / $N_GPUS
-LOCAL_SAVE_STEPS=expr $SAVE_STEPS/ $N_GPUS
-LOCAL_EVAL_STEPS=expr $EVAL_STEPS / $N_GPUS
+LOCAL_MAX_STEPS=`expr $MAX_STEPS / $N_GPUS`
+LOCAL_WARMUP_STEPS=`expr $WARMUP_STEPS / $N_GPUS`
+LOCAL_SAVE_STEPS=`expr $SAVE_STEPS/ $N_GPUS`
+LOCAL_EVAL_STEPS=`expr $EVAL_STEPS / $N_GPUS`
 
 
 echo "Global max_steps     = $MAX_STEPS     , local = $LOCAL_MAX_STEPS"
@@ -74,5 +74,5 @@ WANDB_NAME=$EXP_NAME  python -m torch.distributed.launch \
     --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --add_space_token \
-    --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_6.11.2020/ |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.j-$JOBID.rank-$NODE_RANK.out \
-    --dataset_loader_name linebyline
+    --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_6.11.2020/ \
+    --dataset_loader_name linebyline |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.j-$JOBID.rank-$NODE_RANK.out
