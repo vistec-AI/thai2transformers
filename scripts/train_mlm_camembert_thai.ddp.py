@@ -136,7 +136,7 @@ def main():
 
     model = RobertaForMaskedLM(config=config)
 
-    if args.dataset_loader_name.lower() == 'linebyline':
+    if args.dataset_loader_name == 'linebyline':
         
         train_dataset = LineByLineTextDataset(tokenizer=tokenizer,
                                             file_path=args.train_path,
@@ -144,7 +144,7 @@ def main():
         eval_dataset = LineByLineTextDataset(tokenizer=tokenizer,
                                             file_path=args.eval_path,
                                             block_size=args.block_size)
-    elif args.dataset_loader_name.lower() == 'mlmdatasetonefile':
+    elif args.dataset_loader_name == 'mlmdatasetonefile':
 
         train_dataset = MLMDatasetOneFile(tokenizer=tokenizer,
                                           file_path=args.train_path,
@@ -160,7 +160,7 @@ def main():
         print(f'The args.dataset_loader_name specified {args.dataset_loader_name} is not recognized, please select either `linebyline` or `mlmdatasetonefile`.')
         raise 'error'
 
-    print(f'\n[INFO] The args.dataset_loader_name specified is {args.dataset_loader_name specified }')
+    print(f'\n[INFO] The args.dataset_loader_name specified is {args.dataset_loader_name}')
 
     print(f'\n[INFO] Number of examples of train_dataset {len(train_dataset)}')
     print(f'[INFO] Number of examples of eval_dataset {len(eval_dataset)}\n')
