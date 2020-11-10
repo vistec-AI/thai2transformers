@@ -11,7 +11,7 @@ WARMUP_STEPS=$6
 SAVE_STEPS=$7
 EVAL_STEPS=$8
 LOGGING_STEPS=$9
-
+EXP_NAME=${10}
 N_GPUS=expr $N_NODES * N_PROC_PER_NODE
 
 echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.rank-$NODE_RANK.out
@@ -24,7 +24,7 @@ echo "--learning_rate 6e-4 "
 
 module load CUDA/10.2
 
-EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset
+# EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset
 
 if [[ "$NODE_RANK" != "0" ]]; then
   delay=`expr 5 + $NODE_RANK `     # Whitespace for expr is important
@@ -37,7 +37,6 @@ LOCAL_MAX_STEPS=expr $MAX_STEPS / $N_GPUS
 LOCAL_WARMUP_STEPS=expr $WARMUP_STEPS / $N_GPUS
 LOCAL_SAVE_STEPS=expr $SAVE_STEPS/ $N_GPUS
 LOCAL_EVAL_STEPS=expr $EVAL_STEPS / $N_GPUS
-LOCAL_LOGGING_STEPS=expr $LOGGING_STEPS / $N_GPUS
 
 
 echo "Global max_steps     = $MAX_STEPS     , local = $LOCAL_MAX_STEPS"
@@ -63,18 +62,19 @@ WANDB_NAME=$EXP_NAME  python -m torch.distributed.launch \
     --learning_rate 6e-4 --weight_decay 0.01 \
     --adam_epsilon 1e-6 \
     --fp16 True \
-    --max_steps 15625 \
+    --max_steps $LOCAL_MAX_STEPS \
     --per_device_train_batch_size 32 \
     --per_device_eval_batch_size 32 \
     --gradient_accumulation_steps 8 \
-    --warmup_steps 24000 \
+    --warmup_steps $LOCAL_WARMUP_STEPS \
     --seed 2020 \
-    --save_steps 5000 \
+    --save_steps $LOCAL_SAVE_STEPS \
     --logging_steps 5 \
     --save_total_limit 100 \
     --evaluation_strategy steps \
-    --eval_steps 500 \
+    --eval_steps $LOCAL_EVAL_STEPS \
     --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset/ \
     --add_space_token \
-    --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_6.11.2020/ |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.j-$JOBID.rank-$NODE_RANK.out
+    --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_6.11.2020/ |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.j-$JOBID.rank-$NODE_RANK.out \
+    --dataset_loader_name linebyline
