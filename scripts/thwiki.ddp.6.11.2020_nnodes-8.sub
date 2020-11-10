@@ -27,7 +27,7 @@ EVAL_STEPS=$5
 EXP_NAME=$6
 
 
-srun ./thwiki.ddp.6.11.2020_nnodes-8.sh \
+srun ./thwiki.ddp.6.11.2020.sh \
 $N_NODES \
 $HOSTNAME \
 $N_PROC_PER_NODE \
