@@ -10,7 +10,7 @@ SAVE_STEPS=$7
 EVAL_STEPS=$8
 LOGGING_STEPS=$9
 EXP_NAME=${10}
-N_GPUS=`expr $N_NODES * $sN_PROC_PER_NODE`
+N_GPUS=$(expr $N_NODES * $sN_PROC_PER_NODE)
 echo "Number of GPU : $N_GPUS"
 echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.rank-$NODE_RANK.out
 
@@ -31,10 +31,10 @@ if [[ "$NODE_RANK" != "0" ]]; then
   echo "Done."
 fi
 
-LOCAL_MAX_STEPS=`expr $MAX_STEPS / $N_GPUS`
-LOCAL_WARMUP_STEPS=`expr $WARMUP_STEPS / $N_GPUS`
-LOCAL_SAVE_STEPS=`expr $SAVE_STEPS / $N_GPUS`  
-LOCAL_EVAL_STEPS=`expr $EVAL_STEPS / $N_GPUS`
+LOCAL_MAX_STEPS=$(expr $MAX_STEPS / $N_GPUS)
+LOCAL_WARMUP_STEPS=$(expr $WARMUP_STEPS / $N_GPUS)
+LOCAL_SAVE_STEPS=$(expr $SAVE_STEPS / $N_GPUS)  
+LOCAL_EVAL_STEPS=$(expr $EVAL_STEPS / $N_GPUS)
 
 
 echo "Global max_steps     = $MAX_STEPS     , local = $LOCAL_MAX_STEPS"
