@@ -2,8 +2,18 @@
 N_NODES=$1
 NODE_RANK=${SLURM_PROCID}
 HOSTNAME=$2
-N_GPU_NODE=$3
+N_PROC_PER_NODE=$3
 JOBID=$4
+
+
+MAX_STEPS=$5
+WARMUP_STEPS=$6
+SAVE_STEPS=$7
+EVAL_STEPS=$8
+LOGGING_STEPS=$9
+
+N_GPUS=expr $N_NODES * N_PROC_PER_NODE
+
 echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.rank-$NODE_RANK.out
 
 export MASTER_PORT=9999
@@ -23,9 +33,23 @@ if [[ "$NODE_RANK" != "0" ]]; then
   echo "Done."
 fi
 
+LOCAL_MAX_STEPS=expr $MAX_STEPS / $N_GPUS
+LOCAL_WARMUP_STEPS=expr $WARMUP_STEPS / $N_GPUS
+LOCAL_SAVE_STEPS=expr $SAVE_STEPS/ $N_GPUS
+LOCAL_EVAL_STEPS=expr $EVAL_STEPS / $N_GPUS
+LOCAL_LOGGING_STEPS=expr $LOGGING_STEPS / $N_GPUS
+
+
+echo "Global max_steps     = $MAX_STEPS     , local = $LOCAL_MAX_STEPS"
+echo "Global warmup_steps  = $WARMUP_STEPS  , local = $LOCAL_WARMUP_STEPS"
+echo "Global save_steps    = $SAVE_STEPS    , local = $LOCAL_SAVE_STEPS"
+echo "Global eval_steps    = $EVAL_STEPS    , local = $LOCAL_EVAL_STEPS"
+echo "Global logging_steps = $LOGGING_STEPS , local = $LOCAL_MAX_STEPS"
+
+
 WANDB_WATCH=true WANDB_MODE=dryrun WANDB_PROJECT=thai2transformers WANDB_ENTITY=lalital WANDB_DIR=/ist/ist-share/scads/aires/thai2transformers_store/wandb_logs/ \
-WANDB_NAME=$EXP_NAME CUDA_VISBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch \
-		--nproc_per_node=$N_GPU_NODE \
+WANDB_NAME=$EXP_NAME  python -m torch.distributed.launch \
+		--nproc_per_node=$N_PROC_PER_NODE \
     --nnodes=$N_NODES \
     --node_rank $NODE_RANK \
     --master_addr $MASTER_ADDR \

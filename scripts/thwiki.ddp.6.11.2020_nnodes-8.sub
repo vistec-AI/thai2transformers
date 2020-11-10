@@ -6,7 +6,7 @@
 #SBATCH --time=1-0:0:0
 #SBATCH --gres=gpu:4
 #SBATCH --mem=100GB
-#SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-8
+#SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-8_r2
 
 module load CUDA/10.2
 
@@ -18,7 +18,22 @@ fi
 HOSTNAME=$(hostname -s)
 JOBID=${SLURM_JOB_ID}
 N_PROC_PER_NODE=4
-N_NODES=8
+
+N_NODES=$1
+MAX_STEPS=$2
+WARMUP_STEPS=$3
+SAVE_STEPS=$4
+EVAL_STEPS=$5
+LOGGING_STEPS=$6
 
 
-srun ./thwiki.ddp.6.11.2020_nnodes-8.sh $N_NODES $HOSTNAME $N_PROC_PER_NODE $JOBID
+srun ./thwiki.ddp.6.11.2020_nnodes-8.sh \
+$N_NODES \
+$HOSTNAME \
+$N_PROC_PER_NODE \
+$JOBID \
+$MAX_STEPS \
+$WARMUP_STEPS \
+$SAVE_STEPS \
+$EVAL_STEPS \
+$LOGGING_STEPS
