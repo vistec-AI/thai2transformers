@@ -19,12 +19,12 @@ HOSTNAME=$(hostname -s)
 JOBID=${SLURM_JOB_ID}
 N_PROC_PER_NODE=4
 
-N_NODES=$1
-MAX_STEPS=$2
-WARMUP_STEPS=$3
-SAVE_STEPS=$4
-EVAL_STEPS=$5
-EXP_NAME=$6
+N_NODES=8
+MAX_STEPS=500000
+WARMUP_STEPS=24000
+SAVE_STEPS=32000
+EVAL_STEPS=3200
+EXP_NAME=exp012-2_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_linebyline+fix-warmup-steps
 
 
 srun ./thwiki.ddp.6.11.2020.sh \
