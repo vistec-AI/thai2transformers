@@ -46,7 +46,7 @@ python train_mlm_roberthai.py\
 
 ## Installation 
 
-### Manual installation
+### 1) Manual installation
 
 1) PyTorch
 
@@ -104,7 +104,7 @@ pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cud
 ```
 
 
-### Docker image
+### 2) Docker image
 
 ref: https://hub.docker.com/layers/huggingface/transformers-pytorch-gpu/3.4.0/images/sha256-7e0b2f97aad355f92b27063eef4245ac58e69e8c2113ea9bb0be6b4db23d301a?context=explore
 
