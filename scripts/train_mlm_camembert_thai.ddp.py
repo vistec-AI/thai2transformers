@@ -211,7 +211,7 @@ def main():
     logging.info(" FP16 Training: %s", training_args.fp16)
   
     
-    if args.model_directory != "":
+    if args.model_directory != None:
         # print(f"[INFO] Load pretrianed model from {args.model_directory}/pytorch_model.bin")
         model = RobertaForMaskedLM(config=config)        
         model.load_state_dict(
