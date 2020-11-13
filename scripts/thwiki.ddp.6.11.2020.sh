@@ -11,10 +11,12 @@ EXP_NAME=${9}
 LR=${10}
 BATCH_SIZE=${11}
 GRAD_ACC=${12}
+MODEL_CHECKPOINT_DIR=${13}
 
 NODE_RANK=${SLURM_PROCID}
 
 N_GPUS=`expr $N_NODES \* $N_PROC_PER_NODE `
+
 
 
 echo "Number of GPU : $N_GPUS" |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.rank-$NODE_RANK.out
@@ -29,6 +31,9 @@ echo "--learning_rate $LR "
 module load CUDA/10.2
 
 # EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset
+if [[ "$MODEL_CHECKPOINT_DIR" != "" ]]; then
+  echo "Resume model training from $MODEL_CHECKPOINT_DIR"
+fi
 
 if [[ "$NODE_RANK" != "0" ]]; then
   delay=`expr 5 + $NODE_RANK `     # Whitespace for expr is important
@@ -79,4 +84,5 @@ python -m torch.distributed.launch \
     --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/$EXP_NAME/ \
     --add_space_token \
     --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_6.11.2020/ \
+    --model_directory $MODEL_CHECKPOINT_DIR \
     --dataset_loader_name linebyline |& tee -a ./slurm_logs/$EXP_NAME.job-$JOBID.rank-$NODE_RANK.out
