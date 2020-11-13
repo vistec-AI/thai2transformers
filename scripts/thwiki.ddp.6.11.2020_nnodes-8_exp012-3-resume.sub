@@ -26,8 +26,8 @@ SAVE_STEPS=3125
 EVAL_STEPS=3125
 EXP_NAME=exp012-3-r2_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-31250_ngpus-32_maxseqlen-512_linebyline
 LR=7e-4
-BATCH_SIZE=30
-GRAD_ACC=9
+BATCH_SIZE=32
+GRAD_ACC=8
 MODEL_CHECKPOINT_DIR=/ist/ist-share/scads/aires/thai2transforemrs_shared/checkpoints/exp012-3_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-31250_ngpus-32_maxseqlen-512_linebyline/checkpoint-21875
 
 srun ./thwiki.ddp.6.11.2020.sh $N_NODES $HOSTNAME $N_PROC_PER_NODE $JOBID \
