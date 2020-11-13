@@ -11,7 +11,8 @@ EXP_NAME=${9}
 LR=${10}
 BATCH_SIZE=${11}
 GRAD_ACC=${12}
-NODE_RANK=${13}
+
+NODE_RANK=${SLURM_PROCID}
 
 N_GPUS=`expr $N_NODES \* $N_PROC_PER_NODE `
 
@@ -70,7 +71,7 @@ python -m torch.distributed.launch \
     --warmup_steps $WARMUP_STEPS \
     --seed 2020 \
     --save_steps $SAVE_STEPS \
-    --logging_steps 5 \
+    --logging_steps 10 \
     --save_total_limit 100 \
     --evaluation_strategy steps \
     --eval_steps $EVAL_STEPS \
