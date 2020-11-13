@@ -3,7 +3,7 @@
 #SBATCH --nodes=8
 #SBATCH --partition=gpu-cluster
 #SBATCH --account=scads
-#SBATCH --time=1-14:0:0
+#SBATCH --time=14:0:0
 #SBATCH --gres=gpu:4
 #SBATCH --mem=100GB
 #SBATCH --job-name=exp012-3-r2_thwiki-ddp_6.11.2020_nnodes-8_run-on-13-11.2020
