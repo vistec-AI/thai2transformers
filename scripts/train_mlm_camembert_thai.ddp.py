@@ -134,7 +134,6 @@ def main():
     )
     print('\n[INFO] Roberta config: vocab_size = ', config.vocab_size)
 
-    model = RobertaForMaskedLM(config=config)
 
     if args.dataset_loader_name == 'linebyline':
         
@@ -212,8 +211,15 @@ def main():
   
     
     if args.model_directory != "":
-        print(f"[INFO] Load pretrianed model from {args.model_directory}/pytorch_model.bin")
-        model = RobertaForMaskedLM.from_pretrained(os.path.join(args.model_directory, "pytorch_model.bin"))
+        # print(f"[INFO] Load pretrianed model from {args.model_directory}/pytorch_model.bin")
+        
+        model = RobertaForMaskedLM.from_pretrained(
+                    pretrained_model_name_or_path=os.path.join(args.model_directory),
+                    from_pt=True,
+                    config=config
+                )
+    else:
+        model = RobertaForMaskedLM(config=config)
 
     #initiate trainer
     trainer = Trainer(
