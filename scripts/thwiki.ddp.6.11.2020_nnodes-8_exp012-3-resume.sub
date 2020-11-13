@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --output=./slurm_output/exp012-3-r2_thwiki-ddp_6.11.2020_run-on-1311.2020.job-%j.node-%n.out
+#SBATCH --output=./slurm_output/exp012-3-resume_thwiki-ddp_6.11.2020_run-on-1311.2020.job-%j.node-%n.out
 #SBATCH --nodes=8
 #SBATCH --partition=gpu-cluster
 #SBATCH --account=scads
