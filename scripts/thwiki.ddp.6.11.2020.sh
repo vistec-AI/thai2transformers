@@ -33,6 +33,8 @@ module load CUDA/10.2
 # EXP_NAME=exp012_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_mlmdataset
 if [[ "$MODEL_CHECKPOINT_DIR" != "" ]]; then
   echo "Resume model training from $MODEL_CHECKPOINT_DIR"
+else 
+  MODEL_CHECKPOINT_DIR=''
 fi
 
 if [[ "$NODE_RANK" != "0" ]]; then
