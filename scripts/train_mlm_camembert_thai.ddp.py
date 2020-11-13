@@ -84,8 +84,8 @@ def main():
     parser.add_argument("--seed", type=int, default=1412)
     parser.add_argument('--fp16', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
-    parser.add_argument("--model_path", type=str, default=None) # for resume training
-    parser.add_argument("--model_dir", type=str, default=None) # for resume training
+    
+    parser.add_argument("--model_directory", type=str, default=None) # for resume training
 
     parser.add_argument("--add_space_token", action='store_true', default=False)
     
@@ -211,9 +211,9 @@ def main():
     logging.info(" FP16 Training: %s", training_args.fp16)
   
     
-    if args.model_path != None:
-        print(f'[INFO] Load pretrianed model from {args.model_path}')
-        model = RobertaForMaskedLM.from_pretrained(args.model_path)
+    if args.model_directory != "":
+        print(f"[INFO] Load pretrianed model from {args.model_directory}/pytorch_model.bin")
+        model = RobertaForMaskedLM.from_pretrained(os.path.join(args.model_directory, "pytorch_model.bin"))
 
     #initiate trainer
     trainer = Trainer(
@@ -228,8 +228,8 @@ def main():
     logging.info(" Is local process zero: %s", trainer.is_local_process_zero())
 
     #train
-    if args.model_path != None:
-        trainer.train(model_path=args.model_dir)
+    if args.model_directory != None:
+        trainer.train(model_path=args.model_directory)
     else:
         trainer.train()
     
