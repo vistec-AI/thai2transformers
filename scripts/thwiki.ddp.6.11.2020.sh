@@ -49,7 +49,7 @@ export WANDB_PROJECT=thai2transformers
 export WANDB_ENTITY=lalital
 export WANDB_DIR=/ist/ist-share/scads/aires/thai2transformers_store/wandb_logs/ \
 export WANDB_NAME=$EXP_NAME
-if [[ "$MODEL_CHECKPOINT_DIR" != "" ]]; then
+if [[ "$MODEL_CHECKPOINT_DIR" != "none" ]]; then
   echo "Resume model training from $MODEL_CHECKPOINT_DIR"
   python -m torch.distributed.launch \
 		--nproc_per_node=$N_PROC_PER_NODE \
