@@ -5,6 +5,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+import torch
 from transformers import (
     CamembertTokenizer,
     RobertaConfig,
@@ -212,11 +213,9 @@ def main():
     
     if args.model_directory != "":
         # print(f"[INFO] Load pretrianed model from {args.model_directory}/pytorch_model.bin")
-        
-        model = RobertaForMaskedLM.from_pretrained(
-                    pretrained_model_name_or_path=os.path.join(args.model_directory),
-                    from_pt=True,
-                    config=config
+        model = RobertaForMaskedLM(config=config)        
+        model.load_state_dict(
+                    state_dict=torch.load(os.path.join(args.model_directory, "pytorch_model.bin")),
                 )
     else:
         model = RobertaForMaskedLM(config=config)
