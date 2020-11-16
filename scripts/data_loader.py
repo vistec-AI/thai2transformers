@@ -231,9 +231,10 @@ class MemmapConcatTextDataset(Dataset):
                         grouped.extend(e)
                     lines = []
                 if len(grouped) > block_size * 512:
-                    blocks = [grouped[i - block_size: i]
-                              for i in range(block_size, len(grouped), block_size)]
-                    grouped = grouped[-(len(grouped) % block_size):]
+                    blocks = []
+                    for i in range(block_size, len(grouped), block_size):
+                        blocks.append(grouped[i - block_size: i])
+                    grouped = grouped[i:]
                     self.memmap_index_dataset.add(blocks)
             if len(lines) > 0:
                 batch_encoding = tokenizer(lines, add_special_tokens=True,
