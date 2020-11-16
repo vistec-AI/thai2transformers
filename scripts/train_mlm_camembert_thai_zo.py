@@ -116,19 +116,6 @@ class ArchitectureArguments:
 
 
 @dataclass
-class CustomOthersArguments:
-    add_space_token: bool = field(
-        default=False, metadata={'help': 'Add spacial token for tokenizer.'}
-        )
-    ext: str = field(
-        default='.txt', metadata={'help': 'Extension of training and evaluation files.'}
-        )
-    model_dir: Optional[str] = field(
-        default=None, metadata={'help': 'Dir of the checkpoint.'}
-        )
-
-
-@dataclass
 class CustomTrainingArgument(TrainingArguments):
     """
     Setting new default and copy type and help from parent.
@@ -226,6 +213,25 @@ class CustomTrainingArgument(TrainingArguments):
         )
 
 
+@dataclass
+class CustomOthersArguments:
+    add_space_token: bool = field(
+        default=False, metadata={'help': 'Add spacial token for tokenizer.'}
+        )
+    ext: str = field(
+        default='.txt', metadata={'help': 'Extension of training and evaluation files.'}
+        )
+    model_dir: Optional[str] = field(
+        default=None, metadata={'help': 'Dir of the checkpoint.'}
+        )
+    datasets_map_batch_size: Optional[int] = field(
+        default=1000, metadata={'help': 'Batch_size in `datasets.map`.'}
+        )
+    writer_batch_size: Optional[int] = field(
+        default=1000, metadata={'help': 'Batch_size in datasets writer'}
+        )
+
+
 # Arguments that will be removed but kept for now.
 # We should suggest alternative or explain the reason for removing.
 COMPAT_WARN_LIST = [('train_max_length',
@@ -304,8 +310,8 @@ def main():
     # Initialize model
     model = RobertaForMaskedLM(config=config)
 
-    data_args.train_files = glob.glob(f'{data_args.train_dir}/*.{custom_args.ext}')
-    data_args.validation_files = glob.glob(f'{data_args.eval_dir}/*.{custom_args.ext}')
+    data_args.train_files = list(sorted(glob.glob(f'{data_args.train_dir}/*.{custom_args.ext}')))
+    data_args.validation_files = list(sorted(glob.glob(f'{data_args.eval_dir}/*.{custom_args.ext}')))
 
     if custom_args.ext == 'txt':
         # Skip downloading processing script
@@ -348,7 +354,9 @@ def main():
     # https://github.com/huggingface/transformers/blob/master/examples/language-modeling/run_clm.py
 
     def tokenize_function(examples):
-        return tokenizer(examples['text'])
+        examples = tokenizer(examples['text'])
+        examples['labels'] = examples['input_ids'].copy()
+        return examples
 
     tokenized_datasets = datasets.map(
         tokenize_function,
@@ -356,59 +364,15 @@ def main():
         num_proc=data_args.preprocessing_num_workers,
         remove_columns=['text'],
         load_from_cache_file=not data_args.overwrite_cache,
+        batch_size=custom_args.datasets_map_batch_size,
     )
-
-    if data_args.block_size <= 0:
-        block_size = tokenizer.model_max_length
-    else:
-        if data_args.block_size > tokenizer.model_max_length:
-            print(
-                f"The block_size passed ({data_args.block_size}) is larger than "
-                f"the maximum length for the model"
-                f"({tokenizer.model_max_length}). Using block_size={tokenizer.model_max_length}."
-            )
-        block_size = min(data_args.block_size, tokenizer.model_max_length)
-
-    # Main data processing function that will concatenate all texts from our dataset
-    # and generate chunks of block_size.
-    def group_texts(examples):
-        # Concatenate all texts.
-        concatenated_examples = {k: sum(examples[k], []) for k in examples.keys()}
-        total_length = len(concatenated_examples[list(examples.keys())[0]])
-        # We drop the small remainder, we could add padding if the model supported it instead of
-        # this drop, you can customize this part to your needs.
-        total_length = (total_length // block_size) * block_size
-        # Split by chunks of max_len.
-        result = {
-            k: [t[i: i + block_size] for i in range(0, total_length, block_size)]
-            for k, t in concatenated_examples.items()
-        }
-        result["labels"] = result["input_ids"].copy()
-        return result
-
-    # Note that with `batched=True`, this map processes 1,000 texts together,
-    # so group_texts throws away a remainder for each of those groups of 1,000 texts.
-    # You can adjust that batch_size here but a higher value might be slower
-    # to preprocess.
-
-    # To speed up this part, we use multiprocessing. See the documentation of
-    # the map method for more information:
-    # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
-    lm_datasets = tokenized_datasets.map(
-        group_texts,
-        batched=True,
-        num_proc=data_args.preprocessing_num_workers,
-        load_from_cache_file=not data_args.overwrite_cache,
-    )
-
-    # End datasets processing sections
 
     # Initialize trainer
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=lm_datasets["train"],
-        eval_dataset=lm_datasets["validation"],
+        train_dataset=tokenized_datasets["train"],
+        eval_dataset=tokenized_datasets["validation"],
         data_collator=data_collator,
         prediction_loss_only=True
     )
