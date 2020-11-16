@@ -41,12 +41,16 @@ from transformers import (
     TrainingArguments,
     set_seed,
 )
-from transformers.trainer_utils import is_main_process
+from data_loader import MemmapLineByLineTextDataset
 
 
 logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_MASKED_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
+
+
+def is_main_process(rank):
+    return rank in [-1, 0]
 
 
 @dataclass
@@ -164,11 +168,8 @@ class CustomOthersArguments:
     model_dir: Optional[str] = field(
         default=None, metadata={'help': 'Dir of the checkpoint.'}
         )
-    datasets_map_batch_size: Optional[int] = field(
-        default=1000, metadata={'help': 'Batch_size in `datasets.map`.'}
-        )
-    writer_batch_size: Optional[int] = field(
-        default=1000, metadata={'help': 'Batch_size in datasets writer'}
+    tokenize_chunksize: Optional[int] = field(
+        default=2500, metadata={'help': 'Chunksize for tokenize function.'}
         )
 
 
@@ -212,21 +213,9 @@ def main():
     #
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
-    train_files = list(sorted(glob.glob(f'{data_args.train_dir}/*.{custom_args.ext}')))#[:2]
-    validation_files = list(sorted(glob.glob(f'{data_args.eval_dir}/*.{custom_args.ext}')))#[:2]
+    train_files = list(sorted(glob.glob(f'{data_args.train_dir}/*.{custom_args.ext}')))[:1]#[:2]
+    validation_files = list(sorted(glob.glob(f'{data_args.eval_dir}/*.{custom_args.ext}')))[:1]#[:2]
 
-    if custom_args.ext == 'txt':
-        # Skip downloading processing script
-        dataset_processing_path = '../external_scripts/datasets/text.py'
-        if not os.path.exists(dataset_processing_path):
-            dataset_processing_path = 'text'
-        datasets = load_dataset(dataset_processing_path,
-                                data_files={'train': train_files,
-                                            'validation': validation_files},
-                                cache_dir=data_args.datasets_cache_dir)
-    else:
-        raise NotImplementedError(f'not supprt {custom_args.ext},'
-                                  f'but this should be possible to support.')
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
@@ -245,22 +234,24 @@ def main():
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED',
                                                '<th_roberta_space_token>']
 
-    def tokenize_function(examples):
-        examples = tokenizer(examples['text'],
-                             max_length=data_args.max_seq_length,
-                             truncation=True,
-                             return_special_tokens_mask=True)
-        examples['labels'] = examples['input_ids'].copy()
-        return examples
-
-    tokenized_datasets = datasets.map(
-        tokenize_function,
-        batched=True,
-        num_proc=data_args.preprocessing_num_workers,
-        remove_columns=['text'],
-        load_from_cache_file=not data_args.overwrite_cache,
-        batch_size=custom_args.datasets_map_batch_size,
-    )
+    if custom_args.ext == 'txt':
+        if len(train_files) > 1 or len(validation_files) > 1:
+            raise NotImplementedError('only one txt file support for now')
+        datasets = {
+            'train': MemmapLineByLineTextDataset(
+                tokenizer, train_files[0], data_args.max_seq_length,
+                os.path.join(data_args.datasets_cache_dir, 'train'),
+                custom_args.tokenize_chunksize, data_args.overwrite_cache
+            ),
+            'validation': MemmapLineByLineTextDataset(
+                tokenizer, validation_files[0], data_args.max_seq_length,
+                os.path.join(data_args.datasets_cache_dir, 'validation'),
+                custom_args.tokenize_chunksize, data_args.overwrite_cache
+            )
+        }
+    else:
+        raise NotImplementedError(f'not supprt {custom_args.ext},'
+                                  f'but this should be possible to support.')
 
     config = RobertaConfig(
         vocab_size=tokenizer.vocab_size,
@@ -302,8 +293,8 @@ def main():
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=tokenized_datasets["train"],
-        eval_dataset=tokenized_datasets["validation"],
+        train_dataset=datasets["train"],
+        eval_dataset=datasets["validation"],
         data_collator=data_collator,
         prediction_loss_only=True
     )
@@ -318,6 +309,11 @@ def main():
     output_model_dir = os.path.join(training_args.output_dir, 'roberta_thai')
     logging.info(" Save final model to '%s'.", output_model_dir)
     trainer.save_model(output_model_dir)
+
+    if trainer.is_world_process_zero():
+        output_tokenizer_dir = os.path.join(training_args.output_dir, 'roberta_thai_tokenizer')
+        tokenizer.save_pretrained(output_tokenizer_dir)
+
     return
     # evaluate
     trainer.evaluate()
