@@ -12,6 +12,7 @@ LR=${10}
 BATCH_SIZE=${11}
 GRAD_ACC=${12}
 MODEL_CHECKPOINT_DIR=${13}
+BLOCK_SIZE=${14}
 
 NODE_RANK=${SLURM_PROCID}
 
@@ -25,6 +26,7 @@ echo "Node rank $NODE_RANK" |& tee -a ./slurm_logs/thwiki.ddp.6.11.2020.rank-$NO
 export MASTER_PORT=9999
 export MASTER_ADDR=$HOSTNAME
 
+echo "Block size =$BLOCK_SIZE"
 echo "Total steps = $MAX_STEPS"
 echo "--learning_rate $LR "
 
@@ -62,7 +64,7 @@ python -m torch.distributed.launch \
   --ext txt \
   --train_path ../dataset/split/thwiki-for-ddp_6.11.2020/train/train.txt \
   --eval_path ../dataset/split/thwiki-for-ddp_6.11.2020/val/val.txt \
-  --block_size 510 \
+  --block_size $BLOCK_SIZE \
   --learning_rate $LR --weight_decay 0.01 \
   --adam_epsilon 1e-6 \
   --fp16 True \
