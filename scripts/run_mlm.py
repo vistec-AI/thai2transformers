@@ -27,8 +27,6 @@ import glob
 from dataclasses import dataclass, field
 from typing import Optional
 
-from datasets import load_dataset
-
 import transformers
 from transformers import (
     RobertaConfig,
@@ -41,7 +39,7 @@ from transformers import (
     TrainingArguments,
     set_seed,
 )
-from data_loader import MemmapLineByLineTextDataset
+from data_loader import MemmapLineByLineTextDataset, MemmapConcatTextDataset
 
 
 logger = logging.getLogger(__name__)
@@ -130,6 +128,9 @@ class DataTrainingArguments:
     mlm: bool = field(
         default=False,
         metadata={"help": "Train with masked-language modeling loss instead of language modeling."}
+    )
+    datasets_type: str = field(
+        default='MemmapLineByLineTextDataset', metadata={'help': 'Type of datasets object.'}
     )
 
     def __post_init__(self):
@@ -237,18 +238,34 @@ def main():
     if custom_args.ext == 'txt':
         if len(train_files) > 1 or len(validation_files) > 1:
             raise NotImplementedError('only one txt file support for now')
-        datasets = {
-            'train': MemmapLineByLineTextDataset(
-                tokenizer, train_files[0], data_args.max_seq_length,
-                os.path.join(data_args.datasets_cache_dir, 'train'),
-                custom_args.tokenize_chunksize, data_args.overwrite_cache
-            ),
-            'validation': MemmapLineByLineTextDataset(
-                tokenizer, validation_files[0], data_args.max_seq_length,
-                os.path.join(data_args.datasets_cache_dir, 'validation'),
-                custom_args.tokenize_chunksize, data_args.overwrite_cache
-            )
-        }
+        if data_args.datasets_type == 'MemmapLineByLineTextDataset':
+            datasets = {
+                'train': MemmapLineByLineTextDataset(
+                    tokenizer, train_files[0], data_args.max_seq_length,
+                    os.path.join(data_args.datasets_cache_dir, 'train'),
+                    custom_args.tokenize_chunksize, data_args.overwrite_cache
+                ),
+                'validation': MemmapLineByLineTextDataset(
+                    tokenizer, validation_files[0], data_args.max_seq_length,
+                    os.path.join(data_args.datasets_cache_dir, 'validation'),
+                    custom_args.tokenize_chunksize, data_args.overwrite_cache
+                )
+            }
+        elif data_args.datasets_type == 'MemmapConcatTextDataset':
+            datasets = {
+                'train': MemmapConcatTextDataset(
+                    tokenizer, train_files[0], data_args.max_seq_length,
+                    os.path.join(data_args.datasets_cache_dir, 'train'),
+                    custom_args.tokenize_chunksize, data_args.overwrite_cache
+                ),
+                'validation': MemmapConcatTextDataset(
+                    tokenizer, validation_files[0], data_args.max_seq_length,
+                    os.path.join(data_args.datasets_cache_dir, 'validation'),
+                    custom_args.tokenize_chunksize, data_args.overwrite_cache
+                )
+            }
+        else:
+            raise NotImplementedError(f'No specified datasets type {data_args.datasets_type}')
     else:
         raise NotImplementedError(f'not supprt {custom_args.ext},'
                                   f'but this should be possible to support.')

@@ -185,3 +185,74 @@ class MemmapLineByLineTextDataset(Dataset):
 
     def __getitem__(self, i) -> Dict[str, torch.tensor]:
         return torch.tensor(self.memmap_index_dataset[i], dtype=torch.long)
+
+
+class MemmapConcatTextDataset(Dataset):
+    """
+    Group text into block of specific size storing examples in persistant storage instaed of RAM.
+    """
+
+    def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, block_size: int,
+                 datasets_cache_dir: str = None, chunk_size: int = 2500,
+                 overwrite_cache: bool = False, drop_last: bool = True):
+        assert os.path.isfile(file_path), f"Input file path {file_path} not found"
+        # Here, we do not cache the features, operating under the assumption
+        # that we will soon use fast multithreaded tokenizers from the
+        # `tokenizers` repo everywhere =)
+        if datasets_cache_dir is None:
+            datasets_cache_dir = tempfile.mkdtemp()
+        else:
+            found_cache = not overwrite_cache and os.path.exists(datasets_cache_dir)
+            os.makedirs(datasets_cache_dir, exist_ok=True)
+        self.memmap_index_dataset = MemmapIndexDataset(
+            os.path.join(datasets_cache_dir, 'arr.dat'),
+            os.path.join(datasets_cache_dir, 'idx_arr.dat')
+            )
+        if found_cache:
+            logger.info("Found cached features at %s", datasets_cache_dir)
+            self.memmap_index_dataset.load()
+            return
+        logger.info("Creating features from dataset file at %s", file_path)
+        lines = []
+        grouped = []
+        with open(file_path, encoding="utf-8") as f:
+            while True:
+                line = f.readline()
+                if line:
+                    if len(line) > 0 and not line.isspace():
+                        lines.append(line)
+                else:
+                    break
+                if len(lines) >= chunk_size:
+                    batch_encoding = tokenizer(lines, add_special_tokens=True,
+                                               truncation=True, max_length=block_size)
+                    chunk_ex = batch_encoding["input_ids"]
+                    for e in chunk_ex:
+                        grouped.extend(e)
+                    lines = []
+                if len(grouped) > block_size * 512:
+                    blocks = [grouped[i - block_size: i]
+                              for i in range(block_size, len(grouped), block_size)]
+                    grouped = grouped[-(len(grouped) % block_size):]
+                    self.memmap_index_dataset.add(blocks)
+            if len(lines) > 0:
+                batch_encoding = tokenizer(lines, add_special_tokens=True,
+                                           truncation=True, max_length=block_size)
+                chunk_ex = batch_encoding["input_ids"]
+                for e in chunk_ex:
+                    grouped.extend(e)
+                lines = []
+            if grouped:
+                blocks = [grouped[i - block_size: i]
+                          for i in range(block_size, len(grouped), block_size)]
+                grouped = grouped[-(len(grouped) % block_size):]
+                if grouped and not drop_last:
+                    blocks.append(grouped)
+                self.memmap_index_dataset.add(blocks)
+                lines = []
+
+    def __len__(self):
+        return len(self.memmap_index_dataset)
+
+    def __getitem__(self, i) -> Dict[str, torch.tensor]:
+        return torch.tensor(self.memmap_index_dataset[i], dtype=torch.long)
