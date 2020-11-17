@@ -115,7 +115,7 @@ def main():
         pretrained_model_name_or_path = ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[args.architecture],
         vocab_size = tokenizer.vocab_size
     )
-    logging.info('[%s] The vocabulary size is %d', config.__name__, config.vocab_size)
+    logging.info('[AutoConfig] The vocabulary size is %d', config.vocab_size)
 
     # Instantiate model
     logging.info('Initiate RobertaForMaskedLM.')
