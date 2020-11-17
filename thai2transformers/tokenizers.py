@@ -3,6 +3,7 @@ from typing import List, Optional, Tuple
 from shutil import copyfile
 from transformers.tokenization_utils import PreTrainedTokenizer, AddedToken
 import sentencepiece as spm
+import warnings
 
 VOCAB_FILES_NAMES = {"vocab_file": "sentencepiece.bpe.model"}
 
