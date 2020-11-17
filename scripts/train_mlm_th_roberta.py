@@ -90,8 +90,6 @@ def main():
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
     
     parser.add_argument("--model_directory", type=str, default=None) # for resume training
-
-    parser.add_argument("--add_space_token", action='store_true', default=False)
     
     parser.add_argument("--datasets_cache_dir",  type=str, default=None)
 
