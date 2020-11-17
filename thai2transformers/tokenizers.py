@@ -233,7 +233,7 @@ class ThaiRobertaTokenizer(PreTrainedTokenizer):
 
         return (out_vocab_file,)
 
-     def prepare_for_tokenization(self, text, is_split_into_words=False, **kwargs):
+    def prepare_for_tokenization(self, text, is_split_into_words=False, **kwargs):
         if "is_pretokenized" in kwargs:
             warnings.warn(
                 "`is_pretokenized` is deprecated and will be removed in a future version, use `is_split_into_words` instead.",
