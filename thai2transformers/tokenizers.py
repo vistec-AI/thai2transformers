@@ -17,7 +17,7 @@ import logging
 
 logger = logging.getLogger()
 
-class ThRobertaTokenizer(PreTrainedTokenizer):
+class ThaiRobertaTokenizer(PreTrainedTokenizer):
     """
     Adapted from :class:`~transformers.CamembertTokenizer`. Construct a
     Thai Roberta tokenizer. Based on `SentencePiece <https://github.com/google/sentencepiece>`__.
