@@ -1,7 +1,7 @@
 import os
 from typing import List, Optional, Tuple
 from shutil import copyfile
-from transformers.tokenization_utils import PreTrainedTokenizer
+from transformers.tokenization_utils import PreTrainedTokenizer, AddedToken
 import sentencepiece as spm
 
 VOCAB_FILES_NAMES = {"vocab_file": "sentencepiece.bpe.model"}
@@ -11,7 +11,7 @@ PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
     "th-roberta-base": 512,
 }
 
-SPIECE_UNDERLINE = "▁"
+SPACE_TOKEN = "<th_roberta_space_token>"
 
 import logging
 
@@ -81,7 +81,7 @@ class ThaiRobertaTokenizer(PreTrainedTokenizer):
         unk_token="<unk>",
         pad_token="<pad>",
         mask_token="<mask>",
-        additional_special_tokens=["<th_roberta_space_token>"],
+        additional_special_tokens=[SPACE_TOKEN],
         **kwargs
     ):
         super().__init__(
@@ -232,3 +232,17 @@ class ThaiRobertaTokenizer(PreTrainedTokenizer):
             copyfile(self.vocab_file, out_vocab_file)
 
         return (out_vocab_file,)
+
+     def prepare_for_tokenization(self, text, is_split_into_words=False, **kwargs):
+        if "is_pretokenized" in kwargs:
+            warnings.warn(
+                "`is_pretokenized` is deprecated and will be removed in a future version, use `is_split_into_words` instead.",
+                FutureWarning,
+            )
+            is_split_into_words = kwargs.pop("is_pretokenized")
+
+        # replace empty space with special space token
+
+        text = text.replace(' ', SPACE_TOKEN)
+
+        return (text, kwargs)
