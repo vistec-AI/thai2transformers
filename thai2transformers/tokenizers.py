@@ -11,7 +11,7 @@ VOCAB_FILES_NAMES = {"vocab_file": "sentencepiece.bpe.model"}
 PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
     "th-roberta-base": 512,
 }
-
+SPIECE_UNDERLINE = '▁'
 SPACE_TOKEN = "<th_roberta_space_token>"
 
 import logging
@@ -218,7 +218,7 @@ class ThaiRobertaTokenizer(PreTrainedTokenizer):
 
     def convert_tokens_to_string(self, tokens):
         """Converts a sequence of tokens (strings for sub-words) in a single string."""
-        out_string = "".join(tokens).replace(SPIECE_UNDERLINE, " ").strip()
+        out_string = "".join(tokens).replace(SPIECE_UNDERLINE, "\n").strip()
         return out_string
 
     def save_vocabulary(self, save_directory: str, filename_prefix: Optional[str] = None) -> Tuple[str]:
