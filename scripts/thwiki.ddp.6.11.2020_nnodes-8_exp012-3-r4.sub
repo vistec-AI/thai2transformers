@@ -26,10 +26,10 @@ SAVE_STEPS=3125
 EVAL_STEPS=3125
 EXP_NAME=exp012-3-r4_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz16_maxstep-31250_ngpus-32_maxseqlen-512_linebyline
 LR=7e-4
-BATCH_SIZE=8
-GRAD_ACC=32
+BATCH_SIZE=16
+GRAD_ACC=16
 MODEL_CHECKPOINT_DIR=none
-BLOCK_SIZE=514
+BLOCK_SIZE=512
 
 
 srun ./thwiki-ddp-6.11.2020_train-mlm-th-roberta.sh $N_NODES $HOSTNAME $N_PROC_PER_NODE $JOBID \
