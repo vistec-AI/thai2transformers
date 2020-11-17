@@ -110,10 +110,9 @@ def main():
         "roberta-large": "../roberta_config/th-roberta-large-config.json",
     }
 
-   
     config = AutoConfig.from_pretrained(
         pretrained_model_name_or_path = ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[args.architecture],
-        vocab_size = tokenizer.vocab_size
+        vocab_size = tokenizer.vocab_size + 1 # For mask token
     )
     logging.info('[AutoConfig] The vocabulary size is %d', config.vocab_size)
 
