@@ -105,10 +105,6 @@ def main():
     #initialize tokenizer
 
     tokenizer = ThaiRobertaTokenizer.from_pretrained(args.tokenizer_name_or_path)
-    # if args.add_space_token:
-    #     logging.info('Special token `<th_roberta_space_token>` will be added to the CamembertTokenizer instance.')
-    #     tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', '<th_roberta_space_token>']
-
 
     #initialize models
     ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP = {
