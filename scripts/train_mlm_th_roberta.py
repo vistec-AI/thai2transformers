@@ -17,7 +17,7 @@ from transformers import (
     set_seed,
     LineByLineTextDataset,
     AutoConfig,
-    AutoModel,
+    AutoModelForMaskedLM,
 )
 
 logger = logging.getLogger(__name__)
