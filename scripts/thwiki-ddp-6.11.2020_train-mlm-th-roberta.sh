@@ -80,6 +80,5 @@ python -m torch.distributed.launch \
   --eval_steps $EVAL_STEPS \
   --logging_dir /ist/ist-share/scads/aires/thai2transformers_store/logs/$EXP_NAME/ \
   --output_dir /ist/ist-share/scads/aires/thai2transformers_store/checkpoints/$EXP_NAME/ \
-  --add_space_token \
   --datasets_cache_dir ../dataset/binarized/thwiki-for-ddp_6.11.2020/ \
   --dataset_loader_name linebyline |& tee -a ./slurm_logs/$EXP_NAME.job-$JOBID.rank-$NODE_RANK.out
