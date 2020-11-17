@@ -59,7 +59,7 @@ python -m torch.distributed.launch \
   --master_port $MASTER_PORT \
   ./train_mlm_th_roberta.py \
   --architecture roberta-base \
-  --tokenizer_name_or_path ../dataset/spm/thwiki-for-ddp_6.11.2020_spm_vs-24k/sentencepiece.bpe.model \
+  --tokenizer_name_or_path ../dataset/spm/thwiki-for-ddp_6.11.2020_spm_vs-24k_v2/sentencepiece.bpe.model \
   --ext txt \
   --train_path ../dataset/split/thwiki-for-ddp_6.11.2020/train/train.txt \
   --eval_path ../dataset/split/thwiki-for-ddp_6.11.2020/val/val.txt \
