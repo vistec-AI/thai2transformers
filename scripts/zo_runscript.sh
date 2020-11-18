@@ -5,7 +5,7 @@ python3 run_mlm.py \
  --ext txt \
  --train_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/val \
  --eval_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/val \
- --max_seq_length 514 \
+ --max_seq_length 512 \
  --learning_rate 3e-4 --weight_decay 0.01 \
  --adam_epsilon 1e-6 \
  --max_steps 100 \
@@ -23,6 +23,5 @@ python3 run_mlm.py \
  --output_dir "../data/output/$EXP_NAME/model" \
  --add_space_token \
  --datasets_cache_dir ../cache/$EXP_NAME \
- --no_cuda \
  --datasets_type MemmapConcatFullSentenceTextDataset \
  --architecture roberta-base
