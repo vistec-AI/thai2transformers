@@ -1,0 +1,30 @@
+#!/bin/sh
+#SBATCH --output=./slurm_output/thwiki_ddp_6.11.2020.job-%j.node-%n.out
+#SBATCH --nodes=8
+#SBATCH --partition=gpu-cluster
+#SBATCH --account=scads
+#SBATCH --time=1-0:0:0
+#SBATCH --gres=gpu:4
+#SBATCH --mem=100GB
+#SBATCH --job-name=thwiki_ddp_6.11.2020_nnodes-8_r2
+
+module load CUDA/10.2
+
+unset XDG_RUNTIME_DIR
+if [ "$SLURM_JOBTMP" != "" ]; then
+     export XDG_RUNTIME_DIR=$SLURM_JOBTMP
+fi
+
+HOSTNAME=$(hostname -s)
+JOBID=${SLURM_JOB_ID}
+N_PROC_PER_NODE=4
+
+N_NODES=8
+MAX_STEPS=500000
+WARMUP_STEPS=24000
+SAVE_STEPS=32000
+EVAL_STEPS=3200
+EXP_NAME=exp012-2_thwiki-for-ddp_6.11.2020_spm_vs-24k_fp16_bz32_maxstep-500k_ngpus-32_maxseqlen-512_linebyline+fix-warmup-steps
+
+
+srun ./thwiki.ddp.6.11.2020.sh $N_NODES $HOSTNAME $N_PROC_PER_NODE $JOBID $MAX_STEPS $WARMUP_STEPS $SAVE_STEPS $EVAL_STEPS $EXP_NAME

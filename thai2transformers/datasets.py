@@ -9,8 +9,10 @@ from torch.utils.data import Dataset
 import pickle
 import gc
 from contextlib import contextmanager
-
-
+from filelock import FileLock
+import logging, time
+from typing import Optional
+import joblib
 nb_cores = multiprocessing.cpu_count()
 
 
@@ -22,6 +24,72 @@ def disable_gc():
     finally:
         gc.enable()
 
+class MLMDatasetOneFile(Dataset):
+    def __init__(
+        self,
+        tokenizer,
+        file_path: str,
+        block_size: int,
+        overwrite_cache=False,
+        cache_dir: Optional[str] = None,
+
+    ):
+        assert os.path.isfile(file_path), f"Input file path {file_path} not found"
+
+        block_size = block_size - tokenizer.num_special_tokens_to_add(pair=False)
+
+        directory, filename = os.path.split(file_path)
+        cached_features_file = os.path.join(
+            cache_dir if cache_dir is not None else directory,
+            "cached_lm_{}_{}_{}".format(
+                tokenizer.__class__.__name__,
+                str(block_size),
+                filename,
+            ),
+        )
+
+        # Make sure only the first process in distributed training processes the dataset,
+        # and the others will use the cache.
+        lock_path = cached_features_file + ".lock"
+        with FileLock(lock_path):
+
+            if os.path.exists(cached_features_file) and not overwrite_cache:
+                start = time.time()
+                with open(cached_features_file, "rb") as handle:
+                    self.examples = joblib.load(handle)
+                logging.info(
+                    f"Loading features from cached file {cached_features_file} [took %.3f s]", time.time() - start
+                )
+
+            else:
+                logging.info(f"Creating features from dataset file at {directory}")
+
+                self.examples = []
+                with open(file_path, encoding="utf-8") as f:
+                    text = f.read()
+
+                tokenized_text = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
+
+                for i in range(0, len(tokenized_text) - block_size + 1, block_size):  # Truncate in block of block_size
+                    self.examples.append(
+                        tokenizer.build_inputs_with_special_tokens(tokenized_text[i : i + block_size])
+                    )
+                # Note that we are losing the last truncated example here for the sake of simplicity (no padding)
+                # If your dataset is small, first you should loook for a bigger one :-) and second you
+                # can change this behavior by adding (model specific) padding.
+
+                start = time.time()
+                with open(cached_features_file, "wb") as handle:
+                    joblib.dump(self.examples, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                logging.info(
+                    "Saving features into cached file %s [took %.3f s]", cached_features_file, time.time() - start
+                )
+
+    def __len__(self):
+        return len(self.examples)
+
+    def __getitem__(self, i) -> torch.Tensor:
+        return torch.tensor(self.examples[i], dtype=torch.long)
 
 class MLMDataset(Dataset):
     def __init__(
@@ -73,7 +141,7 @@ class MLMDataset(Dataset):
                         texts,
                         max_length=self.max_length,
                         truncation=True,
-                        pad_to_max_length=False,
+                        pad_to_max_length=False
                     )
                     # add to list
                     self.features += [e for e in tokenized_inputs['input_ids']]
@@ -89,7 +157,7 @@ class MLMDataset(Dataset):
                     texts,
                     max_length=self.max_length,
                     truncation=True,
-                    pad_to_max_length=False,
+                    pad_to_max_length=False
                 )
                 # add to list
                 features += [e for e in tokenized_inputs['input_ids']]
@@ -162,8 +230,9 @@ class MLMDataset(Dataset):
 
     def _load_binarized_features(self, binarized_path):
         print(f'[INFO] Start loading binarized data from `{binarized_path}`.')
-        with open(binarized_path, 'rb') as fp:
-            return pickle.load(fp)
+        with FileLock(lock_path):
+            with open(binarized_path, 'rb') as fp:
+                return pickle.load(fp)
 
     def load_binarized_features(self):
         print('[INFO] Load binarized data')
@@ -323,9 +392,11 @@ class TokenClassificationDataset(Dataset):
         return res
 
     def _add_special_tokens(self, src_, lbl_):
-        src = [self.tokenizer.bos_token, " "] + src_ + [self.tokenizer.eos_token]
+        src = [self.tokenizer.bos_token, " "] + \
+            src_ + [self.tokenizer.eos_token]
         lbl = (
-            [self.label_pad_token, self.label_pad_token] + lbl_ + [self.label_pad_token]
+            [self.label_pad_token, self.label_pad_token] +
+            lbl_ + [self.label_pad_token]
         )
         txt = "".join(src)
         return src, lbl, txt
@@ -348,7 +419,8 @@ class TokenClassificationDataset(Dataset):
 
         # map subwords to labels
         subword_df = (
-            word_df.groupby(["sub_i"]).agg({"label": max, "word_i": max}).reset_index()
+            word_df.groupby(["sub_i"]).agg(
+                {"label": max, "word_i": max}).reset_index()
         )
 
         # label for only the first subword of token
@@ -374,7 +446,8 @@ class TokenClassificationDataset(Dataset):
         to_pad = self.max_length - len(ids)
         ids += [self.tokenizer.pad_token_id] * to_pad
         attn += [0] * to_pad
-        sub = [i.replace("▁", " ") for i in self.tokenizer.convert_ids_to_tokens(ids)]
+        sub = [i.replace("▁", " ")
+               for i in self.tokenizer.convert_ids_to_tokens(ids)]
         sub_txt = "".join(sub)
 
         # pad labels and words

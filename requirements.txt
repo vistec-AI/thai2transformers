@@ -1,8 +1,9 @@
 transformers==3.4.0
 sentencepiece==0.1.94
 tqdm
-pandas
 pytorch_lightning
 emoji
-pythainlp
+pythainlp==2.2.4
 datasets==1.1.2
+pandas==1.1.4
+swifter==1.0.7

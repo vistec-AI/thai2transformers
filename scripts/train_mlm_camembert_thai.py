@@ -1,6 +1,7 @@
 import os
 import logging
 import torch
+logging.basicConfig(level=logging.INFO)
 import argparse
 
 from transformers import (
@@ -152,6 +153,7 @@ def main():
         fp16=args.fp16,
         fp16_opt_level=args.fp16_opt_level,
         dataloader_drop_last=args.dataloader_drop_last,
+        logging_first_step=True
     )
 
     logging.info(" Number of devices: %d", training_args.n_gpu)

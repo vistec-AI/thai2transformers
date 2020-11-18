@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH --output=./slurm_output/thwiki_ddp_4.11.2020.job-%j.node-%n.out
+#SBATCH --nodes=2
+#SBATCH --partition=gpu-cluster
+#SBATCH --account=scads
+#SBATCH --time=2:0:0
+#SBATCH --gres=gpu:4
+#SBATCH --mem=100GB
+#SBATCH --job-name=thwiki_ddp_4.11.2020_nnodes-2
+  
+
+module load CUDA/10.2
+
+unset XDG_RUNTIME_DIR
+if [ "$SLURM_JOBTMP" != "" ]; then
+     export XDG_RUNTIME_DIR=$SLURM_JOBTMP
+fi
+
+
+HOSTNAME=$(hostname -s)
+JOBID=${SLURM_JOB_ID}
+srun ./thwiki.ddp.4.11.2020.sh 2 $HOSTNAME 4 $JOBID

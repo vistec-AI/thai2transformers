@@ -15,7 +15,9 @@ from transformers import (
     TrainingArguments,
     HfArgumentParser,
     set_seed,
-    LineByLineTextDataset
+    LineByLineTextDataset,
+    AutoConfig,
+    AutoModelForMaskedLM,
 )
 
 logger = logging.getLogger(__name__)
@@ -23,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 #thai2transformers
 from thai2transformers.datasets import MLMDatasetOneFile
-
+from thai2transformers.tokenizers import ThaiRobertaTokenizer
 #argparse
 import argparse
 
@@ -33,6 +35,7 @@ def main():
         prog="train_mlm_roberthai.py",
         description="train mlm for roberta with huggingface Trainer",
     )
+
     #distributed training
     parser.add_argument("--local_rank", type=int, default=-1)
     parser.add_argument("--n_gpu", type=int, default=0)
@@ -87,8 +90,6 @@ def main():
     parser.add_argument("--fp16_opt_level", type=str, default="O1")
     
     parser.add_argument("--model_directory", type=str, default=None) # for resume training
-
-    parser.add_argument("--add_space_token", action='store_true', default=False)
     
     parser.add_argument("--datasets_cache_dir",  type=str, default=None)
 
@@ -101,39 +102,24 @@ def main():
 
     #initialize tokenizer
 
-    tokenizer = CamembertTokenizer.from_pretrained(args.tokenizer_name_or_path)
-    if args.add_space_token:
-        logging.info('Special token `<th_roberta_space_token>` will be added to the CamembertTokenizer instance.')
-        tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', '<th_roberta_space_token>']
-
+    tokenizer = ThaiRobertaTokenizer.from_pretrained(args.tokenizer_name_or_path)
 
     #initialize models
     ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP = {
-        "roberta-base": "../roberta_config/roberta-base-config.json",
-        "roberta-large": "../roberta_config/roberta-large-config.json",
+        "roberta-base": "../roberta_config/th-roberta-base-config.json",
+        "roberta-large": "../roberta_config/th-roberta-large-config.json",
     }
 
-    # config = RobertaConfig.from_pretrained(
-    #     pretrained_model_name_or_path = ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[args.architecture],
-    #     vocab_size = tokenizer.vocab_size
-    # )
-    # Change vocab size
-    # config.vocab_size = tokenizer.vocab_size
-    config = RobertaConfig(
-        vocab_size=tokenizer.vocab_size,
-        type_vocab_size=1,
-        #roberta base as default
-        num_hidden_layers=args.num_hidden_layers, # L
-        hidden_size=args.hidden_size,  # H
-        intermediate_size=args.intermediate_size, 
-        num_attention_head=args.num_attention_head, # A
-        #roberta large
-        # num_hidden_layers=24,
-        # hidden_size=1024, 
-        # intermediate_size=4096,
-        # num_attention_head=16
+    config = AutoConfig.from_pretrained(
+        pretrained_model_name_or_path = ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[args.architecture],
+        vocab_size = tokenizer.vocab_size
     )
-    print('\n[INFO] Roberta config: vocab_size = ', config.vocab_size)
+    logging.info('[AutoConfig] The vocabulary size is %d', config.vocab_size)
+
+    # Instantiate model
+    logging.info('Initiate RobertaForMaskedLM.')
+    model = AutoModelForMaskedLM.from_config(config)
+    logging.info('%s', model)
 
 
     if args.dataset_loader_name == 'linebyline':
