@@ -187,7 +187,7 @@ class MemmapLineByLineTextDataset(Dataset):
         return torch.tensor(self.memmap_index_dataset[i], dtype=torch.long)
 
 
-class MemmapConcatTextDataset(Dataset):
+class MemmapConcatFullSentenceTextDataset(Dataset):
     """
     Group text into block of specific size storing examples in persistant storage instaed of RAM.
     """
@@ -202,7 +202,11 @@ class MemmapConcatTextDataset(Dataset):
         if datasets_cache_dir is None:
             datasets_cache_dir = tempfile.mkdtemp()
         else:
-            found_cache = not overwrite_cache and os.path.exists(datasets_cache_dir)
+            found_cache = (
+                not overwrite_cache and
+                os.path.exists(os.path.join(datasets_cache_dir, 'arr.dat')) and
+                os.path.exists(os.path.join(datasets_cache_dir, 'idx_arr.dat'))
+                )
             os.makedirs(datasets_cache_dir, exist_ok=True)
         self.memmap_index_dataset = MemmapIndexDataset(
             os.path.join(datasets_cache_dir, 'arr.dat'),
@@ -214,7 +218,8 @@ class MemmapConcatTextDataset(Dataset):
             return
         logger.info("Creating features from dataset file at %s", file_path)
         lines = []
-        grouped = []
+        block = []
+        skipped_n = []
         with open(file_path, encoding="utf-8") as f:
             while True:
                 line = f.readline()
@@ -227,31 +232,35 @@ class MemmapConcatTextDataset(Dataset):
                     batch_encoding = tokenizer(lines, add_special_tokens=True,
                                                truncation=True, max_length=block_size)
                     chunk_ex = batch_encoding["input_ids"]
-                    for e in chunk_ex:
-                        grouped.extend(e)
-                    lines = []
-                if len(grouped) > block_size * 512:
                     blocks = []
-                    for i in range(block_size, len(grouped), block_size):
-                        blocks.append(grouped[i - block_size: i])
-                    grouped = grouped[i:]
+                    for e in chunk_ex:
+                        if len(block) + len(e) > block_size and block:
+                            blocks.append(block)
+                            if len(e) <= block_size:
+                                block = e
+                            else:
+                                skipped_n += 1
+                        else:
+                            block.extend(e)
+                    lines = []
                     self.memmap_index_dataset.add(blocks)
             if len(lines) > 0:
                 batch_encoding = tokenizer(lines, add_special_tokens=True,
                                            truncation=True, max_length=block_size)
                 chunk_ex = batch_encoding["input_ids"]
-                for e in chunk_ex:
-                    grouped.extend(e)
-                lines = []
-            if grouped:
                 blocks = []
-                for i in range(block_size, len(grouped), block_size):
-                    blocks.append(grouped[i - block_size: i])
-                grouped = grouped[i:]
-                if grouped and not drop_last:
-                    blocks.append(grouped)
+                for e in chunk_ex:
+                    if len(block) + len(e) > block_size and block:
+                        blocks.append(block)
+                        if len(e) <= block_size:
+                            block = e
+                        else:
+                            skipped_n += 1
+                    else:
+                        block.extend(e)
+            if block:
+                blocks = [block]
                 self.memmap_index_dataset.add(blocks)
-                lines = []
 
     def __len__(self):
         return len(self.memmap_index_dataset)

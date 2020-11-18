@@ -39,7 +39,7 @@ from transformers import (
     TrainingArguments,
     set_seed,
 )
-from data_loader import MemmapLineByLineTextDataset, MemmapConcatTextDataset
+from data_loader import MemmapLineByLineTextDataset, MemmapConcatFullSentenceTextDataset
 
 
 logger = logging.getLogger(__name__)
@@ -251,14 +251,14 @@ def main():
                     custom_args.tokenize_chunksize, data_args.overwrite_cache
                 )
             }
-        elif data_args.datasets_type == 'MemmapConcatTextDataset':
+        elif data_args.datasets_type == 'MemmapConcatFullSentenceTextDataset':
             datasets = {
-                'train': MemmapConcatTextDataset(
+                'train': MemmapConcatFullSentenceTextDataset(
                     tokenizer, train_files[0], data_args.max_seq_length,
                     os.path.join(data_args.datasets_cache_dir, 'train'),
                     custom_args.tokenize_chunksize, data_args.overwrite_cache
                 ),
-                'validation': MemmapConcatTextDataset(
+                'validation': MemmapConcatFullSentenceTextDataset(
                     tokenizer, validation_files[0], data_args.max_seq_length,
                     os.path.join(data_args.datasets_cache_dir, 'validation'),
                     custom_args.tokenize_chunksize, data_args.overwrite_cache

@@ -24,4 +24,4 @@ python3 run_mlm.py \
  --add_space_token \
  --datasets_cache_dir ../cache/$EXP_NAME \
  --no_cuda \
- --datasets_type MemmapConcatTextDataset
+ --datasets_type MemmapConcatFullSentenceTextDataset
