@@ -22,14 +22,13 @@ https://huggingface.co/models?filter=masked-lm
 import torch
 import logging
 import os
-import sys
 import glob
 from dataclasses import dataclass, field
 from typing import Optional
 
 import transformers
 from transformers import (
-    RobertaConfig,
+    AutoConfig,
     RobertaForMaskedLM,
     CamembertTokenizer,
     MODEL_FOR_MASKED_LM_MAPPING,
@@ -41,6 +40,14 @@ from transformers import (
 )
 from data_loader import MemmapLineByLineTextDataset, MemmapConcatFullSentenceTextDataset
 
+
+# thai2transformers
+try:
+    from thai2transformers.tokenizers import ThaiRobertaTokenizer
+except ModuleNotFoundError:
+    import sys
+    sys.path.append('..')  # path hacking
+    from thai2transformers.tokenizers import ThaiRobertaTokenizer
 
 logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_MASKED_LM_MAPPING.keys())
@@ -156,6 +163,10 @@ class ArchitectureArguments:
         default=12,
         metadata={'help': 'number of attention head (A)'}
         )
+    architecture: str = field(
+        default=None,
+        metadata={'help': 'type of architecture.'}
+        )
 
 
 @dataclass
@@ -164,13 +175,13 @@ class CustomOthersArguments:
         default=False, metadata={'help': 'Add spacial token for tokenizer.'}
         )
     ext: str = field(
-        default='.txt', metadata={'help': 'Extension of training and evaluation files.'}
+        default='.txt', metadata={'help': 'extension of training and evaluation files.'}
         )
     model_dir: Optional[str] = field(
-        default=None, metadata={'help': 'Dir of the checkpoint.'}
+        default=None, metadata={'help': 'dir of the checkpoint.'}
         )
     tokenize_chunksize: Optional[int] = field(
-        default=2500, metadata={'help': 'Chunksize for tokenize function.'}
+        default=2500, metadata={'help': 'chunksize for tokenize function.'}
         )
 
 
@@ -227,13 +238,8 @@ def main():
     # download model & vocab.
     # Create config for LM model
 
-    tokenizer = CamembertTokenizer.from_pretrained(
+    tokenizer = ThaiRobertaTokenizer.from_pretrained(
         model_args.tokenizer_name_or_path, use_fast=model_args.use_fast_tokenizer)
-    if custom_args.add_space_token:
-        logging.info('Special token `<th_roberta_space_token>` will be added'
-                     'to the CamembertTokenizer instance.')
-        tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED',
-                                               '<th_roberta_space_token>']
 
     if custom_args.ext == 'txt':
         if len(train_files) > 1 or len(validation_files) > 1:
@@ -270,19 +276,14 @@ def main():
         raise NotImplementedError(f'not supprt {custom_args.ext},'
                                   f'but this should be possible to support.')
 
-    config = RobertaConfig(
-        vocab_size=tokenizer.vocab_size,
-        type_vocab_size=1,
-        # roberta base as default
-        num_hidden_layers=arch_args.num_hidden_layers,  # L
-        hidden_size=arch_args.hidden_size,  # H
-        intermediate_size=arch_args.intermediate_size,
-        num_attention_head=arch_args.num_attention_head,  # A
-        # roberta large
-        # num_hidden_layers=24,
-        # hidden_size=1024,
-        # intermediate_size=4096,
-        # num_attention_head=16
+    ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+        "roberta-base": "../roberta_config/th-roberta-base-config.json",
+        "roberta-large": "../roberta_config/th-roberta-large-config.json",
+    }
+
+    config = AutoConfig.from_pretrained(
+        pretrained_model_name_or_path=ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP[arch_args.architecture],
+        vocab_size=tokenizer.vocab_size
     )
 
     # Initialize model

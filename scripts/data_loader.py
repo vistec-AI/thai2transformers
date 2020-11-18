@@ -217,50 +217,68 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
             self.memmap_index_dataset.load()
             return
         logger.info("Creating features from dataset file at %s", file_path)
+        eos_token_id = tokenizer.eos_token_id
+        bos_token_id = tokenizer.bos_token_id
+        newline_token_id = tokenizer.get_vocab()['▁']
+        usable_block_size = block_size - 2
         lines = []
+        skipped_n = 0
         block = []
-        skipped_n = []
         with open(file_path, encoding="utf-8") as f:
             while True:
                 line = f.readline()
                 if line:
+                    line = line.strip()
                     if len(line) > 0 and not line.isspace():
                         lines.append(line)
                 else:
                     break
                 if len(lines) >= chunk_size:
-                    batch_encoding = tokenizer(lines, add_special_tokens=True,
-                                               truncation=True, max_length=block_size)
+                    batch_encoding = tokenizer(lines, add_special_tokens=False,
+                                               truncation=True, max_length=usable_block_size + 1)
                     chunk_ex = batch_encoding["input_ids"]
                     blocks = []
-                    for e in chunk_ex:
-                        if len(block) + len(e) > block_size and block:
-                            blocks.append(block)
-                            if len(e) <= block_size:
+                    if not block:
+                        for i, e in enumerate(chunk_ex):
+                            if len(e) <= usable_block_size:
+                                block = e
+                                break
+                    for e in chunk_ex[i + 1:]:
+                        if len(block) + len(e) > usable_block_size and block:
+                            blocks.append([bos_token_id] + block + [eos_token_id])
+                            if len(e) <= usable_block_size:
                                 block = e
                             else:
                                 skipped_n += 1
                         else:
+                            block.append(newline_token_id)
                             block.extend(e)
                     lines = []
                     self.memmap_index_dataset.add(blocks)
             if len(lines) > 0:
-                batch_encoding = tokenizer(lines, add_special_tokens=True,
-                                           truncation=True, max_length=block_size)
+                batch_encoding = tokenizer(lines, add_special_tokens=False,
+                                           truncation=True, max_length=usable_block_size + 1)
                 chunk_ex = batch_encoding["input_ids"]
                 blocks = []
-                for e in chunk_ex:
-                    if len(block) + len(e) > block_size and block:
-                        blocks.append(block)
-                        if len(e) <= block_size:
+                if not block:
+                    for i, e in enumerate(chunk_ex):
+                        if len(e) <= usable_block_size:
+                            block = e
+                            break
+                for e in chunk_ex[i + 1:]:
+                    if len(block) + len(e) > usable_block_size and block:
+                        blocks.append([bos_token_id] + block + [eos_token_id])
+                        if len(e) <= usable_block_size:
                             block = e
                         else:
                             skipped_n += 1
                     else:
+                        block.append(newline_token_id)
                         block.extend(e)
-            if block:
-                blocks = [block]
+            if block and len(block) <= usable_block_size:
+                blocks.append(block)
                 self.memmap_index_dataset.add(blocks)
+        logger.info(f'Skipped {skipped_n}')
 
     def __len__(self):
         return len(self.memmap_index_dataset)

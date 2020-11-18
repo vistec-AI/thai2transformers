@@ -1,11 +1,11 @@
  EXP_NAME="zo_test"
 
 python3 run_mlm.py \
- --tokenizer_name_or_path ../data/input/zo_test/sentencepiece.bpe.model \
+ --tokenizer_name_or_path ../data/input/zo_test/thwiki-for-ddp_concat_12.11.2020_spm_vs-24k_v2 \
  --ext txt \
- --train_dir ../data/input/zo_test/text/train \
- --eval_dir ../data/input/zo_test/text/train \
- --max_seq_length 416 \
+ --train_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/val \
+ --eval_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/val \
+ --max_seq_length 514 \
  --learning_rate 3e-4 --weight_decay 0.01 \
  --adam_epsilon 1e-6 \
  --max_steps 100 \
@@ -24,4 +24,5 @@ python3 run_mlm.py \
  --add_space_token \
  --datasets_cache_dir ../cache/$EXP_NAME \
  --no_cuda \
- --datasets_type MemmapConcatFullSentenceTextDataset
+ --datasets_type MemmapConcatFullSentenceTextDataset \
+ --architecture roberta-base
