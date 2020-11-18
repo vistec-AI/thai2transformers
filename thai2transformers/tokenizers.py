@@ -4,19 +4,19 @@ from shutil import copyfile
 from transformers.tokenization_utils import PreTrainedTokenizer, AddedToken
 import sentencepiece as spm
 import warnings
+import logging
+logger = logging.getLogger()
 
 VOCAB_FILES_NAMES = {"vocab_file": "sentencepiece.bpe.model"}
 
-
 PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
-    "th-roberta-base": 512,
+    "th-roberta-base": 514,
 }
 SPIECE_UNDERLINE = '▁'
-SPACE_TOKEN = "<th_roberta_space_token>"
+SPACE_TOKEN = "<_>"
+DEPRECATED_SPACE_TOKEN = '<th_roberta_space_token>'
 
-import logging
 
-logger = logging.getLogger()
 
 class ThaiRobertaTokenizer(PreTrainedTokenizer):
     """
