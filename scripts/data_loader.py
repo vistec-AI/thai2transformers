@@ -244,9 +244,10 @@ class MemmapConcatTextDataset(Dataset):
                     grouped.extend(e)
                 lines = []
             if grouped:
-                blocks = [grouped[i - block_size: i]
-                          for i in range(block_size, len(grouped), block_size)]
-                grouped = grouped[-(len(grouped) % block_size):]
+                blocks = []
+                for i in range(block_size, len(grouped), block_size):
+                    blocks.append(grouped[i - block_size: i])
+                grouped = grouped[i:]
                 if grouped and not drop_last:
                     blocks.append(grouped)
                 self.memmap_index_dataset.add(blocks)
