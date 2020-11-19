@@ -183,6 +183,9 @@ class CustomOthersArguments:
     tokenize_chunksize: Optional[int] = field(
         default=2500, metadata={'help': 'chunksize for tokenize function.'}
         )
+    build_dataset_only: Optional[bool] = field(
+        default=False, metadata={'help': 'only build dataset part.'}
+        )
 
 
 def main():
@@ -263,6 +266,9 @@ def main():
     else:
         raise NotImplementedError(f'not supprt {custom_args.ext},'
                                   f'but this should be possible to support.')
+
+    if custom_args.build_dataset_only:
+        return
 
     ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP = {
         "roberta-base": "../roberta_config/th-roberta-base-config.json",

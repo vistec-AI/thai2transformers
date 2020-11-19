@@ -19,6 +19,7 @@ from transformers import (
 import mmap
 import struct
 from contextlib import contextmanager
+from helper import get_file_size
 
 
 logger = logging.get_logger(__name__)
@@ -194,7 +195,8 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
 
     def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, block_size: int,
                  datasets_cache_dir: str = None, chunk_size: int = 2500,
-                 overwrite_cache: bool = False, drop_last: bool = True):
+                 overwrite_cache: bool = False, drop_last: bool = True,
+                 progress: bool = True):
         assert os.path.isfile(file_path), f"Input file path {file_path} not found"
         # Here, we do not cache the features, operating under the assumption
         # that we will soon use fast multithreaded tokenizers from the
@@ -243,6 +245,7 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
                     return ids
 
         with open(file_path, encoding="utf-8") as f:
+            file_size = get_file_size(f)
             while True:
                 line = f.readline()
                 if line:
@@ -258,8 +261,13 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
                     blocks = []
                     for ids in input_ids:
                         block = add_to_block(ids, block, blocks)
+                        if not block:
+                            skipped_n += 1
                     lines = []
                     self.memmap_index_dataset.add(blocks)
+                    if progress:
+                        print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
+                              flush=True, end=' ')
             if len(lines) > 0:
                 batch_encoding = tokenizer(lines, add_special_tokens=False,
                                            truncation=True, max_length=usable_block_size + 1)
@@ -267,9 +275,15 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
                 blocks = []
                 for ids in input_ids:
                     block = add_to_block(ids, block, blocks)
+                    if not block:
+                        skipped_n += 1
             if block:
                 blocks.append(block)
                 self.memmap_index_dataset.add(blocks)
+            if progress:
+                print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
+                      flush=True, end=' ')
+        print()
         logger.info(f'Skipped {skipped_n}')
 
     def __len__(self):

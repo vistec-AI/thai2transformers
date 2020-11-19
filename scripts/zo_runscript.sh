@@ -24,4 +24,5 @@ python3 run_mlm.py \
  --add_space_token \
  --datasets_cache_dir ../cache/$EXP_NAME \
  --datasets_type MemmapConcatFullSentenceTextDataset \
- --architecture roberta-base
+ --architecture roberta-base \
+ --build_dataset_only

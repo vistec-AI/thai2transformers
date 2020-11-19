@@ -7,6 +7,7 @@ Created on Tue Nov  3 14:39:32 2020
 """
 
 import warnings
+import os
 
 
 class REQUIRED:
@@ -35,3 +36,11 @@ def check_required(args):
             required.append(k)
     if required:
         raise ValueError(f'{tuple(required)} are required.')
+
+
+def get_file_size(f):
+    old_file_position = f.tell()
+    f.seek(0, os.SEEK_END)
+    size = f.tell()
+    f.seek(old_file_position, os.SEEK_SET)
+    return size
