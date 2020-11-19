@@ -226,25 +226,21 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
         block = []
 
         def add_to_block(ids, block, blocks):
-            size = 0 if not block else 1
-            size += len(block) + len(ids)
-            if size > usable_block_size:
-                if block:
-                    # Commit the current block
+            size = len(block) + len(ids)
+            if block:
+                size += 1
+                if size > usable_block_size:
                     blocks.append([bos_token_id] + block + [eos_token_id])
-                    # Try adding it now
-                    block = add_to_block(ids, [], blocks)
-                    return block
+                    return add_to_block(ids, [], blocks)
                 else:
-                    # Skip the tokens, since it exceed usable_block_size
-                    return []
-            else:
-                if block:
-                    # There is a thing before it append newline_token_id
                     block.append(newline_token_id)
-                # Add tokens to block
-                block.extend(ids)
-                return block
+                    block.extend(ids)
+                    return block
+            else:
+                if size > usable_block_size:
+                    return []
+                else:
+                    return ids
 
         with open(file_path, encoding="utf-8") as f:
             while True:
