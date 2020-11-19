@@ -39,7 +39,7 @@ from transformers import (
     set_seed,
 )
 from data_loader import MemmapLineByLineTextDataset, MemmapConcatFullSentenceTextDataset
-
+from sanity import tokenizer_and_model_config_mismatch, block_size_exceed_max_position_embeddings
 
 # thai2transformers
 try:
@@ -216,20 +216,8 @@ def main():
     # Set seed before initializing model.
     set_seed(training_args.seed)
 
-    # Get the datasets: you can either provide your own CSV/JSON/TXT training and evaluation files (see below)
-    # or just provide the name of one of the public datasets available on the hub at https://huggingface.co/datasets/
-    # (the dataset will be downloaded automatically from the datasets Hub
-    #
-    # For CSV/JSON files, this script will use the column called 'text' or the first column. You can easily tweak this
-    # behavior (see below)
-    #
-    # In distributed training, the load_dataset function guarantee that only one local process can concurrently
-    # download the dataset.
     train_files = list(sorted(glob.glob(f'{data_args.train_dir}/*.{custom_args.ext}')))[:1]#[:2]
     validation_files = list(sorted(glob.glob(f'{data_args.eval_dir}/*.{custom_args.ext}')))[:1]#[:2]
-
-    # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
-    # https://huggingface.co/docs/datasets/loading_datasets.html.
 
     # Load pretrained model and tokenizer
     #
@@ -286,6 +274,9 @@ def main():
         vocab_size=tokenizer.vocab_size
     )
 
+    # Some sanity check
+    tokenizer_and_model_config_mismatch(config, tokenizer)
+    block_size_exceed_max_position_embeddings(config, data_args.max_seq_length)
     # Initialize model
     model = RobertaForMaskedLM(config=config)
 
