@@ -218,6 +218,8 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
             logger.info("Found cached features at %s", datasets_cache_dir)
             self.memmap_index_dataset.load()
             return
+        else:
+            self.memmap_index_dataset.clear()
         logger.info("Creating features from dataset file at %s", file_path)
         eos_token_id = tokenizer.eos_token_id
         bos_token_id = tokenizer.bos_token_id
@@ -291,3 +293,21 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
 
     def __getitem__(self, i) -> Dict[str, torch.tensor]:
         return torch.tensor(self.memmap_index_dataset[i], dtype=torch.long)
+
+
+class PaddedDataset(Dataset):
+
+    def __init__(self, dataset, padding_idx, block_size):
+        self.dataset = dataset
+        self.padding_idx = padding_idx
+        self.block_size = block_size
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, i) -> Dict[str, torch.tensor]:
+        r = self.dataset[i]
+        padded = torch.tensor((), dtype=torch.long)
+        padded = padded.new_full((self.block_size, ), self.padding_idx)
+        padded[:r.shape[0]] = r
+        return padded

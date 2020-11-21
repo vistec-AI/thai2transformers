@@ -38,7 +38,7 @@ from transformers import (
     TrainingArguments,
     set_seed,
 )
-from data_loader import MemmapLineByLineTextDataset, MemmapConcatFullSentenceTextDataset
+from data_loader import MemmapLineByLineTextDataset, MemmapConcatFullSentenceTextDataset, PaddedDataset
 from sanity import tokenizer_and_model_config_mismatch, block_size_exceed_max_position_embeddings
 
 # thai2transformers
@@ -255,10 +255,12 @@ def main():
                     os.path.join(data_args.datasets_cache_dir, 'train'),
                     custom_args.tokenize_chunksize, data_args.overwrite_cache
                 ),
-                'validation': MemmapConcatFullSentenceTextDataset(
-                    tokenizer, validation_files[0], data_args.max_seq_length,
-                    os.path.join(data_args.datasets_cache_dir, 'validation'),
-                    custom_args.tokenize_chunksize, data_args.overwrite_cache
+                'validation': PaddedDataset(
+                    MemmapConcatFullSentenceTextDataset(
+                        tokenizer, validation_files[0], data_args.max_seq_length,
+                        os.path.join(data_args.datasets_cache_dir, 'validation'),
+                        custom_args.tokenize_chunksize, data_args.overwrite_cache
+                    ), tokenizer.pad_token_id, data_args.max_seq_length
                 )
             }
         else:
@@ -283,6 +285,7 @@ def main():
     # Some sanity check
     tokenizer_and_model_config_mismatch(config, tokenizer)
     block_size_exceed_max_position_embeddings(config, data_args.max_seq_length)
+
     # Initialize model
     model = RobertaForMaskedLM(config=config)
 
@@ -310,8 +313,7 @@ def main():
         args=training_args,
         train_dataset=datasets["train"],
         eval_dataset=datasets["validation"],
-        data_collator=data_collator,
-        prediction_loss_only=True
+        data_collator=data_collator
     )
 
     # Training
