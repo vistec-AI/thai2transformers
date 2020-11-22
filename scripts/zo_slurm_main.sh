@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-jobname="wiki-test-singularity-fp16"
+jobname="wiki-test-singularity-fp16-2"
 
 # Load appropiate packages
 
@@ -43,7 +43,7 @@ mkdir -p "$ZO_SLURM_LOG_OUTPUT_DIR"
 # User defined directory
 
 PROJECT_DATA_ROOT="/ist/ist-share/scads/zo/thai2transformers/"
-export EXP_NAME="thwiki-ddp-concat-test-003"
+export EXP_NAME="thwiki-ddp-concat-test-004"
 
 export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/spm/thwiki-for-ddp_concat_12.11.2020_spm_vs-24k_v2"
 export PROJECT_TRAIN_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/train"

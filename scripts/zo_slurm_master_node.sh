@@ -48,7 +48,8 @@ python3 -m torch.distributed.launch \
  --add_space_token \
  --datasets_cache_dir "$PROJECT_CACHE_DIR" \
  --datasets_type MemmapConcatFullSentenceTextDataset \
- --architecture roberta-base
+ --architecture roberta-base \
+ --mlm
 
 EOF
 )
