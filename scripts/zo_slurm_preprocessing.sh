@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+singularity exec --bind /ist/ist-share/scads/zo/:/ist/ist-share/scads/zo/ ../docker-images/zo_th2tfm.sif bash <( cat <<EOF
+
 python3 run_mlm.py \
  --tokenizer_name_or_path "$PROJECT_TOKENIZER_PATH"  \
  --ext txt \
@@ -28,3 +30,6 @@ python3 run_mlm.py \
  --architecture roberta-base \
  --no_cuda \
  --build_dataset_only
+
+EOF
+)

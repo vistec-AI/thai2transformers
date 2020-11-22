@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
 
-jobname="wiki-test"
+jobname="wiki-test-singularity"
 
 # Load appropiate packages
 
-module load Anaconda3
+# module load Anaconda3
+# 
+# # Fix since when you use `module load` inside bash script
+# # it does not source conda correctly
+# . /ist/apps/modules/software/Anaconda3/5.3.0/etc/profile.d/conda.sh
+# 
+# conda activate dev
 
-# Fix since when you use `module load` inside bash script
-# it does not source conda correctly
-. /ist/apps/modules/software/Anaconda3/5.3.0/etc/profile.d/conda.sh
-
-conda activate dev
+# singularity shell --nv ../docker-images/zo_th2tfm.sif
 
 # Sanity check
 
-echo "$CONDA_DEFAULT_ENV"
-python3 --version
+# python3 --version
 
 # export some variable we will use later
 

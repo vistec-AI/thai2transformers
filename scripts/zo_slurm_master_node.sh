@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
 
-
 if [ $NODE_RANK -ne 0 ]; then
     sleep "$WAIT_MASTER_NODE"
-    MASTER_HOSTNAME=$(scontrol show job $MASTER_NODE_JOBID | grep ' NodeList' | awk -F'=' '{print $2}')
-    MASTER_ADDR=$MASTER_HOSTNAME
+    MASTER_HOSTNAME=$(scontrol show job $MASTER_NODE_JOBID | grep ' NodeList' | awk -F'=' '{print $2}')  # cant use in images
+    export MASTER_ADDR=$MASTER_HOSTNAME  # Need to export in this case since singularity container spawn another process?
 else
     MASTER_HOSTNAME=$(hostname -s)
-    MASTER_ADDR=$MASTER_HOSTNAME
+    export MASTER_ADDR=$MASTER_HOSTNAME
 fi
+
+# Hacking this for now but this should be possible to wrap this in another helper script
+singularity exec --bind /ist/ist-share/scads/zo/:/ist/ist-share/scads/zo/ --nv ../docker-images/zo_th2tfm.sif bash <( cat <<EOF
 
 echo "Node rank: $NODE_RANK"
 echo "Master Address: $MASTER_ADDR"
 
-python -m torch.distributed.launch \
+python3 -m torch.distributed.launch \
     --nproc_per_node=$N_GPUS_PER_NODE \
     --nnodes=$N_NODES \
     --node_rank $NODE_RANK \
@@ -45,3 +47,6 @@ python -m torch.distributed.launch \
  --datasets_cache_dir "$PROJECT_CACHE_DIR" \
  --datasets_type MemmapConcatFullSentenceTextDataset \
  --architecture roberta-base
+
+EOF
+)
