@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-jobname="wiki-test-singularity"
+jobname="wiki-test-singularity-fp16"
 
 # Load appropiate packages
 
@@ -33,7 +33,7 @@ if [ -e "$ZO_SLURM_MAIN_FOLDER" ]; then
             [Yy]* )
                 rm -r "$ZO_SLURM_MAIN_FOLDER"
                 break;;
-            [Nn]* ) break;;
+            [Nn]* ) echo Quit; break;;
             * ) echo "Try again.";;
         esac
     done
@@ -43,11 +43,10 @@ mkdir -p "$ZO_SLURM_LOG_OUTPUT_DIR"
 # User defined directory
 
 PROJECT_DATA_ROOT="/ist/ist-share/scads/zo/thai2transformers/"
-
-export EXP_NAME="thwiki-ddp-concat-test-002"
+export EXP_NAME="thwiki-ddp-concat-test-003"
 
 export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/spm/thwiki-for-ddp_concat_12.11.2020_spm_vs-24k_v2"
-export PROJECT_TRAIN_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/val"
+export PROJECT_TRAIN_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/train"
 export PROJECT_EVAL_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/val"
 export PROJECT_CACHE_DIR="$PROJECT_DATA_ROOT/cache/$EXP_NAME "
 export PROJECT_OUTPUT_DIR="$PROJECT_DATA_ROOT/data/output/$EXP_NAME/model"
@@ -56,18 +55,19 @@ export PROJECT_LOG_DIR="$PROJECT_DATA_ROOT/data/output/$EXP_NAME/logs"
 # User defined hyperparameters
 
 export PROJECT_MAX_SEQ_LENGTH=512
-export PROJECT_LEARNING_RATE=3e-4
-export PROJECT_MAX_STEPS=100
-export PROJECT_BATCH_SIZE=2
-export PROJECT_GRAD_ACC_STEPS=2
-export PROJECT_WARMUP_STEPS=24000
+export PROJECT_LEARNING_RATE=7e-4
+export PROJECT_ADAM_BETA2=0.98  # According to paper, they said 0.98 instead of default 0.999 improve stability
+export PROJECT_MAX_STEPS=125000
+export PROJECT_BATCH_SIZE=16
+export PROJECT_GRAD_ACC_STEPS=16
+export PROJECT_WARMUP_STEPS=10000  # Warmup step is usally around 1/10 of total step
 export PROJECT_SEED=2020
-export PROJECT_SAVE_STEPS=100
-export PROJECT_EVAL_STEPS=100
+export PROJECT_SAVE_STEPS=1000
+export PROJECT_EVAL_STEPS=1000
 
 # Define multi-nodes variables
 
-export N_NODES=4
+export N_NODES=2
 export N_GPUS_PER_NODE=4
 export MASTER_PORT=13335
 # We will define master address later
@@ -75,10 +75,61 @@ export MASTER_PORT=13335
 
 # Node cluster spec
 
-MEMORY_NEED=64GB
-TIME_NEED="30"
+MEMORY_NEED=128GB
+TIME_NEED="06:00:00"
 PARTITION_NAME="gpu-cluster"
 ACCOUNT_NAME="scads"
+
+# Confirm Information
+
+cat <<EOF
+=================Info==================
+
+PWD: $PWD
+Jobname: $jobname
+Slurm Output Dir: $ZO_SLURM_MAIN_FOLDER
+
+PROJECT_DATA_ROOT: $PROJECT_DATA_ROOT
+EXP_NAME: $EXP_NAME
+
+===============Resource================
+N_NODES: $N_NODES
+N_GPUS_PER_NODE: $N_GPUS_PER_NODE
+TIME_ALLOC: $TIME_NEED
+
+=============Configuration=============
+
+PROJECT_TOKENIZER_PATH: $PROJECT_DATA_ROOT/dataset/spm/thwiki-for-ddp_concat_12.11.2020_spm_vs-24k_v2
+PROJECT_TRAIN_DATASET_DIR: $PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/val
+PROJECT_EVAL_DATASET_DIR: $PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/val
+PROJECT_CACHE_DIR: $PROJECT_DATA_ROOT/cache/$EXP_NAME
+PROJECT_OUTPUT_DIR: $PROJECT_DATA_ROOT/data/output/$EXP_NAME/model
+PROJECT_LOG_DIR: $PROJECT_DATA_ROOT/data/output/$EXP_NAME/logs
+
+============Hyperparameters============
+
+PROJECT_MAX_SEQ_LENGTH: $PROJECT_MAX_SEQ_LENGTH
+PROJECT_LEARNING_RATE: $PROJECT_LEARNING_RATE
+PROJECT_MAX_STEPS: $PROJECT_MAX_STEPS
+PROJECT_BATCH_SIZE: $PROJECT_BATCH_SIZE
+PROJECT_GRAD_ACC_STEPS: $PROJECT_GRAD_ACC_STEPS
+PROJECT_WARMUP_STEPS: $PROJECT_WARMUP_STEPS
+PROJECT_SEED: $PROJECT_SEED
+PROJECT_SAVE_STEPS: $PROJECT_SAVE_STEPS
+PROJECT_EVAL_STEPS: $PROJECT_EVAL_STEPS
+
+Effective Batchsize: $(($PROJECT_BATCH_SIZE * $PROJECT_GRAD_ACC_STEPS * $N_GPUS_PER_NODE * $N_NODES))
+
+EOF
+
+while true; do
+    read -p "Is the configuration correct (y/n)?" answer
+    case "$answer" in
+        [Yy]* ) break;;
+        [Nn]* ) echo Quit; exit;;
+        * ) echo "Try again.";;
+    esac
+done
 
 # Preprocessing
 
@@ -122,11 +173,11 @@ for ((NODE_RANK=1; NODE_RANK<N_NODES; NODE_RANK++)); do
 
 echo "Queue Worker Node ($NODE_RANK) job."
 
-# It should be able to delay ab bit before submit job for now we just
+# It should be able to delay a bit before submit job for now we just
 # use sleep to wait it
 # One possible way to work around this is to launch dummy sleep task
 # then set worker node to depend on it
-# Or lastest slurm can set sbatch --dependency with time
+# Or latest slurm can set sbatch --dependency with time
 # but not the version we got on cluster.
 
 ZO_SLURM_WORKER_NODE_JOBID=$( \

@@ -2,7 +2,7 @@
 
 if [ $NODE_RANK -ne 0 ]; then
     sleep "$WAIT_MASTER_NODE"
-    MASTER_HOSTNAME=$(scontrol show job $MASTER_NODE_JOBID | grep ' NodeList' | awk -F'=' '{print $2}')  # cant use in images
+    MASTER_HOSTNAME=$(scontrol show job $MASTER_NODE_JOBID | grep ' NodeList' | awk -F'=' '{print $2}')  # cant use in image
     export MASTER_ADDR=$MASTER_HOSTNAME  # Need to export in this case since singularity container spawn another process?
 else
     MASTER_HOSTNAME=$(hostname -s)
@@ -26,8 +26,10 @@ python3 -m torch.distributed.launch \
  --ext txt \
  --train_dir "$PROJECT_TRAIN_DATASET_DIR" \
  --eval_dir "$PROJECT_EVAL_DATASET_DIR" \
+ --fp16 \
  --max_seq_length "$PROJECT_MAX_SEQ_LENGTH" \
  --learning_rate "$PROJECT_LEARNING_RATE" --weight_decay 0.01 \
+ --adam_beta2 "$PROJECT_ADAM_BETA2" \
  --adam_epsilon 1e-6 \
  --max_steps "$PROJECT_MAX_STEPS" \
  --per_device_train_batch_size "$PROJECT_BATCH_SIZE" \
