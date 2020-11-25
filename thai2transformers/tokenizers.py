@@ -50,6 +50,7 @@ class WordLevelTrainer:
         self.input_fnames = glob.glob(f"{self.input_dir}/*{self.ext}")
         self.vocab = None
         self.freq = None
+        self.token_counter = None
 
     def count_one(self, fname: str) -> Counter:
         with open(fname, "r") as f:
@@ -60,7 +61,8 @@ class WordLevelTrainer:
     def count_parallel(self, nb_cores: int = _nb_cores) -> Dict[(str, int)]:
         with multiprocessing.Pool(nb_cores) as pool:
             counters = pool.map(self.count_one, self.input_fnames)
-        counter_all = sum(counters, Counter()).most_common(self.vocab_size)
+        self.token_counter = sum(counters, Counter())
+        counter_all = self.token_counter.most_common(self.vocab_size)
         self.freq = [(i, 0) for i in self.special_tokens] + counter_all
         self.vocab = dict((c[0], i) for i, c in enumerate(self.freq))
         return self.vocab
