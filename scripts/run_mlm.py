@@ -30,7 +30,6 @@ import transformers
 from transformers import (
     AutoConfig,
     RobertaForMaskedLM,
-    CamembertTokenizer,
     MODEL_FOR_MASKED_LM_MAPPING,
     DataCollatorForLanguageModeling,
     HfArgumentParser,
@@ -219,8 +218,14 @@ def main():
     # Set seed before initializing model.
     set_seed(training_args.seed)
 
-    train_files = list(sorted(glob.glob(f'{data_args.train_dir}/*.{custom_args.ext}')))[:1]#[:2]
-    validation_files = list(sorted(glob.glob(f'{data_args.eval_dir}/*.{custom_args.ext}')))[:1]#[:2]
+    train_files = list(sorted(glob.glob(f'{data_args.train_dir}/*.{custom_args.ext}')))
+    validation_files = list(sorted(glob.glob(f'{data_args.eval_dir}/*.{custom_args.ext}')))
+    if len(train_files) > 1:
+        logger.warning(f'Got {len(train_files)} train files, only pick first file.')
+        train_files = train_files[:1]
+    if len(validation_files) > 1:
+        logger.warning(f'Got {len(validation_files)} validation files, only pick first file.')
+        validation_files = validation_files[:1]
 
     # Load pretrained model and tokenizer
     #
@@ -291,13 +296,17 @@ def main():
 
     if custom_args.model_dir is not None:
         model_path = os.path.join(custom_args.model_dir, 'pytorch_model.bin')
-        print(f'[INFO] Load pretrianed model (state_dict) from {model_path}')
+        logger.info(f'[INFO] Load pretrianed model (state_dict) from {model_path}')
         # Use strict=False to kept model compatible with older version,
         # so we can bumb transformers version up and use new datasets library
         # see this issues https://github.com/huggingface/transformers/issues/6882
         # The program itself will run but does it has any side effect?
         # Maybe bad idea?
-        model.load_state_dict(state_dict=torch.load(model_path), strict=False)
+        try:
+            model.load_state_dict(state_dict=torch.load(model_path))
+        except RuntimeError:
+            logger.info('[INFO] RuntimeError, try loading with strict=False instead.')
+            model.load_state_dict(state_dict=torch.load(model_path), strict=False)
         # If we did not add strict=False, this will raise Error since the keys are not match
         # RuntimeError: Error(s) in loading state_dict for RobertaForMaskedLM:
         #     Missing key(s) in state_dict: "roberta.embeddings.position_ids".
@@ -331,14 +340,8 @@ def main():
         output_tokenizer_dir = os.path.join(training_args.output_dir, 'roberta_thai_tokenizer')
         tokenizer.save_pretrained(output_tokenizer_dir)
 
-    return
     # evaluate
     trainer.evaluate()
-
-
-def _mp_fn(index):
-    # For xla_spawn (TPUs)
-    main()
 
 
 if __name__ == "__main__":

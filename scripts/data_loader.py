@@ -158,6 +158,9 @@ class MemmapLineByLineTextDataset(Dataset):
             logger.info("Found cached features at %s", datasets_cache_dir)
             self.memmap_index_dataset.load()
             return
+        else:
+            # Handle overwrite_cache case
+            self.memmap_index_dataset.clear()
         logger.info("Creating features from dataset file at %s", file_path)
         lines = []
         with open(file_path, encoding="utf-8") as f:
@@ -219,6 +222,7 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
             self.memmap_index_dataset.load()
             return
         else:
+            # Handle overwrite_cache case
             self.memmap_index_dataset.clear()
         logger.info("Creating features from dataset file at %s", file_path)
         eos_token_id = tokenizer.eos_token_id
@@ -230,6 +234,11 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
         block = []
 
         def add_to_block(ids, block, blocks):
+            """
+            Add indices to block, if the combined size of indices and block + 2 (bos, eos)
+            exceed block_size, add the block to blocks if block is not empty
+            then try to add indices again.
+            """
             size = len(block) + len(ids)
             if block:
                 size += 1
