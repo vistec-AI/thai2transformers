@@ -7,3 +7,4 @@ pythainlp==2.2.4
 datasets==1.1.2
 pandas==1.1.4
 swifter==1.0.7
+tensorboard==2.3.0

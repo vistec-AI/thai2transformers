@@ -12,6 +12,7 @@ RUN pip3 install tqdm emoji pythainlp
 RUN pip3 install transformers==3.4.0
 RUN git clone https://github.com/huggingface/datasets.git && cd datasets && \
     pip3 install .
+RUN pip3 install tensorboard==2.3.0
 
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
