@@ -1,6 +1,6 @@
  EXP_NAME="zo_test"
 
-python3 run_mlm.py \
+python3 -m pdb run_mlm.py \
  --tokenizer_name_or_path ../data/input/zo_test/thwiki-for-ddp_concat_12.11.2020_spm_vs-24k_v2 \
  --ext txt \
  --train_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/train \
@@ -23,6 +23,6 @@ python3 run_mlm.py \
  --logging_dir "../data/output/$EXP_NAME/logs" \
  --output_dir "../data/output/$EXP_NAME/model" \
  --add_space_token \
- --datasets_cache_dir ../cache/$EXP_NAME \
+ --datasets_cache_dir ../cache2/$EXP_NAME \
  --datasets_type MemmapConcatFullSentenceTextDataset \
  --architecture roberta-base

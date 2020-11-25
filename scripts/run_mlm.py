@@ -87,6 +87,10 @@ class ModelArguments:
         default=True,
         metadata={"help": "Whether to use one of the fast tokenizer (backed by the tokenizers library) or not."},
     )
+    tokenizer_type: Optional[str] = field(
+        default='ThaiRobertaTokenizer',
+        metadata={'help': 'type of tokenizer'}
+    )
 
 
 @dataclass
@@ -146,22 +150,6 @@ class DataTrainingArguments:
 
 @dataclass
 class ArchitectureArguments:
-    num_hidden_layers: int = field(
-        default=12,
-        metadata={'help': 'number of hidden layers (L)'}
-        )
-    hidden_size: int = field(
-        default=768,
-        metadata={'help': 'number of hidden size (H)'}
-        )
-    intermediate_size: int = field(
-        default=3072,
-        metadata={'help': 'number of intermediate_size'}
-        )
-    num_attention_head: int = field(
-        default=12,
-        metadata={'help': 'number of attention head (A)'}
-        )
     architecture: str = field(
         default=None,
         metadata={'help': 'type of architecture.'}
@@ -233,9 +221,11 @@ def main():
     # The .from_pretrained methods guarantee that only one local process can concurrently
     # download model & vocab.
     # Create config for LM model
-
-    tokenizer = ThaiRobertaTokenizer.from_pretrained(
-        model_args.tokenizer_name_or_path, use_fast=model_args.use_fast_tokenizer)
+    if model_args.tokenizer_type == 'ThaiRobertaTokenizer':
+        tokenizer = ThaiRobertaTokenizer.from_pretrained(
+            model_args.tokenizer_name_or_path, use_fast=model_args.use_fast_tokenizer)
+    else:
+        raise NotImplementedError(f'tokenizer_type {model_args.tokenizer_type} is not implemeted.')
 
     if custom_args.ext == 'txt':
         if len(train_files) > 1 or len(validation_files) > 1:
