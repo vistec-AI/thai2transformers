@@ -228,7 +228,11 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
         logger.info("Creating features from dataset file at %s", file_path)
         eos_token_id = tokenizer.eos_token_id
         bos_token_id = tokenizer.bos_token_id
-        newline_token_id = tokenizer.get_vocab()['▁']
+        tokenizer_vocab = tokenizer.get_vocab()
+        if '▁' in tokenizer_vocab:
+            newline_token_id = tokenizer_vocab['▁']
+        elif '\n' in tokenizer_vocab:
+            newline_token_id = tokenizer_vocab['\n']
         usable_block_size = block_size - 2
         lines = []
         skipped_n = 0

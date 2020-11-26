@@ -42,11 +42,13 @@ from sanity import tokenizer_and_model_config_mismatch, block_size_exceed_max_po
 
 # thai2transformers
 try:
-    from thai2transformers.tokenizers import ThaiRobertaTokenizer
+    from thai2transformers.tokenizers import (
+        ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer)
 except ModuleNotFoundError:
     import sys
     sys.path.append('..')  # path hacking
-    from thai2transformers.tokenizers import ThaiRobertaTokenizer
+    from thai2transformers.tokenizers import (
+        ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer)
 
 logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_MASKED_LM_MAPPING.keys())
@@ -224,6 +226,9 @@ def main():
     if model_args.tokenizer_type == 'ThaiRobertaTokenizer':
         tokenizer = ThaiRobertaTokenizer.from_pretrained(
             model_args.tokenizer_name_or_path, use_fast=model_args.use_fast_tokenizer)
+    elif model_args.tokenizer_type == 'ThaiWordsNewmmTokenizer':
+        tokenizer = ThaiWordsNewmmTokenizer.from_pretrained(
+            model_args.tokenizer_name_or_path)
     else:
         raise NotImplementedError(f'tokenizer_type {model_args.tokenizer_type} is not implemeted.')
 
