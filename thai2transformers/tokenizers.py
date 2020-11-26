@@ -296,11 +296,18 @@ class WordLevelTrainer:
 
     def count_one(self, fname: str) -> Counter:
         with open(fname, "r") as f:
-            word_list = [self.pre_tokenize_func(line) for line in f]
+            word_list = []
+            for line in f:
+                if line:
+                    line = line.strip()
+                    if len(line) > 0 and not line.isspace():
+                        word_list.append(line)
+                    word_list.append(self.pre_tokenize_func(line))
             flat_list = [item for sublist in word_list for item in sublist]
         return Counter(flat_list)
 
     def count_parallel(self, nb_cores: int = _nb_cores) -> Dict[(str, int)]:
+        #counters = [self.count_one(fname) for fname in self.input_files]
         with multiprocessing.Pool(nb_cores) as pool:
             counters = pool.map(self.count_one, self.input_files)
         counter_all = sum(counters, Counter()).most_common(self.vocab_size)
@@ -315,4 +322,3 @@ class WordLevelTrainer:
 import sefr_cut
 sefr_cut.load_model(engine='best')
 def sefr_pre_token(text): sefr_cut.tokenize(text)[0]
-

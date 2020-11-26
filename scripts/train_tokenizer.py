@@ -6,6 +6,9 @@ from transformers import (
 )
 from tokenizers import Tokenizer, pre_tokenizers, models
 from pythainlp.tokenize import word_tokenize, syllable_tokenize
+from pythainlp.corpus import thai_syllables, thai_words
+from pythainlp.util.trie import Trie
+from functools import partial
 
 
 try:
@@ -62,17 +65,22 @@ def main():
     train_files = list(sorted(glob.glob(f'{data_args.train_dir}/*.{data_args.ext}')))
     validation_files = list(sorted(glob.glob(f'{data_args.eval_dir}/*.{data_args.ext}')))
 
-    pre_tokenizers_map = {'newmm': word_tokenize,
-                          'syllable': syllable_tokenize,
+    additional_special_tokens = ['<bos>', '<pad>', '<eos>', '<unk>', '<mask>', '<_>', '\n']
+    pre_tokenizers_map = {'newmm': partial(
+        word_tokenize,
+        custom_dict=Trie(frozenset(set(thai_words()).union(set(additional_special_tokens))))
+        ),
+                          'syllable': partial(
+        syllable_tokenize,
+        custom_dict=Trie(frozenset(set(thai_syllables()).union(set(additional_special_tokens))))
+        ),
                           'sefr_cut': sefr_pre_token}
 
     pre_tokenizer_func = pre_tokenizers_map.get(custom_args.pre_tokenizer_type, None)
     if pre_tokenizer_func is None:
         raise NotImplementedError
-    breakpoint()
 
     if not os.path.exists(custom_args.output_file) or custom_args.overwrite_output_file:
-        additional_special_tokens = ['<bos>', '<pad>', '<eos>', '<unk>', '<mask>', '<_>']
         trainer = WordLevelTrainer(pre_tokenize_func=pre_tokenizer_func,
                                    vocab_size=custom_args.vocab_size,
                                    input_files=train_files,
@@ -86,11 +94,12 @@ def main():
     tokenizer.pre_tokenizer = custom_pre_tokenizer
 
     print('Tokenize following text.')
-    texts = ['โรนัลโดเขาได้เล่นกับทีม', 'โปรตุเกสมีโรนัลโด']
+    texts = ['โรนัลโดเขาได้เล่นกับทีม', 'โปรตุเกสมีโรนัลโด', 'โรนัลโดเขาได้เล่นกับทีม\nโปรตุเกสมีโรนัลโด']
     ids = [e.ids for e in tokenizer.encode_batch(texts)]
     decoded_texts = tokenizer.decode_batch(ids)
     for text, i, decoded_text in zip(texts, ids, decoded_texts):
         print('Text: ', text, '>', 'Tokenized: ', i, '>', 'Decoded: ', decoded_text)
+    breakpoint()
 
 
 if __name__ == '__main__':

@@ -167,6 +167,7 @@ class MemmapLineByLineTextDataset(Dataset):
             while True:
                 line = f.readline()
                 if line:
+                    line = line.strip()
                     if len(line) > 0 and not line.isspace():
                         lines.append(line)
                 else:
