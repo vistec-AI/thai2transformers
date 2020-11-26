@@ -58,8 +58,8 @@ $distributed_command run_mlm.py \
  --evaluation_strategy steps \
  --eval_steps "$PROJECT_EVAL_STEPS" \
  --prediction_loss_only \
- --logging_dir "$PROJECT_LOG_DIR/$NODE_RANK/" \
- --output_dir "$PROJECT_OUTPUT_DIR/$NODE_RANK/" \
+ --logging_dir "$PROJECT_LOG_DIR" \
+ --output_dir "$PROJECT_OUTPUT_DIR" \
  --add_space_token \
  --datasets_cache_dir "$PROJECT_CACHE_DIR" \
  --datasets_type MemmapConcatFullSentenceTextDataset \

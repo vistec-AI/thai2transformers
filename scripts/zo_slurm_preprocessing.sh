@@ -22,7 +22,6 @@ python3 run_mlm.py \
  --save_total_limit 100 \
  --evaluation_strategy steps \
  --eval_steps "$PROJECT_EVAL_STEPS" \
- --logging_dir "$PROJECT_LOG_DIR" \
  --output_dir "$PROJECT_OUTPUT_DIR" \
  --datasets_cache_dir "$PROJECT_CACHE_DIR" \
  --datasets_type MemmapConcatFullSentenceTextDataset \

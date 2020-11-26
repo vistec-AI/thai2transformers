@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-jobname="th-wiki-concat-newmm-test-001"
+jobname="th-wiki-concat-newmm-test-003"
 
 # export some variable we will use later
 
@@ -27,7 +27,7 @@ mkdir -p "$ZO_SLURM_LOG_OUTPUT_DIR"
 # User defined directory
 
 PROJECT_DATA_ROOT="/ist/ist-share/scads/zo/thai2transformers/"
-export EXP_NAME="th-wiki-concat-newmm-test-001"
+export EXP_NAME="th-wiki-concat-newmm-test-003"
 
 export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/newmm/thwiki-for-ddp_concat_12.11.2020_newmm_tokenizer"
 export PROJECT_TRAIN_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/train"
@@ -53,7 +53,7 @@ export PROJECT_TOKENIZER_TYPE="ThaiWordsNewmmTokenizer"
 
 # Define multi-nodes variables
 
-export N_NODES=2
+export N_NODES=8
 export N_GPUS_PER_NODE=4
 export MASTER_PORT=13335
 # We will define master address later
@@ -62,7 +62,7 @@ export MASTER_PORT=13335
 # Node cluster spec
 
 MEMORY_NEED=128GB
-TIME_NEED="01:00:00"
+TIME_NEED="2-00:00:00"
 PARTITION_NAME="gpu-cluster"
 ACCOUNT_NAME="scads"
 N_CPUS_PER_GPU=2  # 1 CPU per GPU yield almost 100% utilization on CPU but have no effect on performance.
@@ -173,7 +173,7 @@ echo "Queue Worker Node ($NODE_RANK) job."
 ZO_SLURM_WORKER_NODE_JOBID=$( \
 env NODE_RANK="$NODE_RANK" \
     MASTER_NODE_JOBID="$ZO_SLURM_MASTER_NODE_JOBID" \
-    WAIT_MASTER_NODE=10 \
+    WAIT_MASTER_NODE=0 \
 sbatch \
     --dependency=after:"$ZO_SLURM_MASTER_NODE_JOBID" \
     --partition="$PARTITION_NAME" \
