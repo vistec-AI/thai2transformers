@@ -9,6 +9,7 @@ python3 run_mlm.py \
  --eval_dir "$PROJECT_EVAL_DATASET_DIR" \
  --max_seq_length "$PROJECT_MAX_SEQ_LENGTH" \
  --learning_rate "$PROJECT_LEARNING_RATE" --weight_decay 0.01 \
+ --adam_beta2 "$PROJECT_ADAM_BETA2" \
  --adam_epsilon 1e-6 \
  --max_steps "$PROJECT_MAX_STEPS" \
  --per_device_train_batch_size "$PROJECT_BATCH_SIZE" \
@@ -21,13 +22,13 @@ python3 run_mlm.py \
  --save_total_limit 100 \
  --evaluation_strategy steps \
  --eval_steps "$PROJECT_EVAL_STEPS" \
- --prediction_loss_only \
  --logging_dir "$PROJECT_LOG_DIR" \
  --output_dir "$PROJECT_OUTPUT_DIR" \
- --add_space_token \
  --datasets_cache_dir "$PROJECT_CACHE_DIR" \
  --datasets_type MemmapConcatFullSentenceTextDataset \
  --architecture roberta-base \
+ --tokenizer_type "$PROJECT_TOKENIZER_TYPE" \
+ --mlm \
  --no_cuda \
  --build_dataset_only
 
