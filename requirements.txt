@@ -1,3 +1,7 @@
 torch==1.7.0
 transformers==3.4.0
 sentencepiece==0.1.94
+sefr_cut==0.2
+ssg==0.0.6
+pythainlp==2.2.4
+tokenizers==0.9.4
