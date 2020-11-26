@@ -64,6 +64,7 @@ $distributed_command run_mlm.py \
  --datasets_cache_dir "$PROJECT_CACHE_DIR" \
  --datasets_type MemmapConcatFullSentenceTextDataset \
  --architecture roberta-base \
+ --tokenizer_type "$PROJECT_TOKENIZER_TYPE" \
  --mlm
 
 EOF

@@ -28,4 +28,5 @@ python3 -m pdb run_mlm.py \
  --datasets_type MemmapConcatFullSentenceTextDataset \
  --tokenizer_type ThaiWordsNewmmTokenizer \
  --overwrite_cache \
+ --mlm \
  --architecture roberta-base
