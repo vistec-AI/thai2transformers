@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-jobname="th-wiki-concat-newmm-test-003"
+jobname="th-wiki-concat-syllable-test-001"
 
 # export some variable we will use later
 
@@ -27,20 +27,21 @@ mkdir -p "$ZO_SLURM_LOG_OUTPUT_DIR"
 # User defined directory
 
 PROJECT_DATA_ROOT="/ist/ist-share/scads/zo/thai2transformers/"
-export EXP_NAME="th-wiki-concat-newmm-test-003"
+export EXP_NAME="th-wiki-concat-syllable-test-001"
 
-export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/newmm/thwiki-for-ddp_concat_12.11.2020_newmm_tokenizer"
+export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/newmm/thwiki-for-ddp_concat_12.11.2020_syllable_tokenizer_min_freq_4"
 export PROJECT_TRAIN_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/train"
 export PROJECT_EVAL_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/val"
-export PROJECT_CACHE_DIR="$PROJECT_DATA_ROOT/cache/share-newmm"
+export PROJECT_CACHE_DIR="$PROJECT_DATA_ROOT/cache/share-syllable-min-freq-4"
 export PROJECT_OUTPUT_DIR="$PROJECT_DATA_ROOT/data/output/$EXP_NAME/model"
 export PROJECT_LOG_DIR="$PROJECT_DATA_ROOT/data/output/$EXP_NAME/logs"
 export PROJECT_LOCAL_CACHE=false
+#export PROJECT_MODEL_DIR="/ist/ist-share/scads/zo/thai2transformers//data/output/th-wiki-concat-newmm-test-003/model/checkpoint-2000/"
 
 # User defined hyperparameters
 
 export PROJECT_MAX_SEQ_LENGTH=512
-export PROJECT_LEARNING_RATE=1e-3
+export PROJECT_LEARNING_RATE=7e-4
 export PROJECT_ADAM_BETA2=0.98  # According to paper, they said 0.98 instead of default 0.999 improve stability
 export PROJECT_MAX_STEPS=31250
 export PROJECT_BATCH_SIZE=16
@@ -49,7 +50,7 @@ export PROJECT_WARMUP_STEPS=1250  # Warmup step is usally around <5-10% of total
 export PROJECT_SEED=2020
 export PROJECT_SAVE_STEPS=500
 export PROJECT_EVAL_STEPS=500
-export PROJECT_TOKENIZER_TYPE="ThaiWordsNewmmTokenizer"
+export PROJECT_TOKENIZER_TYPE="ThaiWordsSyllableTokenizer"
 
 # Define multi-nodes variables
 
@@ -95,6 +96,7 @@ PROJECT_CACHE_DIR: $PROJECT_CACHE_DIR
 PROJECT_OUTPUT_DIR: $PROJECT_OUTPUT_DIR
 PROJECT_LOG_DIR: $PROJECT_LOG_DIR
 PROJECT_LOCAL_CACHE: $PROJECT_LOG_DIR
+PROJECT_MODEL_DIR: $PROJECT_MODEL_DIR
 
 ============Hyperparameters============
 

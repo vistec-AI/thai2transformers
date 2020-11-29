@@ -35,7 +35,7 @@ PRE_TOKENIZERS_MAP = {'newmm': partial(
     custom_dict=Trie(frozenset(set(thai_words()).union(set(ADDITIONAL_SPECIAL_TOKENS))))
     ),
                       'syllable': partial(
-    syllable_tokenize,
+    word_tokenize,
     custom_dict=Trie(frozenset(set(thai_syllables()).union(set(ADDITIONAL_SPECIAL_TOKENS))))
     )}
 
@@ -363,40 +363,7 @@ class ThaiRobertaTokenizer(PreTrainedTokenizer):
         return (text, kwargs)
 
 
-class ThaiWordsNewmmTokenizer(PreTrainedTokenizer):
-    vocab_files_names = {"vocab_file": "newmm.json"}
-
-    def __init__(
-        self,
-        vocab_file,
-        bos_token="<s>",
-        eos_token="</s>",
-        sep_token="</s>",
-        cls_token="<s>",
-        unk_token="<unk>",
-        pad_token="<pad>",
-        mask_token="<mask>",
-        additional_special_tokens=ADDITIONAL_SPECIAL_TOKENS,
-        **kwargs
-    ):
-        super().__init__(
-            bos_token=bos_token,
-            eos_token=eos_token,
-            unk_token=unk_token,
-            sep_token=sep_token,
-            cls_token=cls_token,
-            pad_token=pad_token,
-            mask_token=mask_token,
-            additional_special_tokens=ADDITIONAL_SPECIAL_TOKENS,
-            **kwargs,
-        )
-        pre_tokenizer_func = PRE_TOKENIZERS_MAP['newmm']
-        custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
-            CustomPreTokenizer(pre_tokenizer_func))
-        tokenizer = Tokenizer(models.WordLevel.from_file(vocab_file))
-        tokenizer.pre_tokenizer = custom_pre_tokenizer
-        self.tokenizer_model = tokenizer
-        self.vocab_file = vocab_file
+class BaseThaiWordsTokenizer(PreTrainedTokenizer):
 
     def build_inputs_with_special_tokens(
         self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None
@@ -545,3 +512,103 @@ class ThaiWordsNewmmTokenizer(PreTrainedTokenizer):
         text = text.replace(' ', SPACE_TOKEN)
 
         return (text, kwargs)
+
+
+class ThaiWordsNewmmTokenizer(BaseThaiWordsTokenizer):
+    vocab_files_names = {"vocab_file": "newmm.json"}
+
+    def __init__(
+        self,
+        vocab_file,
+        bos_token="<s>",
+        eos_token="</s>",
+        sep_token="</s>",
+        cls_token="<s>",
+        unk_token="<unk>",
+        pad_token="<pad>",
+        mask_token="<mask>",
+        additional_special_tokens=ADDITIONAL_SPECIAL_TOKENS,
+        **kwargs
+    ):
+        super().__init__(
+            bos_token=bos_token,
+            eos_token=eos_token,
+            unk_token=unk_token,
+            sep_token=sep_token,
+            cls_token=cls_token,
+            pad_token=pad_token,
+            mask_token=mask_token,
+            additional_special_tokens=ADDITIONAL_SPECIAL_TOKENS,
+            **kwargs,
+        )
+        pre_tokenizer_func = PRE_TOKENIZERS_MAP['newmm']
+        custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
+            CustomPreTokenizer(pre_tokenizer_func))
+        tokenizer = Tokenizer(models.WordLevel.from_file(vocab_file))
+        tokenizer.pre_tokenizer = custom_pre_tokenizer
+        self.tokenizer_model = tokenizer
+        self.vocab_file = vocab_file
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state["tokenizer_model"] = None
+        return state
+
+    def __setstate__(self, d):
+        self.__dict__ = d
+        pre_tokenizer_func = PRE_TOKENIZERS_MAP['newmm']
+        custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
+            CustomPreTokenizer(pre_tokenizer_func))
+        tokenizer = Tokenizer(models.WordLevel.from_file(self.vocab_file))
+        tokenizer.pre_tokenizer = custom_pre_tokenizer
+        self.tokenizer_model = tokenizer
+
+
+class ThaiWordsSyllableTokenizer(BaseThaiWordsTokenizer):
+    vocab_files_names = {"vocab_file": "syllable.json"}
+
+    def __init__(
+        self,
+        vocab_file,
+        bos_token="<s>",
+        eos_token="</s>",
+        sep_token="</s>",
+        cls_token="<s>",
+        unk_token="<unk>",
+        pad_token="<pad>",
+        mask_token="<mask>",
+        additional_special_tokens=ADDITIONAL_SPECIAL_TOKENS,
+        **kwargs
+    ):
+        super().__init__(
+            bos_token=bos_token,
+            eos_token=eos_token,
+            unk_token=unk_token,
+            sep_token=sep_token,
+            cls_token=cls_token,
+            pad_token=pad_token,
+            mask_token=mask_token,
+            additional_special_tokens=ADDITIONAL_SPECIAL_TOKENS,
+            **kwargs,
+        )
+        pre_tokenizer_func = PRE_TOKENIZERS_MAP['syllable']
+        custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
+            CustomPreTokenizer(pre_tokenizer_func))
+        tokenizer = Tokenizer(models.WordLevel.from_file(vocab_file))
+        tokenizer.pre_tokenizer = custom_pre_tokenizer
+        self.tokenizer_model = tokenizer
+        self.vocab_file = vocab_file
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state["tokenizer_model"] = None
+        return state
+
+    def __setstate__(self, d):
+        self.__dict__ = d
+        pre_tokenizer_func = PRE_TOKENIZERS_MAP['syllable']
+        custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
+            CustomPreTokenizer(pre_tokenizer_func))
+        tokenizer = Tokenizer(models.WordLevel.from_file(self.vocab_file))
+        tokenizer.pre_tokenizer = custom_pre_tokenizer
+        self.tokenizer_model = tokenizer

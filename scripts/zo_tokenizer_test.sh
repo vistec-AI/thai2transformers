@@ -1,4 +1,4 @@
-TOKENIZER_TYPE=newmm
+TOKENIZER_TYPE=syllable
 
 python3 train_tokenizer.py \
  --ext txt \
@@ -7,4 +7,4 @@ python3 train_tokenizer.py \
  --output_file "../data/input/zo_test/thwiki-for-ddp_concat_12.11.2020_newmm_tokenizer/$TOKENIZER_TYPE.json" \
  --pre_tokenizer_type "$TOKENIZER_TYPE" \
  --debug \
- --vocab_min_freq 3
+ --vocab_min_freq 4

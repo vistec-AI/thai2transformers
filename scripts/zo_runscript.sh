@@ -1,8 +1,8 @@
  EXP_NAME="zo_test"
 
-python3 -m pdb run_mlm.py \
+
+arguements=$(cat <<-EOF
  --tokenizer_name_or_path ../data/input/zo_test/thwiki-for-ddp_concat_12.11.2020_newmm_tokenizer \
- --ext txt \
  --train_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/zo_val \
  --eval_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/zo_val \
  --max_seq_length 512 \
@@ -26,7 +26,14 @@ python3 -m pdb run_mlm.py \
  --add_space_token \
  --datasets_cache_dir ../cache2/$EXP_NAME \
  --datasets_type MemmapConcatFullSentenceTextDataset \
- --tokenizer_type ThaiWordsNewmmTokenizer \
+ --tokenizer_type ThaiWordsSyllableTokenizer \
  --overwrite_cache \
  --mlm \
  --architecture roberta-base
+EOF
+)
+
+arguements="$arguements --ext txt"
+
+python3 -m pdb run_mlm.py $arguements
+
