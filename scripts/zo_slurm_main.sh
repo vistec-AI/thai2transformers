@@ -29,7 +29,7 @@ mkdir -p "$ZO_SLURM_LOG_OUTPUT_DIR"
 PROJECT_DATA_ROOT="/ist/ist-share/scads/zo/thai2transformers/"
 export EXP_NAME="th-wiki-concat-syllable-test-001"
 
-export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/newmm/thwiki-for-ddp_concat_12.11.2020_syllable_tokenizer_min_freq_4"
+export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/syllable/thwiki-for-ddp_concat_12.11.2020_syllable_tokenizer_min_freq_4"
 export PROJECT_TRAIN_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/train"
 export PROJECT_EVAL_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/val"
 export PROJECT_CACHE_DIR="$PROJECT_DATA_ROOT/cache/share-syllable-min-freq-4"

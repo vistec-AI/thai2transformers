@@ -19,7 +19,7 @@ from transformers import (
 import mmap
 import struct
 from contextlib import contextmanager
-from helper import get_file_size
+from helper import get_file_size, _readline_clean_and_strip
 
 
 logger = logging.get_logger(__name__)
@@ -164,14 +164,8 @@ class MemmapLineByLineTextDataset(Dataset):
         logger.info("Creating features from dataset file at %s", file_path)
         lines = []
         with open(file_path, encoding="utf-8") as f:
-            while True:
-                line = f.readline()
-                if line:
-                    line = line.strip()
-                    if len(line) > 0 and not line.isspace():
-                        lines.append(line)
-                else:
-                    break
+            for line in _readline_clean_and_strip(f):
+                lines.append(line)
                 if len(lines) >= chunk_size:
                     batch_encoding = tokenizer(lines, add_special_tokens=True,
                                                truncation=True, max_length=block_size)
@@ -234,9 +228,6 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
         elif '\n' in tokenizer_vocab:
             newline_token_id = tokenizer_vocab['\n']
         usable_block_size = block_size - 2
-        lines = []
-        skipped_n = 0
-        block = []
 
         def add_to_block(ids, block, blocks):
             """
@@ -260,16 +251,13 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
                 else:
                     return ids
 
+        skipped_n = 0
+        lines = []
+        block = []
         with open(file_path, encoding="utf-8") as f:
             file_size = get_file_size(f)
-            while True:
-                line = f.readline()
-                if line:
-                    line = line.strip()
-                    if len(line) > 0 and not line.isspace():
-                        lines.append(line)
-                else:
-                    break
+            for line in _readline_clean_and_strip(f):
+                lines.append(line)
                 if len(lines) >= chunk_size:
                     batch_encoding = tokenizer(lines, add_special_tokens=False,
                                                truncation=True, max_length=usable_block_size + 1)

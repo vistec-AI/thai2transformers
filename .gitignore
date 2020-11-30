@@ -20,6 +20,7 @@ dataset/
 cleaned_data/
 wandb/
 cache
+cache2
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

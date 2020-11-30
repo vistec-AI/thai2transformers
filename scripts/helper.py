@@ -48,11 +48,16 @@ def get_file_size(f):
 
 def readline_clean_and_strip(file_path):
     with open(file_path, encoding="utf-8") as f:
-        while True:
-            line = f.readline()
-            if line:
-                line = line.strip()
-                if len(line) > 0 and not line.isspace():
-                    yield line
-            else:
-                break
+        for line in _readline_clean_and_strip(f):
+            yield line
+
+
+def _readline_clean_and_strip(f):
+    while True:
+        line = f.readline()
+        if line:
+            line = line.strip()
+            if len(line) > 0 and not line.isspace():
+                yield line
+        else:
+            break
