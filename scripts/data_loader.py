@@ -18,6 +18,7 @@ from transformers import (
     )
 import mmap
 import struct
+import bisect
 from contextlib import contextmanager
 from helper import get_file_size, _readline_clean_and_strip
 
@@ -182,7 +183,7 @@ class MemmapLineByLineTextDataset(Dataset):
     def __len__(self):
         return len(self.memmap_index_dataset)
 
-    def __getitem__(self, i) -> Dict[str, torch.tensor]:
+    def __getitem__(self, i):
         return torch.tensor(self.memmap_index_dataset[i], dtype=torch.long)
 
 
@@ -293,7 +294,7 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
     def __len__(self):
         return len(self.memmap_index_dataset)
 
-    def __getitem__(self, i) -> Dict[str, torch.tensor]:
+    def __getitem__(self, i):
         return torch.tensor(self.memmap_index_dataset[i], dtype=torch.long)
 
 
@@ -307,9 +308,35 @@ class PaddedDataset(Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def __getitem__(self, i) -> Dict[str, torch.tensor]:
+    def __getitem__(self, i):
         r = self.dataset[i]
         padded = torch.tensor((), dtype=torch.long)
         padded = padded.new_full((self.block_size, ), self.padding_idx)
         padded[:r.shape[0]] = r
         return padded
+
+
+class ConcatDataset(Dataset):
+
+    def __init__(self, datasets):
+        self.datasets = datasets
+        self.length = 0
+        self.cumulative_length = [0]
+        for dataset in datasets:
+            dataset_len = len(dataset)
+            self.length += dataset_len
+            self.cumulative_length.append(self.length)
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, i):
+        if i > len(self) - 1:
+            raise IndexError
+        elif i < 0:
+            if abs(i) > len(self):
+                raise IndexError
+            return self.__getitem__(len(self) + i)
+        select_dataset_idx = bisect.bisect_right(self.cumulative_length, i) - 1
+        idx = i - self.cumulative_length[select_dataset_idx]
+        return self.datasets[select_dataset_idx][idx]
