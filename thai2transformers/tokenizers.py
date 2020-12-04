@@ -1,4 +1,5 @@
 import os
+import re
 from typing import List, Optional, Tuple
 from shutil import copyfile
 import sentencepiece as spm
@@ -11,11 +12,19 @@ from typing import Collection, Callable, Dict
 from tokenizers import NormalizedString, PreTokenizedString
 from transformers.tokenization_utils import PreTrainedTokenizer
 from tokenizers import Tokenizer, pre_tokenizers, models
-from pythainlp.tokenize import word_tokenize, syllable_tokenize
+from pythainlp.tokenize import word_tokenize
 from pythainlp.corpus import thai_syllables, thai_words
 from pythainlp.util.trie import Trie
 from functools import partial
-from helper import get_file_size
+
+#def breakpoint(): import pdb; pdb.set_trace()
+
+try:
+    from helper import get_file_size, multi_imap
+except ModuleNotFoundError:
+    import sys
+    sys.path.append('../scripts')  # path hacking
+    from helper import get_file_size, multi_imap
 
 
 logger = logging.getLogger()
@@ -29,6 +38,9 @@ SPIECE_UNDERLINE = '▁'
 SPACE_TOKEN = "<_>"
 DEPRECATED_SPACE_TOKEN = '<th_roberta_space_token>'
 ADDITIONAL_SPECIAL_TOKENS = ['<s>', '<pad>', '</s>', '<unk>', '<mask>', SPACE_TOKEN, '\n']
+ADDITIONAL_SPECIAL_TOKENS_EXCLUDE_SPACE_TOKEN = \
+    [e for e in ADDITIONAL_SPECIAL_TOKENS if e != SPACE_TOKEN]
+SET_ADDITIONAL_SPECIAL_TOKENS = frozenset(ADDITIONAL_SPECIAL_TOKENS)
 
 PRE_TOKENIZERS_MAP = {'newmm': partial(
     word_tokenize,
@@ -37,9 +49,89 @@ PRE_TOKENIZERS_MAP = {'newmm': partial(
                       'syllable': partial(
     word_tokenize,
     custom_dict=Trie(frozenset(set(thai_syllables()).union(set(ADDITIONAL_SPECIAL_TOKENS))))
-    )}
+    )
+    }
 
 _nb_cores = multiprocessing.cpu_count()
+
+
+def split_additional_special_token(texts):
+    # Construct regex pattern to match additional special tokens exlude space token.
+    # Not sure, if we need to escape the token but this seems to do fine.
+    group = '|'.join(ADDITIONAL_SPECIAL_TOKENS_EXCLUDE_SPACE_TOKEN)
+    splitter = re.compile(f'({group})')
+    list_of_pre_cut_texts = []
+    for text in texts:
+        pre_cut_texts = []
+        # Split the text this will inculde the additional token itself
+        # and some time empty string in case of splitting consecutive
+        # additional token.
+        for e in splitter.split(text):
+            # Filter out empty string space except if the string is additional
+            # special token itself.
+            if len(e) > 0 and (not e.isspace() or e in ADDITIONAL_SPECIAL_TOKENS):
+                # Replace space token with actual space, since we want
+                # to pass space into the cutter.
+                pre_cut_texts.append(e.replace(SPACE_TOKEN, ' '))
+        list_of_pre_cut_texts.append(pre_cut_texts)
+    return list_of_pre_cut_texts
+
+
+def sefr_cut_tokenize(texts, n_jobs=1, chunk_size=200):
+    if n_jobs != 1 and isinstance(texts, list):
+        n_jobs = n_jobs if n_jobs != -1 else multiprocessing.cpu_count()
+        return multi_imap(texts, chunk_size=chunk_size,
+                          f=sefr_cut_tokenize, n_cores=n_jobs)
+    if not isinstance(texts, list):
+        return sefr_cut_tokenize([texts])[0]
+    # We need to import the library inside the function itself to be able to use
+    # multiprocessing correctly. If we did not do this. Most of the times,
+    # the lock will stuck and the program will hang up.
+    import sefr_cut
+    import tensorflow as tf
+    # Try to run tensorflow in single thread mode so we can limit the program to
+    # a single process this usually give speed up with multiprocessing.
+    # Because sefr_cut do tokenize each text sperately anyway. So there is not
+    # much speed up to gain by using tensorflow with parallelism in conjunction
+    # with multiprocessing module.
+    os.environ['OMP_NUM_THREADS'] = '1'
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    sefr_cut.load_model(engine='best')
+
+    list_of_pre_cut_texts = split_additional_special_token(texts)
+    list_of_cut_texts = []
+    for pre_cut_texts in list_of_pre_cut_texts:
+        cut_texts = []
+        for pre_cut_text in pre_cut_texts:
+            if pre_cut_text not in SET_ADDITIONAL_SPECIAL_TOKENS:
+                # Tokenize pre_cut_text if it is not additional special tokens
+                cut_texts.extend(sefr_cut.tokenize(pre_cut_text)[0])
+            else:
+                # Append token as is
+                cut_texts.append(pre_cut_text)
+        list_of_cut_texts.append(cut_texts)
+
+    # Put SPACE_TOKEN back
+    list_of_cut_texts = [[cut_text.replace(' ', SPACE_TOKEN) for cut_text in cut_texts]
+                         for cut_texts in list_of_cut_texts]
+
+    # Split SPACE_TOKEN out of text
+    final_list_of_cut_texts = []
+    splitter = re.compile(f'({SPACE_TOKEN})')
+    for cut_texts in list_of_cut_texts:
+        final_cut_texts = []
+        for cut_text in cut_texts:
+            if SPACE_TOKEN in cut_text and cut_text != SPACE_TOKEN:
+                final_cut_texts.extend([e for e in splitter.split(cut_text) if len(e) > 0])
+            else:
+                final_cut_texts.append(cut_text)
+        final_list_of_cut_texts.append(final_cut_texts)
+    return final_list_of_cut_texts
+
+
+# Should we do this a bit cleaner?
+PRE_TOKENIZERS_MAP['sefr_cut'] = partial(sefr_cut_tokenize, n_jobs=-1)
 
 
 class CustomPreTokenizer:
@@ -75,6 +167,7 @@ class WordLevelTrainer:
         additional_special_tokens: Collection[str],
         vocab_size: int = None,
         vocab_min_freq: int = None,
+        chunk_size: int = None,
         progress: bool = True
     ):
         self.pre_tokenize_func = pre_tokenize_func
@@ -84,6 +177,7 @@ class WordLevelTrainer:
         self.vocab = None
         self.freq = None
         self.vocab_min_freq = vocab_min_freq
+        self.chunk_size = chunk_size
         self.progress = progress
         if self.vocab_min_freq is not None and self.vocab_size is not None:
             raise AttributeError('use only vocab_min_freq or vocab_size')
@@ -92,23 +186,50 @@ class WordLevelTrainer:
         with open(fname, "r") as f:
             file_size = get_file_size(f)
             words = []
-            i = 0
-            while True:
-                line = f.readline()
-                if line:
-                    line = line.strip()
-                    if len(line) > 0 and not line.isspace():
-                        words.extend(self.pre_tokenize_func(line))
-                else:
-                    break
-                i += 1
-                if self.progress and i % 5000 == 0:
-                    print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
-                          flush=True, end=' ')
+            if self.chunk_size is None:
+                i = 0
+                while True:
+                    line = f.readline()
+                    if line:
+                        line = line.strip()
+                        if len(line) > 0 and not line.isspace():
+                            words.extend(self.pre_tokenize_func(line))
+                    else:
+                        break
+                    i += 1
+                    if self.progress and i % 5000 == 0:
+                        print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
+                              flush=True, end=' ')
+            else:
+                lines = []
+                while True:
+                    line = f.readline()
+                    if line:
+                        line = line.strip()
+                        if len(line) > 0 and not line.isspace():
+                            lines.append(line)
+                    else:
+                        break
+                    if len(lines) >= self.chunk_size:
+                        for tokens in self.pre_tokenize_func(lines):
+                            words.extend(tokens)
+                        lines = []
+                        if self.progress:
+                            print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
+                                  flush=True, end=' ')
+                        lines = []
+                if len(lines):
+                    for tokens in self.pre_tokenize_func(lines):
+                        words.extend(tokens)
+                    lines = []
+                    if self.progress:
+                        print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
+                              flush=True, end=' ')
         return Counter(words)
 
     def count_parallel(self, nb_cores: int = _nb_cores) -> Dict[(str, int)]:
         counters = [self.count_one(fname) for fname in self.input_files]
+        # disable multiprocessing for now for easier debugging
         # with multiprocessing.Pool(nb_cores) as pool:
         #     counters = pool.map(self.count_one, self.input_files)
         counter_all = sum(counters, Counter())
@@ -466,20 +587,6 @@ class BaseThaiWordsTokenizer(PreTrainedTokenizer):
     def _convert_id_to_token(self, index):
         """Converts an index (integer) in a token (str) using the vocab."""
         return self.tokenizer_model.id_to_token(index)
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state["tokenizer_model"] = None
-        return state
-
-    def __setstate__(self, d):
-        self.__dict__ = d
-        pre_tokenizer_func = Trie(frozenset(set(thai_words()).union(set(ADDITIONAL_SPECIAL_TOKENS))))
-        custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
-            CustomPreTokenizer(pre_tokenizer_func))
-        tokenizer = Tokenizer(models.WordLevel.from_file(self.vocab_file))
-        tokenizer.pre_tokenizer = custom_pre_tokenizer
-        self.tokenizer_model = tokenizer
 
     def convert_tokens_to_string(self, tokens):
         """Converts a sequence of tokens (strings for sub-words) in a single string."""

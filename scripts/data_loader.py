@@ -10,7 +10,6 @@ Created on Tue Nov  3 13:54:52 2020
 import torch
 import tempfile
 import os
-from typing import Dict
 from torch.utils.data.dataset import Dataset
 from transformers import (
     PreTrainedTokenizer,
@@ -143,9 +142,6 @@ class MemmapLineByLineTextDataset(Dataset):
                  datasets_cache_dir: str = None, chunk_size: int = 2500,
                  overwrite_cache: bool = False):
         assert os.path.isfile(file_path), f"Input file path {file_path} not found"
-        # Here, we do not cache the features, operating under the assumption
-        # that we will soon use fast multithreaded tokenizers from the
-        # `tokenizers` repo everywhere =)
         if datasets_cache_dir is None:
             datasets_cache_dir = tempfile.mkdtemp()
         else:
@@ -197,9 +193,6 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
                  overwrite_cache: bool = False, drop_last: bool = True,
                  progress: bool = True):
         assert os.path.isfile(file_path), f"Input file path {file_path} not found"
-        # Here, we do not cache the features, operating under the assumption
-        # that we will soon use fast multithreaded tokenizers from the
-        # `tokenizers` repo everywhere =)
         if datasets_cache_dir is None:
             datasets_cache_dir = tempfile.mkdtemp()
         else:
@@ -299,6 +292,9 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
 
 
 class PaddedDataset(Dataset):
+    """
+    Pad dataset to specified block_size when __getitem__ is called.
+    """
 
     def __init__(self, dataset, padding_idx, block_size):
         self.dataset = dataset
@@ -317,6 +313,10 @@ class PaddedDataset(Dataset):
 
 
 class ConcatDataset(Dataset):
+    """
+    Concatenate multiple datasets together. This way, we can make big dataset
+    out of multiple datasets.
+    """
 
     def __init__(self, datasets):
         self.datasets = datasets

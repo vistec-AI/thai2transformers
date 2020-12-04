@@ -8,6 +8,7 @@ Created on Tue Nov  3 14:39:32 2020
 
 import warnings
 import os
+import multiprocessing
 
 
 class REQUIRED:
@@ -61,3 +62,17 @@ def _readline_clean_and_strip(f):
                 yield line
         else:
             break
+
+
+def multi_imap(data, chunk_size, f,
+               n_cores, process=True):
+    chunks = [data[i: i + chunk_size]
+              for i in range(0, len(data), chunk_size)]
+    with multiprocessing.Pool(n_cores) as pool:
+        results = []
+        for r in pool.imap(f, chunks):
+            results.extend(r)
+            if process:
+                print(f'\rProcessed {len(results) / len(data) * 100:.2f}%',
+                      flush=True, end=' ')
+    return results
