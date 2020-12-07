@@ -25,7 +25,6 @@ except ModuleNotFoundError:
     sys.path.append('../scripts')  # path hacking
     from helper import get_file_size, multi_imap
 
-
 logger = logging.getLogger()
 
 VOCAB_FILES_NAMES = {"vocab_file": "sentencepiece.bpe.model"}
@@ -36,6 +35,7 @@ PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
 SPIECE_UNDERLINE = '▁'
 SPACE_TOKEN = "<_>"
 DEPRECATED_SPACE_TOKEN = '<th_roberta_space_token>'
+SEFR_SPLIT_TOKEN = '<|>'
 ADDITIONAL_SPECIAL_TOKENS = ['<s>', '<pad>', '</s>', '<unk>', '<mask>', SPACE_TOKEN, '\n']
 ADDITIONAL_SPECIAL_TOKENS_EXCLUDE_SPACE_TOKEN = \
     [e for e in ADDITIONAL_SPECIAL_TOKENS if e != SPACE_TOKEN]
@@ -48,7 +48,7 @@ PRE_TOKENIZERS_MAP = {'newmm': partial(
                       'syllable': partial(
     word_tokenize,
     custom_dict=Trie(frozenset(set(thai_syllables()).union(set(ADDITIONAL_SPECIAL_TOKENS))))
-    )
+    ),
     }
 
 _nb_cores = multiprocessing.cpu_count()
@@ -132,6 +132,20 @@ def sefr_cut_tokenize(texts, n_jobs=1, chunk_size=200):
 # Should we do this a bit cleaner?
 PRE_TOKENIZERS_MAP['sefr_cut'] = partial(sefr_cut_tokenize, n_jobs=-1)
 
+sefr_cut_splitter = re.compile(f'({re.escape(SEFR_SPLIT_TOKEN)})')
+
+
+def fake_sefr_cut_keep_split_token(text):
+    return [e for e in sefr_cut_splitter.split(text) if len(e) > 0]
+
+
+def fake_sefr_cut(text):
+    return text.split(SEFR_SPLIT_TOKEN)
+
+
+PRE_TOKENIZERS_MAP['fake_sefr_cut'] = fake_sefr_cut
+PRE_TOKENIZERS_MAP['fake_sefr_cut_keep_split_token'] = fake_sefr_cut_keep_split_token
+
 
 class CustomPreTokenizer:
     def __init__(self, pre_tokenize_func: Callable):
@@ -140,6 +154,7 @@ class CustomPreTokenizer:
     def split(
         self, n: int, normalized_string: NormalizedString
     ) -> Collection[NormalizedString]:
+        # is argument n needs?
         break_i = []
         total_i = 0
         for word in self.pre_tokenize_func(str(normalized_string)):
@@ -156,6 +171,23 @@ class CustomPreTokenizer:
 
     def pre_tokenize(self, pretok: PreTokenizedString):
         pretok.split(self.split)
+
+
+class FakeSefrCustomTokenizer(CustomPreTokenizer):
+    def split(
+        self, n: int, normalized_string: NormalizedString
+    ) -> Collection[NormalizedString]:
+        # We have to operate on original normalized string since it track aligment or something
+        kept_indices = []
+        p = 0
+        for word in self.pre_tokenize_func(str(normalized_string)):
+            if word != SEFR_SPLIT_TOKEN:
+                kept_indices.append((p, p + len(word)))
+            p += len(word)
+        splits = []
+        for start, stop in kept_indices:
+            splits.append(normalized_string[start:stop])
+        return splits
 
 
 class WordLevelTrainer:
@@ -591,9 +623,17 @@ class BaseThaiWordsTokenizer(PreTrainedTokenizer):
 
         return (text, kwargs)
 
+    def __getstate__(self):
+        # What is this funcion even do?
+        raise NotImplementedError
+
+    def __setstate__(self, d):
+        # What is this funcion even do?
+        raise NotImplementedError
+
 
 class ThaiWordsNewmmTokenizer(BaseThaiWordsTokenizer):
-    vocab_files_names = {"vocab_file": "newmm.json"}
+    vocab_files_names = {"vocab_file": "newmm.json"}  # vocabulary file location in folder
 
     def __init__(
         self,
@@ -690,3 +730,39 @@ class ThaiWordsSyllableTokenizer(BaseThaiWordsTokenizer):
         tokenizer = Tokenizer(models.WordLevel.from_file(self.vocab_file))
         tokenizer.pre_tokenizer = custom_pre_tokenizer
         self.tokenizer_model = tokenizer
+
+
+class FakeSefrCutTokenizer(BaseThaiWordsTokenizer):
+    vocab_files_names = {"vocab_file": "fake_sefr_cut.json"}
+
+    def __init__(
+        self,
+        vocab_file,
+        bos_token="<s>",
+        eos_token="</s>",
+        sep_token="</s>",
+        cls_token="<s>",
+        unk_token="<unk>",
+        pad_token="<pad>",
+        mask_token="<mask>",
+        additional_special_tokens=ADDITIONAL_SPECIAL_TOKENS,
+        **kwargs
+    ):
+        super().__init__(
+            bos_token=bos_token,
+            eos_token=eos_token,
+            unk_token=unk_token,
+            sep_token=sep_token,
+            cls_token=cls_token,
+            pad_token=pad_token,
+            mask_token=mask_token,
+            additional_special_tokens=ADDITIONAL_SPECIAL_TOKENS,
+            **kwargs,
+        )
+        pre_tokenizer_func = PRE_TOKENIZERS_MAP['fake_sefr_cut_keep_split_token']
+        custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
+            FakeSefrCustomTokenizer(pre_tokenizer_func))
+        tokenizer = Tokenizer(models.WordLevel.from_file(vocab_file))
+        tokenizer.pre_tokenizer = custom_pre_tokenizer
+        self.tokenizer_model = tokenizer
+        self.vocab_file = vocab_file

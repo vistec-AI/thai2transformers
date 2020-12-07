@@ -44,13 +44,13 @@ from sanity import tokenizer_and_model_config_mismatch, block_size_exceed_max_po
 try:
     from thai2transformers.tokenizers import (
         ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
-        ThaiWordsSyllableTokenizer)
+        ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer)
 except ModuleNotFoundError:
     import sys
     sys.path.append('..')  # path hacking
     from thai2transformers.tokenizers import (
         ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
-        ThaiWordsSyllableTokenizer)
+        ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer)
 
 logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_MASKED_LM_MAPPING.keys())
@@ -233,6 +233,9 @@ def main():
             model_args.tokenizer_name_or_path)
     elif model_args.tokenizer_type == 'ThaiWordsSyllableTokenizer':
         tokenizer = ThaiWordsSyllableTokenizer.from_pretrained(
+            model_args.tokenizer_name_or_path)
+    elif model_args.tokenizer_type == 'FakeSefrCutTokenizer':
+        tokenizer = FakeSefrCutTokenizer.from_pretrained(
             model_args.tokenizer_name_or_path)
     else:
         raise NotImplementedError(f'tokenizer_type {model_args.tokenizer_type} is not implemeted.')

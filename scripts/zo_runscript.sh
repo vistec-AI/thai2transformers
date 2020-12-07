@@ -1,10 +1,10 @@
- EXP_NAME="zo_test"
+ EXP_NAME="zo_test_fake_sefr"
 
 
 arguements=$(cat <<-EOF
- --tokenizer_name_or_path ../data/input/zo_test/thwiki-for-ddp_concat_12.11.2020_newmm_tokenizer \
- --train_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/zo_val \
- --eval_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/zo_val \
+ --tokenizer_name_or_path ../data/input/zo_test/thwiki-for-ddp_concat_12.11.2020_sefr_cut_tokenizer \
+ --train_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020_pre_tokenized/val \
+ --eval_dir ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020_pre_tokenized/val \
  --max_seq_length 512 \
  --learning_rate 1e-3 --weight_decay 0.01 \
  --adam_epsilon 1e-6 \
@@ -26,7 +26,7 @@ arguements=$(cat <<-EOF
  --add_space_token \
  --datasets_cache_dir ../cache2/$EXP_NAME \
  --datasets_type MemmapConcatFullSentenceTextDataset \
- --tokenizer_type ThaiWordsSyllableTokenizer \
+ --tokenizer_type FakeSefrCutTokenizer \
  --overwrite_cache \
  --mlm \
  --architecture roberta-base

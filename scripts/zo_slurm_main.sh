@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-jobname="th-wiki-concat-syllable-test-001"
+jobname="th-wiki-concat-fake-sefr-cut-tokenizer-001"
 
 # export some variable we will use later
 
@@ -27,11 +27,11 @@ mkdir -p "$ZO_SLURM_LOG_OUTPUT_DIR"
 # User defined directory
 
 PROJECT_DATA_ROOT="/ist/ist-share/scads/zo/thai2transformers/"
-export EXP_NAME="th-wiki-concat-syllable-test-001"
+export EXP_NAME="th-wiki-concat-fake-sefr-cut-tokenizer-001"
 
 export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/syllable/thwiki-for-ddp_concat_12.11.2020_syllable_tokenizer_min_freq_4"
-export PROJECT_TRAIN_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/train"
-export PROJECT_EVAL_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/val"
+export PROJECT_TRAIN_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/train_pretokenized"
+export PROJECT_EVAL_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/val_pretokenized"
 export PROJECT_CACHE_DIR="$PROJECT_DATA_ROOT/cache/share-syllable-min-freq-4"
 export PROJECT_OUTPUT_DIR="$PROJECT_DATA_ROOT/data/output/$EXP_NAME/model"
 export PROJECT_LOG_DIR="$PROJECT_DATA_ROOT/data/output/$EXP_NAME/logs"

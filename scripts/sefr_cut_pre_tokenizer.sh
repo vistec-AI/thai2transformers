@@ -1,6 +1,6 @@
 arguements=$(cat <<-EOF
- --input_folder ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/zo_val
- --output_folder ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020_pre_tokenized/zo_val
+ --input_folder ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/val
+ --output_folder ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020_pre_tokenized/val
  --chunk_size $(($(nproc) * 200))
  --overwrite
 EOF

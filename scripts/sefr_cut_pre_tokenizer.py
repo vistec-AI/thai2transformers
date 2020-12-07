@@ -6,14 +6,11 @@ from helper import _readline_clean_and_strip, get_file_size
 
 
 try:
-    from thai2transformers.tokenizers import sefr_cut_tokenize
+    from thai2transformers.tokenizers import sefr_cut_tokenize, SEFR_SPLIT_TOKEN
 except ModuleNotFoundError:
     import sys
     sys.path.append('..')  # path hacking
-    from thai2transformers.tokenizers import sefr_cut_tokenize
-
-
-SEFR_SPLIT_TOKEN = '<|>'
+    from thai2transformers.tokenizers import sefr_cut_tokenize, SEFR_SPLIT_TOKEN
 
 
 def pre_tokenize_texts(texts, n_jobs=-1):
@@ -24,7 +21,7 @@ def pre_tokenize_texts(texts, n_jobs=-1):
 
 def write_output(texts, path):
     with open(path, 'a') as f:
-        f.writelines(texts)
+        f.write('\n'.join(texts))
 
 
 def read_pre_tokenizer_and_write(input_folder, output_folder,

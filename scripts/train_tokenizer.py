@@ -11,14 +11,14 @@ try:
     from thai2transformers.tokenizers import (
         CustomPreTokenizer, WordLevelTrainer,
         ADDITIONAL_SPECIAL_TOKENS,
-        PRE_TOKENIZERS_MAP)
+        PRE_TOKENIZERS_MAP, FakeSefrCustomTokenizer)
 except ModuleNotFoundError:
     import sys
     sys.path.append('..')  # path hacking
     from thai2transformers.tokenizers import (
         CustomPreTokenizer, WordLevelTrainer,
         ADDITIONAL_SPECIAL_TOKENS,
-        PRE_TOKENIZERS_MAP)
+        PRE_TOKENIZERS_MAP, FakeSefrCustomTokenizer)
 
 
 @dataclass
@@ -87,9 +87,12 @@ def main():
                                    additional_special_tokens=additional_special_tokens)
         trainer.count_parallel()
         trainer.save_vocab(custom_args.output_file)
-    breakpoint()
-    custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
-        CustomPreTokenizer(pre_tokenizer_func))
+    if custom_args.pre_tokenizer_type == 'fake_sefr_cut':
+        custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
+            FakeSefrCustomTokenizer(PRE_TOKENIZERS_MAP['fake_sefr_cut_keep_split_token']))
+    else:
+        custom_pre_tokenizer = pre_tokenizers.PreTokenizer.custom(
+            CustomPreTokenizer(pre_tokenizer_func))
     tokenizer = Tokenizer(models.WordLevel.from_file(custom_args.output_file, unk_token='<unk>'))
     tokenizer.pre_tokenizer = custom_pre_tokenizer
 
@@ -111,10 +114,8 @@ def main():
                         encoded = tokenizer.encode(line)
                         decoded = tokenizer.decode(encoded.ids).replace(' ', '')
                         print('Text: ', line, '>>', encoded.ids, '>>', decoded)
-                        breakpoint()
                 else:
                     break
-        breakpoint()
 
 
 if __name__ == '__main__':
