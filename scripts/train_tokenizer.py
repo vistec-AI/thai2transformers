@@ -5,12 +5,6 @@ from transformers import (
     HfArgumentParser
 )
 from tokenizers import Tokenizer, pre_tokenizers, models
-from pythainlp.tokenize import word_tokenize, syllable_tokenize
-from pythainlp.corpus import thai_syllables, thai_words
-from pythainlp.util.trie import Trie
-from functools import partial
-
-#def breakpoint(): import pdb; pdb.set_trace()
 
 
 try:
@@ -63,9 +57,6 @@ class CustomOthersArguments:
     debug: bool = field(
         default=False
         )
-    chunk_size: int = field(
-        default=None, metadata={'help': 'chunk_size for processing tokenizer in group'}
-        )
 
 
 def main():
@@ -85,16 +76,15 @@ def main():
     pre_tokenizer_func = PRE_TOKENIZERS_MAP.get(custom_args.pre_tokenizer_type, None)
     if pre_tokenizer_func is None:
         raise NotImplementedError
-    elif custom_args.pre_tokenizer_type == 'sefr_cut' and custom_args.chunk_size is None:
-        raise ValueError('can not use sefr_cut with out chunk_size')
+    elif custom_args.pre_tokenizer_type == 'sefr_cut':
+        raise ValueError('sefr_cut is slow use fake_sefr_cu with sefr_cut_pre_tokenizer instead')
 
     if not os.path.exists(custom_args.output_file) or custom_args.overwrite_output_file:
         trainer = WordLevelTrainer(pre_tokenize_func=pre_tokenizer_func,
                                    vocab_size=custom_args.vocab_size,
                                    vocab_min_freq=custom_args.vocab_min_freq,
                                    input_files=train_files,
-                                   additional_special_tokens=additional_special_tokens,
-                                   chunk_size=custom_args.chunk_size)
+                                   additional_special_tokens=additional_special_tokens)
         trainer.count_parallel()
         trainer.save_vocab(custom_args.output_file)
     breakpoint()

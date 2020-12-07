@@ -167,7 +167,6 @@ class WordLevelTrainer:
         additional_special_tokens: Collection[str],
         vocab_size: int = None,
         vocab_min_freq: int = None,
-        chunk_size: int = None,
         progress: bool = True
     ):
         self.pre_tokenize_func = pre_tokenize_func
@@ -177,7 +176,6 @@ class WordLevelTrainer:
         self.vocab = None
         self.freq = None
         self.vocab_min_freq = vocab_min_freq
-        self.chunk_size = chunk_size
         self.progress = progress
         if self.vocab_min_freq is not None and self.vocab_size is not None:
             raise AttributeError('use only vocab_min_freq or vocab_size')
@@ -186,45 +184,19 @@ class WordLevelTrainer:
         with open(fname, "r") as f:
             file_size = get_file_size(f)
             words = []
-            if self.chunk_size is None:
-                i = 0
-                while True:
-                    line = f.readline()
-                    if line:
-                        line = line.strip()
-                        if len(line) > 0 and not line.isspace():
-                            words.extend(self.pre_tokenize_func(line))
-                    else:
-                        break
-                    i += 1
-                    if self.progress and i % 5000 == 0:
-                        print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
-                              flush=True, end=' ')
-            else:
-                lines = []
-                while True:
-                    line = f.readline()
-                    if line:
-                        line = line.strip()
-                        if len(line) > 0 and not line.isspace():
-                            lines.append(line)
-                    else:
-                        break
-                    if len(lines) >= self.chunk_size:
-                        for tokens in self.pre_tokenize_func(lines):
-                            words.extend(tokens)
-                        lines = []
-                        if self.progress:
-                            print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
-                                  flush=True, end=' ')
-                        lines = []
-                if len(lines):
-                    for tokens in self.pre_tokenize_func(lines):
-                        words.extend(tokens)
-                    lines = []
-                    if self.progress:
-                        print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
-                              flush=True, end=' ')
+            i = 0
+            while True:
+                line = f.readline()
+                if line:
+                    line = line.strip()
+                    if len(line) > 0 and not line.isspace():
+                        words.extend(self.pre_tokenize_func(line))
+                else:
+                    break
+                i += 1
+                if self.progress and i % 5000 == 0:
+                    print(f'\rProcessed {f.tell() / file_size * 100:.2f}%',
+                          flush=True, end=' ')
         return Counter(words)
 
     def count_parallel(self, nb_cores: int = _nb_cores) -> Dict[(str, int)]:
