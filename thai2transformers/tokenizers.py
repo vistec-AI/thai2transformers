@@ -17,7 +17,6 @@ from pythainlp.corpus import thai_syllables, thai_words
 from pythainlp.util.trie import Trie
 from functools import partial
 
-#def breakpoint(): import pdb; pdb.set_trace()
 
 try:
     from helper import get_file_size, multi_imap

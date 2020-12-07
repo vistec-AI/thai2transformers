@@ -65,14 +65,14 @@ def _readline_clean_and_strip(f):
 
 
 def multi_imap(data, chunk_size, f,
-               n_cores, process=True):
+               n_cores, progress=False):
     chunks = [data[i: i + chunk_size]
               for i in range(0, len(data), chunk_size)]
     with multiprocessing.Pool(n_cores) as pool:
         results = []
         for r in pool.imap(f, chunks):
             results.extend(r)
-            if process:
+            if progress:
                 print(f'\rProcessed {len(results) / len(data) * 100:.2f}%',
                       flush=True, end=' ')
     return results
