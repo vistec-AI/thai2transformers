@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-jobname="th-wiki-concat-fake-sefr-cut-tokenizer-001"
+jobname="th-wiki-concat-fake-sefr-cut-tokenizer-002"
 
 # export some variable we will use later
 
+export LANG=C.UTF-8  # The env we set in docker image won't transfer to singularity image
+export LC_ALL=C.UTF-8  # The env we set in docker image won't transfer to singularity image
 export ZO_SLURM_MAIN_FOLDER="$jobname"
 export ZO_SLURM_LOG_OUTPUT_DIR="$jobname/slurm-logs"
 
@@ -27,12 +29,12 @@ mkdir -p "$ZO_SLURM_LOG_OUTPUT_DIR"
 # User defined directory
 
 PROJECT_DATA_ROOT="/ist/ist-share/scads/zo/thai2transformers/"
-export EXP_NAME="th-wiki-concat-fake-sefr-cut-tokenizer-001"
+export EXP_NAME="th-wiki-concat-fake-sefr-cut-tokenizer-002"
 
-export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/syllable/thwiki-for-ddp_concat_12.11.2020_syllable_tokenizer_min_freq_4"
+export PROJECT_TOKENIZER_PATH="$PROJECT_DATA_ROOT/dataset/fake-sefr-cut/thwiki-for-ddp_concat_12.11.2020_fake-sefr-cut_tokenizer_min_freq_4"
 export PROJECT_TRAIN_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/train_pretokenized"
 export PROJECT_EVAL_DATASET_DIR="$PROJECT_DATA_ROOT/dataset/split/thwiki-for-ddp_concat_12.11.2020/val_pretokenized"
-export PROJECT_CACHE_DIR="$PROJECT_DATA_ROOT/cache/share-syllable-min-freq-4"
+export PROJECT_CACHE_DIR="$PROJECT_DATA_ROOT/cache/fake-sefr-cut-min-freq-4"
 export PROJECT_OUTPUT_DIR="$PROJECT_DATA_ROOT/data/output/$EXP_NAME/model"
 export PROJECT_LOG_DIR="$PROJECT_DATA_ROOT/data/output/$EXP_NAME/logs"
 export PROJECT_LOCAL_CACHE=false
@@ -45,16 +47,18 @@ export PROJECT_LEARNING_RATE=7e-4
 export PROJECT_ADAM_BETA2=0.98  # According to paper, they said 0.98 instead of default 0.999 improve stability
 export PROJECT_MAX_STEPS=31250
 export PROJECT_BATCH_SIZE=16
-export PROJECT_GRAD_ACC_STEPS=16
+export PROJECT_GRAD_ACC_STEPS=32
 export PROJECT_WARMUP_STEPS=1250  # Warmup step is usally around <5-10% of total step
 export PROJECT_SEED=2020
 export PROJECT_SAVE_STEPS=500
 export PROJECT_EVAL_STEPS=500
-export PROJECT_TOKENIZER_TYPE="ThaiWordsSyllableTokenizer"
+export PROJECT_TOKENIZER_TYPE="FakeSefrCutTokenizer"  # This need to go together with pretokenizer type
+export PROJECT_PRE_TOKENIZER_TYPE="skip"  # if this = skip it will skip training tokenizer process
+export PROJECT_VOCAB_MIN_FREQ=9
 
 # Define multi-nodes variables
 
-export N_NODES=8
+export N_NODES=4
 export N_GPUS_PER_NODE=4
 export MASTER_PORT=13335
 # We will define master address later
@@ -110,6 +114,12 @@ PROJECT_SEED: $PROJECT_SEED
 PROJECT_SAVE_STEPS: $PROJECT_SAVE_STEPS
 PROJECT_EVAL_STEPS: $PROJECT_EVAL_STEPS
 
+==============Tokenizer================
+
+PROJECT_TOKENIZER_TYPE: $PROJECT_TOKENIZER_TYPE
+PROJECT_PRE_TOKENIZER_TYPE: $PROJECT_PRE_TOKENIZER_TYPE
+PROJECT_VOCAB_MIN_FREQ: $PROJECT_VOCAB_MIN_FREQ
+
 Effective Batchsize: $((PROJECT_BATCH_SIZE * PROJECT_GRAD_ACC_STEPS * N_GPUS_PER_NODE * N_NODES))
 
 EOF
@@ -123,18 +133,35 @@ while true; do
     esac
 done
 
-# Preprocessing
+# Train Tokenizer
 
-echo "Queue Preprocess job."
+echo "Queue Train tokenizer job."
 
-ZO_SLURM_PREPROCESS_JOBID=$(
+ZO_SLURM_TRAIN_TOKENIZER_JOBID=$(
 sbatch \
     --partition=cpu \
     --cpus-per-task=4 \
     --time=60 \
     --mem=32GB \
     --account="$ACCOUNT_NAME" \
-    --output="$ZO_SLURM_LOG_OUTPUT_DIR/%j.out" \
+    --output="$ZO_SLURM_LOG_OUTPUT_DIR/train_tokenizer_%j.out" \
+    --job-name="$jobname-train-tokenizer" \
+    zo_slurm_train_tokenizer.sh | awk '{ print $4 }'
+)
+
+# Preprocessing
+
+echo "Queue Preprocess job."
+
+ZO_SLURM_PREPROCESS_JOBID=$(
+sbatch \
+    --dependency=afterok:"$ZO_SLURM_TRAIN_TOKENIZER_JOBID" \
+    --partition=cpu \
+    --cpus-per-task=4 \
+    --time=60 \
+    --mem=32GB \
+    --account="$ACCOUNT_NAME" \
+    --output="$ZO_SLURM_LOG_OUTPUT_DIR/preprocess_%j.out" \
     --job-name="$jobname-preprocess" \
     zo_slurm_preprocessing.sh | awk '{ print $4 }'
 )
