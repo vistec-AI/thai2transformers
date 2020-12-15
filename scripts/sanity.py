@@ -8,6 +8,18 @@ Created on Tue Nov  3 14:39:32 2020
 
 
 def tokenizer_and_model_config_mismatch(config, tokenizer):
+    """
+    Check for tokenizer and model config miss match.
+
+    Args:
+        config:
+            model config.
+        tokenizer:
+            tokenizer.
+
+    Raises:
+        ValueError: A special token id in config is different from tokenizer.
+    """
     id_check_list = ['bos_token_id', 'eos_token_id', 'pad_token_id',
                      'mask_token_id', 'unk_token_id']
     for id_type in id_check_list:

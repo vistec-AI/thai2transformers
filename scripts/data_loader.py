@@ -27,6 +27,13 @@ logger = logging.get_logger(__name__)
 
 @contextmanager
 def callback(func):
+    """
+    Execute function after exiting context.
+
+    Args:
+        func:
+            function to execute after exiting context.
+    """
     try:
         yield
     finally:
@@ -34,7 +41,27 @@ def callback(func):
 
 
 class MemmapIndexDataset:
-    """Memory-mapped backed dataset of list of int list"""
+    """
+    Memory-mapped backed dataset of list of int list.
+
+    Args:
+        arr_fname:
+            path to array binary.
+        idx_arr_fname:
+            path to index binary.
+
+    Examples::
+
+        >>> import tempfile
+        >>> _, arr_fname = tempfile.mkstemp()
+        >>> _, idx_arr_fname = tempfile.mkstemp()
+        >>> data = [list(range(i)) for i in range(1, 5)]
+        >>> memmap_dataset = MemmapIndexDataset(arr_fname, idx_arr_fname)
+        >>> memmap_dataset.clear()  # need to do this if file already exists but empty
+        >>> memmap_dataset.add(data)
+        >>> memmap_dataset
+        ((0,), (0, 1), (0, 1, 2), (0, 1, 2, 3))
+    """
 
     def __init__(self, arr_fname='arr.dat', idx_arr_fname='idx_arr.dat'):
         self.n = 0
@@ -46,7 +73,13 @@ class MemmapIndexDataset:
         self.success = False
 
     def add(self, lstoflst):
-        """Add list of int list to the file. This will append to the already exists data."""
+        """
+        Add list of int list to the file. This will append to the already exists data.
+
+        Args:
+            lstoflst:
+                list of list of int.
+        """
         if os.path.exists(self.arr_fname) and os.path.exists(self.idx_arr_fname):
             write_mode = 'ab'
             _, _, last_arr_p, last_idx_arr_p = self.load()
@@ -136,10 +169,35 @@ class MemmapIndexDataset:
 class MemmapLineByLineTextDataset(Dataset):
     """
     LineByLineTextDataset storing examples in persistant storage instaed of RAM.
+
+    Args:
+        tokenizer:
+            tokenizer for encoding text.
+        file_path:
+            path to text file.
+        block_size:
+            size of each block or maximum sequence length.
+        datasets_cache_dir:
+            dir for MemmapIndexDataset files or cache.
+        chunk_size:
+            size of chunk for each tokenization pass.
+        overwrite_cache:
+            clear cache folder.
+
+    Examples::
+
+        >>> MemmapLineByLineTextDataset(
+                tokenizer, train_file, data_args.max_seq_length,
+                os.path.join(data_args.datasets_cache_dir, 'train'),
+                custom_args.tokenize_chunksize, data_args.overwrite_cache
+                )
     """
 
-    def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, block_size: int,
-                 datasets_cache_dir: str = None, chunk_size: int = 2500,
+    def __init__(self, tokenizer: PreTrainedTokenizer,
+                 file_path: str,
+                 block_size: int,
+                 datasets_cache_dir: str = None,
+                 chunk_size: int = 2500,
                  overwrite_cache: bool = False):
         assert os.path.isfile(file_path), f"Input file path {file_path} not found"
         if datasets_cache_dir is None:
@@ -185,12 +243,40 @@ class MemmapLineByLineTextDataset(Dataset):
 
 class MemmapConcatFullSentenceTextDataset(Dataset):
     """
-    Group text into block of specific size storing examples in persistant storage instaed of RAM.
+    Group multiple text into block of specific size and
+    storing examples in persistant storage instaed of RAM.
+
+    Args:
+        tokenizer:
+            tokenizer for encoding text.
+        file_path:
+            path to text file.
+        block_size:
+            size of each block or maximum sequence length.
+        datasets_cache_dir:
+            dir for MemmapIndexDataset files or cache.
+        chunk_size:
+            size of chunk for each tokenization pass.
+        overwrite_cache:
+            clear cache folder.
+        progess:
+            show progress.
+
+    Examples::
+
+        >>> MemmapConcatFullSentenceTextDataset(
+                tokenizer, train_file, data_args.max_seq_length,
+                os.path.join(data_args.datasets_cache_dir, 'train'),
+                custom_args.tokenize_chunksize, data_args.overwrite_cache
+            )
     """
 
-    def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, block_size: int,
-                 datasets_cache_dir: str = None, chunk_size: int = 2500,
-                 overwrite_cache: bool = False, drop_last: bool = True,
+    def __init__(self, tokenizer: PreTrainedTokenizer,
+                 file_path: str,
+                 block_size: int,
+                 datasets_cache_dir: str = None,
+                 chunk_size: int = 2500,
+                 overwrite_cache: bool = False,
                  progress: bool = True):
         assert os.path.isfile(file_path), f"Input file path {file_path} not found"
         if datasets_cache_dir is None:
@@ -294,6 +380,20 @@ class MemmapConcatFullSentenceTextDataset(Dataset):
 class PaddedDataset(Dataset):
     """
     Pad dataset to specified block_size when __getitem__ is called.
+
+    Args:
+        dataset:
+            torch dataset (or dataset that return torch tensors).
+        padding_idx:
+            index (interger) that use for padding.
+        block_size:
+            block size or max sequence length.
+
+    Examples::
+
+        >>> datasets = MemmapConcatFullSentenceTextDataset(..)
+        >>> padded_datasets = PaddedDataset(datasets, tokenizer.pad_token_id,
+                                            data_args.max_seq_length)
     """
 
     def __init__(self, dataset, padding_idx, block_size):
@@ -314,8 +414,17 @@ class PaddedDataset(Dataset):
 
 class ConcatDataset(Dataset):
     """
-    Concatenate multiple datasets together. This way, we can make big dataset
-    out of multiple datasets.
+    Concatenate multiple datasets together to make a bigger dataset.
+
+    Args:
+        datasets:
+            list or tuple of torch dataset.
+
+    Examples::
+
+        >>> datasets1 = MemmapConcatFullSentenceTextDataset(..)
+        >>> datasets2 = MemmapConcatFullSentenceTextDataset(..)
+        >>> concat_datasets = ConcatDataset([datasets1, datasets2])
     """
 
     def __init__(self, datasets):

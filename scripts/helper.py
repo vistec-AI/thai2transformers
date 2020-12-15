@@ -21,9 +21,7 @@ def get_field(cls, field):
 
 
 def check_depreciated(args, warn_list):
-    """
-    Check if arguments in warn_list appear in args. Raise warning when found.
-    """
+    """Check if arguments in warn_list appear in args. Raise warning when found."""
     for arg, exp_v, warn in warn_list:
         if getattr(args, arg) != exp_v:
             warnings.warn(str(warn.args), warn.__class__)
@@ -40,6 +38,7 @@ def check_required(args):
 
 
 def get_file_size(f):
+    """Get file size from file pointer."""
     old_file_position = f.tell()
     f.seek(0, os.SEEK_END)
     size = f.tell()
@@ -48,12 +47,24 @@ def get_file_size(f):
 
 
 def readline_clean_and_strip(file_path):
+    """Generate striped line that is clean and not space from file path with utf-8 encoding"""
     with open(file_path, encoding="utf-8") as f:
         for line in _readline_clean_and_strip(f):
             yield line
 
 
 def _readline_clean_and_strip(f):
+    """
+    Generate striped line that is clean and not space from file pointer.
+
+    Examples::
+
+        >>> import io
+        >>> f = io.StringIO('hello\n\n\n\n  \t\t\t  world\n')
+        >>> g = _readline_clean_and_strip(f)
+        >>> list(g)
+        ['hello', 'world']
+    """
     while True:
         line = f.readline()
         if line:
@@ -66,6 +77,32 @@ def _readline_clean_and_strip(f):
 
 def multi_imap(data, chunk_size, f,
                n_cores, progress=False):
+    """
+    Run function on data with multiprocessing.Pool.imap.
+
+    Args:
+        data:
+            data to be separate as chunks.
+        chunk_size:
+            size of chunk.
+        f:
+            function to be execute on chunk.
+        n_cores:
+            number of multiprocessing cores.
+        progress:
+            show progress
+
+    Returns:
+        results:
+            processed data.
+
+    Examples::
+
+        >>> import numpy
+        >>> multi_imap(data=list(range(1, 5)), chunk_size=2,
+                       f=numpy.exp, n_cores=2)
+        [2.718281828459045, 7.38905609893065, 20.085536923187668, 54.598150033144236]
+    """
     chunks = [data[i: i + chunk_size]
               for i in range(0, len(data), chunk_size)]
     with multiprocessing.Pool(n_cores) as pool:

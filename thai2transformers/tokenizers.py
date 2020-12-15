@@ -29,9 +29,6 @@ logger = logging.getLogger()
 
 VOCAB_FILES_NAMES = {"vocab_file": "sentencepiece.bpe.model"}
 
-PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
-    "th-roberta-base": 514,
-}
 SPIECE_UNDERLINE = '▁'
 SPACE_TOKEN = "<_>"
 DEPRECATED_SPACE_TOKEN = '<th_roberta_space_token>'
@@ -41,6 +38,11 @@ ADDITIONAL_SPECIAL_TOKENS_EXCLUDE_SPACE_TOKEN = \
     [e for e in ADDITIONAL_SPECIAL_TOKENS if e != SPACE_TOKEN]
 SET_ADDITIONAL_SPECIAL_TOKENS = frozenset(ADDITIONAL_SPECIAL_TOKENS)
 
+PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
+    "th-roberta-base": 514,
+}
+
+# Store pre tokenizer function (text cutter)
 PRE_TOKENIZERS_MAP = {'newmm': partial(
     word_tokenize,
     custom_dict=Trie(frozenset(set(thai_words()).union(set(ADDITIONAL_SPECIAL_TOKENS))))
@@ -55,6 +57,20 @@ _nb_cores = multiprocessing.cpu_count()
 
 
 def split_additional_special_token(texts):
+    """
+    Split list of text by additional special exclude space token.
+
+    Args:
+        texts: list of text.
+
+    Returns:
+        list_of_pre_cut_texts: list of list of pre cut text.
+
+    Examples::
+
+        >>> split_additional_special_token(['hello world</s></s>'])
+        [['hello world', '</s>', '</s>']]
+    """
     # Construct regex pattern to match additional special tokens exlude space token.
     # Not sure, if we need to escape the token but this seems to do fine.
     group = '|'.join(ADDITIONAL_SPECIAL_TOKENS_EXCLUDE_SPACE_TOKEN)
@@ -77,6 +93,25 @@ def split_additional_special_token(texts):
 
 
 def sefr_cut_tokenize(texts, n_jobs=1, chunk_size=200):
+    """
+    Cut list of texts using sefr_cut.
+
+    Args:
+        texts:
+            list of texts.
+        n_jobs:
+            Number of multiprocessing cores. -1 will use all avaliable cores.
+            1 will use single core. Defaults to 1.
+        chunk_size:
+            size of each cutting pass in case of multiprocessing. Defaults to 200.
+
+    Returns:
+        final_list_of_cut_texts: list of list of cut text.
+
+    Examples::
+        >>> sefr_cut_tokenize(['hello world</s></s>'])
+        [['hello', '<_>', 'world', '</s>', '</s>']]
+    """
     if n_jobs != 1 and isinstance(texts, list):
         n_jobs = n_jobs if n_jobs != -1 else multiprocessing.cpu_count()
         return multi_imap(texts, chunk_size=chunk_size,
@@ -136,10 +171,42 @@ sefr_cut_splitter = re.compile(f'({re.escape(SEFR_SPLIT_TOKEN)})')
 
 
 def fake_sefr_cut_keep_split_token(text):
+    """
+    Split text at SEFR_SPLIT_TOKEN and kept split token.
+
+    Args:
+        text: string.
+
+    Returns:
+        list: tokens.
+
+    Examples::
+
+        >>> SEFR_SPLIT_TOKEN
+        '<|>'
+        >>> fake_sefr_cut_keep_split_token(f'hello{SEFR_SPLIT_TOKEN}world')
+        ['hello', '<|>', 'world']
+    """
     return [e for e in sefr_cut_splitter.split(text) if len(e) > 0]
 
 
 def fake_sefr_cut(text):
+    """
+    Split text at SEFR_SPLIT_TOKEN.
+
+    Args:
+        text: string.
+
+    Returns:
+        list: tokens.
+
+    Examples::
+
+        >>> SEFR_SPLIT_TOKEN
+        '<|>'
+        >>> fake_sefr_cut(f'hello{SEFR_SPLIT_TOKEN}world')
+        ['hello', 'world']
+    """
     return text.split(SEFR_SPLIT_TOKEN)
 
 
@@ -174,6 +241,13 @@ class CustomPreTokenizer:
 
 
 class FakeSefrCustomTokenizer(CustomPreTokenizer):
+    """
+    CustomPreTokenizer that skip SEFR_SPLIT_TOKEN
+
+    Args:
+        pre_tokenizer_func: pre tokenize function.
+    """
+
     def split(
         self, n: int, normalized_string: NormalizedString
     ) -> Collection[NormalizedString]:
@@ -191,6 +265,34 @@ class FakeSefrCustomTokenizer(CustomPreTokenizer):
 
 
 class WordLevelTrainer:
+    """
+    Trainer for word level tokenizer.
+
+    Args:
+        pre_tokenize_func:
+            pre tokenize function.
+        input_files:
+            text files for vocabulary creation.
+        additional_special_token:
+            special tokens that will be explicitly added in vocabulary.
+        vocab_size:
+            size of vocabulary.
+        vocab_min_freq:
+            minimum frequency required to kept the word in vocabulary.
+        progress:
+            show progress.
+
+    Examples::
+
+        >>> trainer = WordLevelTrainer(pre_tokenize_func=pre_tokenizer_func,
+                                       vocab_size=custom_args.vocab_size,
+                                       vocab_min_freq=custom_args.vocab_min_freq,
+                                       input_files=train_files,
+                                       additional_special_tokens=additional_special_tokens)
+        >>> trainer.count_parallel()
+        >>> trainer.save_vocab(custom_args.output_file)
+    """
+
     def __init__(
         self,
         pre_tokenize_func: Callable,
@@ -344,7 +446,6 @@ class ThaiRobertaTokenizer(PreTrainedTokenizer):
         self.sp_model.Load(str(vocab_file))
         self.vocab_file = vocab_file
 
-
     def build_inputs_with_special_tokens(
         self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None
     ) -> List[int]:
@@ -488,6 +589,7 @@ class ThaiRobertaTokenizer(PreTrainedTokenizer):
 
 
 class BaseThaiWordsTokenizer(PreTrainedTokenizer):
+    """Base cass for word level tokenizer."""
 
     def build_inputs_with_special_tokens(
         self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None
@@ -633,6 +735,9 @@ class BaseThaiWordsTokenizer(PreTrainedTokenizer):
 
 
 class ThaiWordsNewmmTokenizer(BaseThaiWordsTokenizer):
+    """
+    Newmm tokenizer.
+    """
     vocab_files_names = {"vocab_file": "newmm.json"}  # vocabulary file location in folder
 
     def __init__(
@@ -683,6 +788,9 @@ class ThaiWordsNewmmTokenizer(BaseThaiWordsTokenizer):
 
 
 class ThaiWordsSyllableTokenizer(BaseThaiWordsTokenizer):
+    """
+    Syllable tokenizer.
+    """
     vocab_files_names = {"vocab_file": "syllable.json"}
 
     def __init__(
@@ -733,6 +841,9 @@ class ThaiWordsSyllableTokenizer(BaseThaiWordsTokenizer):
 
 
 class FakeSefrCutTokenizer(BaseThaiWordsTokenizer):
+    """
+    FakeSefrCut tokenizer.
+    """
     vocab_files_names = {"vocab_file": "fake_sefr_cut.json"}
 
     def __init__(

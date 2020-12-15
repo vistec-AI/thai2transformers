@@ -14,18 +14,51 @@ except ModuleNotFoundError:
 
 
 def pre_tokenize_texts(texts, n_jobs=-1):
+    """
+    Pre tokenize list of string to list of pre_tokenized_string.
+
+    Args:
+        texts:
+            list of string.
+        n_jobs:
+            number of multiprocessing cores.
+
+    Returns:
+        pre_tokenized_texts:
+            list of pretokenized string.
+
+    Examples::
+
+        >>> pre_tokenize_texts(['hello world'])
+        ['hello<|><_><|>world']
+    """
     list_of_tokens = sefr_cut_tokenize(texts, n_jobs)
     pre_tokenized_texts = [SEFR_SPLIT_TOKEN.join(tokens) for tokens in list_of_tokens]
     return pre_tokenized_texts
 
 
 def write_output(texts, path):
+    """Append text to file at specifed path."""
     with open(path, 'a') as f:
         f.write('\n'.join(texts))
 
 
 def read_pre_tokenizer_and_write(input_folder, output_folder,
                                  chunk_size, progress=True):
+    """
+    Read text from file in `input_folder` and pre tokenize texts in chunk and output to specified
+    `output_folder`.
+
+    Args:
+        input_folder:
+            path to input_folder.
+        output_folder:
+            path to output_folder.
+        chunk_size:
+            size for chunk.
+        progress:
+            show progress. Defaults to True.
+    """
     files = glob.glob(os.path.join(input_folder, '*.txt'))
     for file in files:
         lines = []
