@@ -8,7 +8,11 @@ This step train a tokenizer (output a vocaulary file) so it can be use later. Cu
  2. syllable - Syllable-level tokenizer from CRF-basd syllable segmentor for Thai ([ssg](https://github.com/ponrawee/ssg))
  3. fake_sefr_cut - ML-based word-level tokenizer from "Stacked Ensemble Filter and Refine for Word Segmentation" ([seft-cut](https://github.com/mrpeerat/SEFR_CUT)). In this configuration, the texts are required to be pretokenized with SEFR tokenizer, and it will split tokens by `SEFR_SPLIT_TOKEN` which is equivalent to `<|>`.
  4. spm - Subword-level tokenizer trained from [SentencePiece](https://github.com/google/sentencepiece) library.
+
+</br>
+
 ## Instruction
+
 a) Syllable-level and word-level tokenizer (`newmm`, `syllable`, `fake_sefr_cut`)
 
 The following command can be use to train a tokenizer. We can also use `--help` to get more information.
