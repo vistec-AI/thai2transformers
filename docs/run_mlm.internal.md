@@ -35,8 +35,7 @@ python3 run_mlm.py \
  --datasets_cache_dir "$PROJECT_CACHE_DIR" \
  --datasets_type MemmapConcatFullSentenceTextDataset \
  --architecture roberta-base \
- --tokenizer_type "$PROJECT_TOKENIZER_TYPE" \
- --mlm
+ --tokenizer_type "$PROJECT_TOKENIZER_TYPE"
 ```
 
 The command above will load tokenizer from `$PROJECT_TOKENIZER_PATH` with tokenizer type `$PROJECT_TOKENIZER_TYPE`. Create train dataset from `*.txt` file in `$PROJECT_TRAIN_DATASET_DIR` and valiadation dataset from `*.txt` file in `$PROJECT_EVAL_DATASET_DIR` with dataset type `MemmapConcatFullSentenceTextDataset`. The datasets created will be cached at `$PROJECT_CACHE_DIR`, right now there are now mechanism to detect if the cache is actually corresponding to the same datasets specified in `train_dir` or `eval_dir` (if the cache already exits it will skip reading from those text files).
