@@ -5,7 +5,7 @@ This step train a tokenizer (output a vocaulary file) so it can be use later. Cu
 ## Type of tokenizer
 
  1. newmm - Dictionary-based word-level maximal matching tokenizer from [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp)
- 2. syllable - cut by word found in syllable corpus.
+ 2. syllable - Syllable-level tokenizer from CRF-basd syllable segmentor for Thai ([ssg](https://github.com/ponrawee/ssg))
  3. fake_sefr_cut - cut word by `SEFR_SPLIT_TOKEN` or in its current form `<|>`.
 
 ## How to
