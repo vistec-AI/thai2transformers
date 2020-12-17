@@ -43,7 +43,7 @@ The command above will load tokenizer from `$PROJECT_TOKENIZER_PATH` with tokeni
 
 Due to the fact that most of the the datasets creation does not use gpus. So to only build datasets and cache it without training we can also use `--build_dataset_only` flags to trigger script to quit before training step.
 
-The above command is suitable for non distributed training, to use distributed training we will to add distributed command in front as following.
+<!-- The above command is suitable for non distributed training, to use distributed training we will to add distributed command in front as following.
 
 ```bash
 NODE_RANK=0
@@ -76,4 +76,4 @@ Variable explanation:
  - `$N_GPUS_PER_NODE` amount to how many gpus each node has or want to be used to part of training.
  - `$N_NODES` is number of nodes.
  
-The above command will run the master node which is the main node for distributed training and has a hostname, `node-1-gpu`. We will need another 3 nodes to join the master node so the other node will run the same command with one change to the command by chaging `NODE_RANK=0` to `NODE_RANK=1`, `NODE_RANK=2`, `NODE_RANK=3`. The master node need to ran first then the worker nodes can join usually the master node need ~15s to be up and runing before worker nodes.
+The above command will run the master node which is the main node for distributed training and has a hostname, `node-1-gpu`. We will need another 3 nodes to join the master node so the other node will run the same command with one change to the command by chaging `NODE_RANK=0` to `NODE_RANK=1`, `NODE_RANK=2`, `NODE_RANK=3`. The master node need to ran first then the worker nodes can join usually the master node need ~15s to be up and runing before worker nodes. -->
