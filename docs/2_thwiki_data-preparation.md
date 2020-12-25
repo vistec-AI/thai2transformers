@@ -8,7 +8,7 @@ This page explains how to download, extract and filter and clean texts from Thai
 1. Download Thai Wikipedia dump with the following script (`./scripts/download_thwiki_dump.sh`)
 
     ```
-    bash download_thwiki_dump.sh ./data/dataset/thwiki-20200820/1_dumps/
+    bash ./scripts/download_thwiki_dump.sh ./data/dataset/thwiki-20200820/1_dumps/
     ```
 
     <details>
