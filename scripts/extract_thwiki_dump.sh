@@ -5,6 +5,9 @@ PARAMS=$4
 
 echo "Begin extracting thwiki dump from $DUMP_FILE_PATH"
 
+mkdir -p logs
+mkdir -p $OUTPUT_DIR
+
 python3 -m wikiextractor.WikiExtractor \
 --output $OUTPUT_DIR \
 --log_file $LOG_PATH \
