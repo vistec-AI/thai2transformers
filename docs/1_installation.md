@@ -29,8 +29,8 @@
     cd build
     cmake ..
     make -j $(nproc)
-    sudo make install
-    sudo ldconfig -v
+    make install
+    ldconfig -v
     ```
     On OSX/macOS, replace the last command with sudo update_dyld_shared_cache
 
