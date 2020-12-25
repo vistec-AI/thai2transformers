@@ -230,15 +230,16 @@ This page explains how to download, extract and filter and clean texts from Thai
         test_ratio: 0.025
 
     INFO: Train/val/test statistics.
-        train set: 944781
+        train set: 944782
         val set: 24863
-        test set: 24863
+        test set: 24862
 
     INFO: Begin writing train split to "./data/dataset/thwiki-20200820/5_split/train/train.txt".
     INFO: Begin writing val split to "./data/dataset/thwiki-20200820/5_split/val/val.txt".
     INFO: Begin writing test split to "./data/dataset/thwiki-20200820/5_split/test/test.txt".
 
     INFO: Done writing all split.
+
     ```
 
     </details>
