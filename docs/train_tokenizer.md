@@ -1,6 +1,6 @@
 # Tokenizer training
 
-This step train a tokenizer (output a vocaulary file) so it can be use later. Currently, there are multiple tokenizer that can be trained using `scripts/train_tokenizer.py`. This all done by cutting up text using predefined model and make a vocabulary with specified constrain, such as minimum frequency of word found in dataset.
+This step is for building the vocabulary for tokenizer. Currently, there are 4 tokenizers that can be trained with `scripts/train_tokenizer.py`. This all done by segmenting text using predefined model and make a vocabulary with specified constrain which is the minimum number of word occurences found in the training corpus.
 
 ## Type of tokenizers
 
