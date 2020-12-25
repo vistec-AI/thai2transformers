@@ -1,18 +1,20 @@
-# `thai2transformers`
-Pretraining transformers in Thai and English
-
-
-
-
-
-## Pretraining Datasets
-
-Developing. See this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06FT2RvBE8twKzvXeSe4w5CHnU29f8ZWMUcJdmRks/edit?usp=sharing). Download current version of cleaned datasets [here](https://drive.google.com/file/d/1oF7_COZJqGdIaDGMNI1rKdDCOEzVoZHq/view?usp=sharing).
-
+## `thai2transformers`
 
 <br>
 
- ### Instruction:
+Pretraining transformers in Thai and English
+
+<br>
+
+### Pretraining Datasets
+
+<br>
+
+Developing. See this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06FT2RvBE8twKzvXeSe4w5CHnU29f8ZWMUcJdmRks/edit?usp=sharing). Download current version of cleaned datasets [here](https://drive.google.com/file/d/1oF7_COZJqGdIaDGMNI1rKdDCOEzVoZHq/view?usp=sharing).
+
+<br>
+
+### Instruction:
  
 <br>
 
@@ -22,9 +24,9 @@ Developing. See this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06F
 
 3. Tokenizer training and vocabulary building : 
     
-    a) For `spm`, `newmm`, `syllable`: [3_train_tokenizer.md](./docs/3_train_tokenizer.md)  
+    a) For SentencePiece BPE (`spm`), word-level token (`newmm`),  syllable-level token (`syllable`): [3_train_tokenizer.md](./docs/3_train_tokenizer.md)  
     
-    b) For `seft-cut` [[Limkonchotiwat et al., 2020](https://github.com/mrpeerat/SEFR_CUT)]: [3b_sefr-cut_pretokenize.md](./docs/2b_sefr-cut_pretokenize.md)  
+    b) For word-level token from [Limkonchotiwat et al., 2020](https://github.com/mrpeerat/SEFR_CUT) (`sefr-cut`) : [3b_sefr-cut_pretokenize.md](./docs/2b_sefr-cut_pretokenize.md)  
 
 4. Pretrain a masked langauge model: [4_run_mlm.md](./docs/3_run_mlm.md)  
 
