@@ -2,7 +2,7 @@
 
 This step train a tokenizer (output a vocaulary file) so it can be use later. Currently, there are multiple tokenizer that can be trained using `scripts/train_tokenizer.py`. This all done by cutting up text using predefined model and make a vocabulary with specified constrain, such as minimum frequency of word found in dataset.
 
-## Type of tokenizer
+## Type of tokenizers
 
  1. newmm - Dictionary-based word-level maximal matching tokenizer from [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp)
  2. syllable - Syllable-level tokenizer from CRF-basd syllable segmentor for Thai ([ssg](https://github.com/ponrawee/ssg))
