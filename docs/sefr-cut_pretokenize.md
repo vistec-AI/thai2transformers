@@ -4,7 +4,7 @@ The word level tokenizer that we use has pre_tokenize hook that will pre tokeniz
 
 ## Instruction
 
-The following command will read text line by line from `input_folder` and output it to `output_folder` with chunk_size of number of process multiply by 200.
+The following command will read text files line by line from `input_folder` and output it to `output_folder` where `chunk_size` (number of lines to be read for each process) is number of process multiply by 200.
 
 ```bash
 arguements=$(cat <<-EOF
