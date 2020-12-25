@@ -28,7 +28,8 @@ The word level tokenizer that we use has pre_tokenize hook that will pre tokeniz
     The following command will read text files line by line from `input_folder` and output it to `output_folder` where `chunk_size` (number of lines to be read for each process) is number of process multiply by 200.
 
     ```bash
-    python ./scripts/sefr_cut_pre_tokenizer.py \ 
+    cd scripts
+    python ./sefr_cut_pre_tokenizer.py \
     --input_folder ../data/dataset/thwiki-20200820/5_split/train \
     --output_folder ../data/tokenizers/thwiki-thwiki/seft_cut/ \
     --chunk_size $(($(nproc) * 200)) \
