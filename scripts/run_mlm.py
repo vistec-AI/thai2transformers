@@ -317,7 +317,7 @@ def main():
         # "roberta.pooler.dense.bias".
 
     data_collator = DataCollatorForLanguageModeling(
-        tokenizer=tokenizer, mlm=data_args.mlm, mlm_probability=data_args.mlm_probability)
+        tokenizer=tokenizer, mlm_probability=data_args.mlm_probability)
 
     # Initialize trainer
     trainer = Trainer(
