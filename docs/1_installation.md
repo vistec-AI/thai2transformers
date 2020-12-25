@@ -20,7 +20,8 @@
     In order to manually build SentencePiece model from raw text files, it is required to install SentencePiece from source. (ref: https://github.com/google/sentencepiece#c-from-source)
 
     ```
-    sudo apt-get install cmake build-essential pkg-config libgoogle-perftools-dev
+    apt-get update
+    apt-get install cmake build-essential pkg-config libgoogle-perftools-dev
 
     git clone https://github.com/google/sentencepiece.git
     cd sentencepiece
