@@ -122,7 +122,6 @@ This page explains how to download, extract and filter and clean texts from Thai
     - (Optional) Replace space token with a special token `"<_>"`
 
 
-
     ```bash
     python ./scripts/preprocess_thwiki_extracted.py \
     ./data/dataset/thwiki-20200820/2_extracted \
@@ -210,7 +209,7 @@ This page explains how to download, extract and filter and clean texts from Thai
 
     </details>
 
-5. Split into train/val/test set via the script `split_dataset.py`
+5. Split into train/val/test set via the script `split_data.py`
 
 
     ```bash
