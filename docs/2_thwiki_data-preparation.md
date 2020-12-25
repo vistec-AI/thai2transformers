@@ -125,7 +125,7 @@ This page explains how to download, extract and filter and clean texts from Thai
     ```bash
     python ./scripts/preprocess_thwiki_extracted.py \
     ./data/dataset/thwiki-20200820/2_extracted \
-    ./data/dataset/thwiki-20200820/3_cleaned \
+    ./data/dataset/thwiki-20200820/3_aggregated \
     --remove_first_empty_parenthesis \
     --split_long_segment \
     --add_end_of_doc_token \
