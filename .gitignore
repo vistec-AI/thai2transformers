@@ -5,6 +5,7 @@
 raw_data
 
 #files
+logs
 data
 data_prep
 lightning_logs
