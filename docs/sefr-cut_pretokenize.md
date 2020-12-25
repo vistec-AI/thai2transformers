@@ -1,4 +1,4 @@
-# Tokenize text woth SEFR tokenizer for `fake_sefr_cut` tokenizer
+# Tokenize text word SEFR tokenizer for `fake_sefr_cut` tokenizer
 
 The word level tokenizer that we use has pre_tokenize hook that will pre tokenize text before passing to the tokenizer unfortunately, this operate on instance by instance basis make this unsuitable for sefr cut since it is very slow compare to other pre tokenizer. To speed up the process we use multiprocessing to accelerate the process and output text with special token that will be use as a split token for fake sefr cut later. For example, if the text `hello world` get split into `['hello', 'world']` by sefr cut we will output the preprocessed text as `hello<|>world` instead if `<|>` is the split token that we specified.
 
