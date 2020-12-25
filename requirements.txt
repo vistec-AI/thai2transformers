@@ -1,4 +1,4 @@
-https://github.com/pytorch/pytorch.git@8f84deddd1b1f7cf4bf981a78eb5ff4cc3299b5e
+git+https://github.com/pytorch/pytorch.git@8f84deddd1b1f7cf4bf981a78eb5ff4cc3299b5e
 transformers==3.4.0
 sentencepiece==0.1.94
 tqdm
