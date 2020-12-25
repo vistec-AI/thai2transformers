@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import csv
 import os
+import math
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -19,9 +21,10 @@ if __name__ == '__main__':
 
         raise "Summation of train/val/test ration is not eqaul to 1.0"
 
-    print(f'INFO: Load csv file from {args.input_path}')
+    print(f'INFO: Load text file from {args.input_path}')
 
-    df = pd.read_csv(args.input_path, encoding='utf-8')
+    with open(args.input_path, 'r', encoding='utf-8') as f:
+        df = pd.DataFrame({ 'text': f.readlines() })
 
     print('INFO: Begin splitting data.')
     
@@ -29,7 +32,7 @@ if __name__ == '__main__':
     print(f'\tval_ratio: {args.val_ratio}')
     print(f'\ttest_ratio: {args.test_ratio}')
     
-    train_df, valid_df, test_df = np.split(df, [int(.95*len(df)), int(.975*len(df))])
+    train_df, valid_df, test_df = np.split(df, [math.ceil(args.train_ratio * len(df)), math.ceil((args.train_ratio + args.val_ratio )*len(df))])
     
     print(f'\nINFO: Train/val/test statistics.')
     print(f'\ttrain set: {train_df.shape[0]}')
@@ -44,8 +47,8 @@ if __name__ == '__main__':
         if os.path.exists(f'{args.output_dir}/{split}') == False:
             os.makedirs(f'{args.output_dir}/{split}', exist_ok=True)
 
-        split_df[split][['text']].to_csv(f'{args.output_dir}/{split}/{split}.txt',
-                                                             encoding='utf-8', sep="\t", index=False, header=None,
-                                                             escapechar="", quotechar="", quoting=csv.QUOTE_NONE)
+        with open(f'{args.output_dir}/{split}/{split}.txt', 'w', encoding='utf-8') as f:
+            texts = split_df[split]['text'].tolist()
+            f.writelines(texts)
 
     print('\nINFO: Done writing all split.')
