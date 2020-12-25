@@ -7,13 +7,9 @@ The word level tokenizer that we use has pre_tokenize hook that will pre tokeniz
 The following command will read text files line by line from `input_folder` and output it to `output_folder` where `chunk_size` (number of lines to be read for each process) is number of process multiply by 200.
 
 ```bash
-arguements=$(cat <<-EOF
- --input_folder ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020/val
- --output_folder ../data/input/datasets/thwiki-for-ddp_concat_12.11.2020_pre_tokenized/val
- --chunk_size $(($(nproc) * 200))
- --overwrite
-EOF
-)
-
-python3 sefr_cut_pre_tokenizer.py $arguements
+python3 ./scripts/sefr_cut_pre_tokenizer.py \ 
+--input_folder ../data/dataset/thwiki-202008_concat/5_split/train \
+--output_folder ../data/tokenizers/thwiki-202008_concat/seft_cut/ \
+--chunk_size $(($(nproc) * 200)) \
+--overwrite
 ```
