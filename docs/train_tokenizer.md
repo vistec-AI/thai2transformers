@@ -15,7 +15,7 @@ This step train a tokenizer (output a vocaulary file) so it can be use later. Cu
 
 a) Syllable-level and word-level tokenizer (`newmm`, `syllable`, `fake_sefr_cut`)
 
-The following command can be use to train a tokenizer. We can also use `--help` to get more information.
+The following command can be used to train a tokenizer. Append `--help` after the `train_tokenizer.py` to get more information.
 
 ```bash
 python3 train_tokenizer.py \
@@ -28,6 +28,27 @@ python3 train_tokenizer.py \
  --vocab_min_freq "$PROJECT_VOCAB_MIN_FREQ"
 ```
 
-The command above will read `*.txt` file in `$PROJECT_TRAIN_DATASET_DIR` line by line, strip, and ignore empty line. Then cut the each line in to multiple words and count words occurance. Filter out words, which has less frequency than `$PROJECT_VOCAB_MIN_FREQ`. Then dump the words and their coresponding ids into `$PROJECT_TOKENIZER_PATH/$PROJECT_PRE_TOKENIZER_TYPE.json`.
+The command above will read `*.txt` file in the directory `$PROJECT_TRAIN_DATASET_DIR` line by line, strip text, and ignore empty line. Then, it tokenizes each line and count word occurences. Finally, it filters out words which has word occurences less than the threshold `$PROJECT_VOCAB_MIN_FREQ` in the training corpus. After the filering process, it write the vocabulary and their coresponding ids to `$PROJECT_TOKENIZER_PATH/$PROJECT_PRE_TOKENIZER_TYPE.json`.
 
 b) Subword-level tokenizer (`spm`)
+
+If the sentencepiece library is already installed, SentencePiece model can be built by the following command.
+
+```
+mkdir -p ./data/dataset/tokenizers/thwiki-20200820/spm/vs-24000
+cd ./data/dataset/tokenizers/thwiki-20200820/spm/vs-24000
+spm_train \
+--input=./data/dataset/thwiki-20200820/5_split/train/train.txt \
+--model_prefix sentencepiece.bpe \
+--vocab_size=24000 \
+--character_coverage=0.9998 --user_defined_symbols="<mask>,<_>" \
+--max_sentencepiece_length=10 \
+--add_dummy_prefix False \
+--bos_id=0 \
+--pad_id=1 \
+--eos_id=2 \
+--unk_id=3 \
+--max_sentence_length 10000
+```
+
+The script will train SentencePiece model based on training corpus located at `./data/dataset/thwiki-20200820/5_split/train/train.txt` with the parameters specified (e.g. vocabulary size, character coverage) and write two files (`sentencepiece.bpe.model` and `sentencepiece.bpe.model`) to the directory: `./data/dataset/tokenizers/thwiki-20200820/spm/vs-24000`
