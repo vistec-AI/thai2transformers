@@ -2,7 +2,7 @@
 
 This step train a mask language model using trained tokenizer and datasets. The tokenizer is implemented derived from a class `transformers.tokenization_utils.PreTrainedTokenizer`. There are a lot of arguments that can be pass in this step. The script is derived from huggingface transformers `examples/language_modeling/run_mlm.py` with decent amount of new arguments and modifications.
 
-## How to 
+## Instruction
 
 The following command can be use to train a mask language model. We can also use `--help` to get more information.
 
