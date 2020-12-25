@@ -8,7 +8,7 @@ RUN apt-get install -y git
 RUN git clone https://github.com/NVIDIA/apex.git && cd apex && \
     pip3 install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
 RUN pip3 install pandas
-RUN pip3 install tqdm emoji pythainlp
+RUN pip3 install tqdm emoji pythainlp==2.2.4
 RUN pip3 install transformers==3.4.0
 RUN git clone https://github.com/huggingface/datasets.git && cd datasets && \
     pip3 install .
