@@ -31,6 +31,7 @@ class DataTrainingArguments:
     )  # Non-standard
     eval_dir: str = field(
         metadata={"help": "The input evaluation data dir (dir that contain text files)."},
+        default=""
     )  # Non-standard
     ext: str = field(
         default='.txt', metadata={'help': 'extension of training and evaluation files.'}
