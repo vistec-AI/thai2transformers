@@ -15,7 +15,7 @@ This step is for building the vocabulary for tokenizer. Currently, there are 4 t
 
 a) Syllable-level and word-level tokenizer (`newmm`, `syllable`, `fake_sefr_cut`)
 
-The following command can be used to train a tokenizer. Append `--help` after the `train_tokenizer.py` to get more information.
+The following command can be used to train a tokenizer (Append `--help` after the `run_mlm.py` to get more information).
 
 ```bash
 python3 train_tokenizer.py \
