@@ -89,6 +89,7 @@ def init_trainer(model, train_dataset, val_dataset,
                  no_cuda=True,
                  save_steps=500,
                  seed=2020,
+                 logging_steps=10,
                  greater_is_better=False,
                  metric_for_best_model='eval_loss'):
         
@@ -108,7 +109,7 @@ def init_trainer(model, train_dataset, val_dataset,
                         #logs
                         logging_dir=log_dir,
                         logging_first_step=True,
-                        logging_steps=5,
+                        logging_steps=logging_steps,
                         #eval
                         evaluation_strategy='steps',
                         eval_steps=eval_steps,
@@ -154,7 +155,7 @@ if __name__ == '__main__':
     parser.add_argument('--greater_is_better', action='store_true', default=False)
     parser.add_argument('--metric_for_best_model', type=str, default='eval_loss')
     parser.add_argument('--eval_steps', type=int, default=250)
-
+    parser.add_argument('--logging_steps', type=int, default=10)
     parser.add_argument('--save_steps', type=int, default=500)
     parser.add_argument('--seed', type=int, default=2020)
     
