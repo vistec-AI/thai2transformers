@@ -110,7 +110,7 @@ def init_trainer(model, train_dataset, val_dataset,
                         logging_first_step=True,
                         logging_steps=5,
                         #eval
-                        evaluate_during_training=True,
+                        evaluation_strategy='steps',
                         eval_steps=eval_steps,
                         #others
                         seed=seed,
