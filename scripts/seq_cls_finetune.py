@@ -186,7 +186,7 @@ if __name__ == '__main__':
 
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
                                         text_input_col_name: '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(batch[text_input_col_name].split()) ]) 
-                                    })
+                                    }, batched=False)
             
     except Exception as e:
         raise e
