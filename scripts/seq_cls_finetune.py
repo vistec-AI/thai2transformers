@@ -233,5 +233,9 @@ if __name__ == '__main__':
 
 
     print('\nBegin model evaluation on test set.')
-    trainer.eval(dataset=dataset_split['test'])
+    result = trainer.evaluate(eval_dataset=dataset_split['test'])
+    print(f'Evaluation on test set (dataset: {args.dataset_name})')    
+    for key, value in result.items():
+        print(f'{key} : {value:.4f}')
+
     print('Done.\n')
