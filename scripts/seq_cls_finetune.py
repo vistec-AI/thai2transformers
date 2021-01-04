@@ -15,7 +15,8 @@ from transformers import (
     AutoConfig,
     Trainer, 
     TrainingArguments,
-    RobertaConfig
+    RobertaConfig,
+    CamembertTokenizer
 )
 
 from datasets import load_dataset, list_metrics, load_dataset
@@ -27,12 +28,13 @@ from thai2transformers.tokenizers import (
     ThaiRobertaTokenizer,
     ThaiWordsNewmmTokenizer,
     ThaiWordsSyllableTokenizer,
-    FakeSefrCutTokenizer
+    FakeSefrCutTokenizer,
 )
 
 
 
 TOKENIZER_CLS = {
+    'spm_camembert': CamembertTokenizer,
     'spm': ThaiRobertaTokenizer,
     'newmm': ThaiWordsNewmmTokenizer,
     'syllable': ThaiWordsSyllableTokenizer,
@@ -69,9 +71,11 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, nu
         model_dir,
         num_labels=num_labels
     )
+ 
     tokenizer = tokenizer_cls.from_pretrained(
         tokenizer_dir,
     )
+
     model = AutoModelForSequenceClassification.from_pretrained(
         model_dir,
         config=config,
@@ -201,11 +205,13 @@ if __name__ == '__main__':
     
     tokenizer_cls = TOKENIZER_CLS[args.tokenizer_type]
 
-
+    
     model, tokenizer, config = init_model_tokenizer_for_seq_cls(args.model_dir,
                                                         tokenizer_cls,
                                                         args.tokenizer_dir,
                                                         num_labels=DATASET_METADATA[args.dataset_name]['num_labels'])
+    if args.tokenizer_type == 'spm_camembert':
+        tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
     dataset_split = { split_name: SequenceClassificationDataset.from_dataset(tokenizer, dataset[split_name],
                         DATASET_METADATA[args.dataset_name]['text_input'],
