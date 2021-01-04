@@ -327,6 +327,7 @@ class SequenceClassificationDataset(Dataset):
 
         return cls(
             tokenizer=tokenizer,
+            data_dir=None,
             max_length=max_length,
             bs=bs,
             input_ids=input_ids,
