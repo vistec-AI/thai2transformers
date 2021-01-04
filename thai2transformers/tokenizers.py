@@ -723,7 +723,7 @@ class BaseThaiWordsTokenizer(PreTrainedTokenizer):
 
         text = text.replace(' ', SPACE_TOKEN)
 
-        return text
+        return (text, kwargs)
 
     def __getstate__(self):
         # What is this funcion even do?
