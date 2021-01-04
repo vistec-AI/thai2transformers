@@ -324,7 +324,7 @@ class SequenceClassificationDataset(Dataset):
         cls.label_column_name = text_column_name
         cls.dataset = dataset
         cls.bs = bs
-        cls._build_from_dataset()
+        cls._build_from_dataset(cls)
     
 
     def _build_from_dataset(self):
