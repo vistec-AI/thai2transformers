@@ -77,7 +77,7 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, nu
         config=config,
     )
 
-    print(f'[INFO] Model architecute: {model} \n\n')
+    print(f'\n[INFO] Model architecute: {model} \n\n')
     return model, tokenizer, config
 
 def init_trainer(model, train_dataset, val_dataset,
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
 
     try:
-        print(f'[INFO] Dataset: {args.dataset_name}\n')
+        print(f'\n\n[INFO] Dataset: {args.dataset_name}\n')
         dataset = load_dataset(args.dataset_name)
 
         if args.tokenizer_type == 'sefr':
