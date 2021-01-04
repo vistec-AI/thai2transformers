@@ -306,7 +306,7 @@ class SequenceClassificationDataset(Dataset):
         }
 
     @classmethod
-    def from_dataset(self,
+    def from_dataset(cls,
                      tokenizer,
                      dataset,
                      text_column_name,
@@ -315,16 +315,16 @@ class SequenceClassificationDataset(Dataset):
                      bs=1000,
                      prepare_for_tokenization=True):
         
-        self.max_length = max_length
-        self.input_ids = []
-        self.attention_masks = []
-        self.labels = []
-        self.prepare_for_tokenization = prepare_for_tokenization
-        self.text_column_name = text_column_name
-        self.label_column_name = text_column_name
-        self.dataset = dataset
-        self.bs = bs
-        self._build_from_dataset()
+        cls.max_length = max_length
+        cls.input_ids = []
+        cls.attention_masks = []
+        cls.labels = []
+        cls.prepare_for_tokenization = prepare_for_tokenization
+        cls.text_column_name = text_column_name
+        cls.label_column_name = text_column_name
+        cls.dataset = dataset
+        cls.bs = bs
+        cls._build_from_dataset()
     
 
     def _build_from_dataset(self):
