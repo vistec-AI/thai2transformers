@@ -76,6 +76,8 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, nu
         model_dir,
         config=config,
     )
+
+    print(f'[INFO] Model architecute: {model} \n\n')
     return model, tokenizer, config
 
 def init_trainer(model, train_dataset, val_dataset,
