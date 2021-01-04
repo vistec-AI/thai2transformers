@@ -15,7 +15,6 @@ from typing import Optional
 import joblib
 nb_cores = multiprocessing.cpu_count()
 
-
 @contextmanager
 def disable_gc():
     gc.disable()
@@ -283,6 +282,7 @@ class SequenceClassificationDataset(Dataset):
         ext=".csv",
         bs=10000,
         preprocessor=None,
+
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
@@ -305,6 +305,49 @@ class SequenceClassificationDataset(Dataset):
             "label": torch.tensor(self.labels[i], dtype=torch.long),
         }
 
+    def from_dataset(self,
+                     tokenizer,
+                     dataset,
+                     text_column_name,
+                     label_column_name,
+                     max_length=128,
+                     bs=1000,
+                     prepare_for_tokenization=True):
+        
+        self.max_length = max_length
+        self.input_ids = []
+        self.attention_masks = []
+        self.labels = []
+        self.prepare_for_tokenization = prepare_for_tokenization
+        self.text_column_name = text_column_name
+        self.label_column_name = text_column_name
+        self.dataset = dataset
+        self.bs = bs
+        self._build_from_dataset()
+    
+
+    def _build_from_dataset(self):
+        texts = self.dataset[self.text_column_name]
+        self.labels = self.dataset[self.label_column_name]
+
+        if self.prepare_for_tokenization:
+
+            texts = list(map(lambda text: self.tokenizer.prepare_for_tokenization(text)[0], texts))
+
+        for i in tqdm(range(math.ceil(len(texts) / self.bs))):
+
+            batched_texts = texts[i * self.bs: (i+1) * self.bs]
+
+            tokenized_inputs = self.tokenizer(
+                batched_texts,
+                max_length=self.max_length,
+                truncation=True,
+                pad_to_max_length=True
+            )
+            # add to list
+            self.input_ids += tokenized_inputs["input_ids"]
+            self.attention_masks += tokenized_inputs["attention_mask"]
+    
     def _build(self):
         for fname in tqdm(self.fnames):
             df = pd.read_csv(fname)
