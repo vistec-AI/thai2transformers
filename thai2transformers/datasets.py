@@ -291,9 +291,9 @@ class SequenceClassificationDataset(Dataset):
         self.tokenizer = tokenizer
         self.bs = bs
         self.preprocessor = preprocessor
-        self.input_ids = []
-        self.attention_masks = []
-        self.labels = []
+        self.input_ids = input_ids
+        self.attention_masks = attention_masks
+        self.labels = labels
 
         self._build()
 
