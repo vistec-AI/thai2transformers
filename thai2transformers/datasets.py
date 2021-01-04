@@ -305,6 +305,7 @@ class SequenceClassificationDataset(Dataset):
             "label": torch.tensor(self.labels[i], dtype=torch.long),
         }
 
+    @classmethod
     def from_dataset(self,
                      tokenizer,
                      dataset,
