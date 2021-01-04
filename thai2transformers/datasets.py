@@ -348,7 +348,7 @@ class SequenceClassificationDataset(Dataset):
 
         if prepare_for_tokenization:
 
-            texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text)[0], texts, space_token=space_token))
+            texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text, space_token=space_token)[0], texts))
 
         for i in tqdm(range(math.ceil(len(texts) / bs))):
 
