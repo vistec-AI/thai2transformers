@@ -185,8 +185,8 @@ if __name__ == '__main__':
             for split_name in ['train', 'validation', 'test']:
 
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
-                                        text_input_col_name: '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(batch[text_input_col_name].split()) ]) 
-                                    }, batched=False)
+                                        text_input_col_name: '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(batch[text_input_col_name][0].split()) ]) 
+                                    }, batched=False, batch_size=1)
             
     except Exception as e:
         raise e
