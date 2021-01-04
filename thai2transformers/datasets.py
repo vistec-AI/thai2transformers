@@ -282,7 +282,9 @@ class SequenceClassificationDataset(Dataset):
         ext=".csv",
         bs=10000,
         preprocessor=None,
-
+        input_ids=[],
+        attention_masks=[],
+        labels=[],
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
@@ -340,7 +342,7 @@ class SequenceClassificationDataset(Dataset):
         labels = dataset[label_column_name]
         input_ids = []
         attention_masks = []
-        
+
         if prepare_for_tokenization:
 
             texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text)[0], texts))
