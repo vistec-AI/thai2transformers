@@ -334,7 +334,6 @@ class SequenceClassificationDataset(Dataset):
             attention_masks=attention_masks,
             labels=labels
         )
-        
     
     @staticmethod
     def _build_from_dataset(tokenizer, dataset, text_column_name, label_column_name,
@@ -362,6 +361,7 @@ class SequenceClassificationDataset(Dataset):
             input_ids += tokenized_inputs["input_ids"]
             attention_masks += tokenized_inputs["attention_mask"]
         return input_ids, attention_masks, labels
+
     def _build(self):
         for fname in tqdm(self.fnames):
             df = pd.read_csv(fname)
