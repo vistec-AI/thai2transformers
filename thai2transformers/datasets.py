@@ -316,6 +316,7 @@ class SequenceClassificationDataset(Dataset):
                      prepare_for_tokenization=True):
         
         cls.max_length = max_length
+        cls.tokenizer = tokenizer
         cls.input_ids = []
         cls.attention_masks = []
         cls.labels = []
