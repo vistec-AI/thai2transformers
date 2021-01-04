@@ -145,7 +145,7 @@ if __name__ == '__main__':
     parser.add_argument('tokenizer_type', type=str, help='The type token model used. Specify the name of tokenizer either `spm`, `newmm`, `syllable`, or `sefr`.')
     parser.add_argument('dataset_name', help='Specify the dataset name to finetune. Currently, sequence classification datasets include `wisesight_sentiment`, `generated_reviews_enth` and`wongnai_reviews`.')
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
-    parser.add_argument('--space_token', action='store_true', default='<_>', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
+    parser.add_argument('--space_token', type=str, default='<_>', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
 
     # Finetuning
     parser.add_argument('output_dir', type=str)
@@ -170,6 +170,9 @@ if __name__ == '__main__':
     try:
         print(f'\n\n[INFO] Dataset: {args.dataset_name}\n')
         dataset = load_dataset(args.dataset_name)
+
+        print(f'\n[INFO] space_token: {args.space_token}')
+        print(f'[INFO] prepare_for_tokenization: {args.prepare_for_tokenization}\n')
 
         if args.tokenizer_type == 'sefr':
             print(f'Apply `sefr_cut` tokenizer to the text inputs of {args.dataset_name} dataset')
@@ -216,7 +219,12 @@ if __name__ == '__main__':
     print(f'[INFO] Number of batches per epoch (training set) = {math.ceil(len(dataset_split["train"]) / args.batch_size)}')
     print(f'[INFO] Number of batches per epoch (validation set) = {math.ceil(len(dataset_split["validation"]))}')
     print(f'[INFO] Warmup steps = {warmup_steps}')
+    print(f'[INFO] Learning rate: {args.learning_rate}')
+    print(f'[INFO] Logging steps: {args.logging_steps}')
+    print(f'[INFO] Saving steps: {args.save_steps}')
+    print(f'[INFO] FP16 training: {args.fp16}\n')
     
+
 
     trainer, training_args = init_trainer(model=model,
                                 train_dataset=dataset_split['train'],
