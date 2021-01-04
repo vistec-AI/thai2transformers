@@ -315,41 +315,48 @@ class SequenceClassificationDataset(Dataset):
                      bs=1000,
                      prepare_for_tokenization=True):
         
-        cls.max_length = max_length
-        cls.tokenizer = tokenizer
-        cls.input_ids = []
-        cls.attention_masks = []
-        cls.labels = []
-        cls.prepare_for_tokenization = prepare_for_tokenization
-        cls.text_column_name = text_column_name
-        cls.label_column_name = text_column_name
-        cls.dataset = dataset
-        cls.bs = bs
-        cls._build_from_dataset(cls)
+        input_ids, attention_masks, labels = SequenceClassificationDataset._build_from_dataset(tokenizer,
+                     dataset,
+                     text_column_name,
+                     label_column_name,
+                     max_length=128,
+                     bs=1000,
+                     prepare_for_tokenization=True)
+
+        return cls(
+            tokenizer=tokenizer,
+            max_length=max_length,
+            bs=bs,
+            input_ids=input_ids,
+            attention_masks=attention_masks,
+            labels=labels
+        )
+        
     
+    @staticmethod
+    def _build_from_dataset(tokenizer, dataset, text_column_name, label_column_name,
+                            max_length, prepare_for_tokenization=True, bs=1000):
+        texts = dataset[text_column_name]
+        labels = dataset[label_column_name]
 
-    def _build_from_dataset(self):
-        texts = self.dataset[self.text_column_name]
-        self.labels = self.dataset[self.label_column_name]
+        if prepare_for_tokenization:
 
-        if self.prepare_for_tokenization:
+            texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text)[0], texts))
 
-            texts = list(map(lambda text: self.tokenizer.prepare_for_tokenization(text)[0], texts))
+        for i in tqdm(range(math.ceil(len(texts) / bs))):
 
-        for i in tqdm(range(math.ceil(len(texts) / self.bs))):
+            batched_texts = texts[i * bs: (i+1) * bs]
 
-            batched_texts = texts[i * self.bs: (i+1) * self.bs]
-
-            tokenized_inputs = self.tokenizer(
+            tokenized_inputs = tokenizer(
                 batched_texts,
-                max_length=self.max_length,
+                max_length=max_length,
                 truncation=True,
                 pad_to_max_length=True
             )
             # add to list
-            self.input_ids += tokenized_inputs["input_ids"]
-            self.attention_masks += tokenized_inputs["attention_mask"]
-    
+            input_ids += tokenized_inputs["input_ids"]
+            attention_masks += tokenized_inputs["attention_mask"]
+        return input_ids, attention_masks, labels
     def _build(self):
         for fname in tqdm(self.fnames):
             df = pd.read_csv(fname)
