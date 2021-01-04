@@ -216,7 +216,7 @@ if __name__ == '__main__':
                     }
 
         
-    warmup_steps = math.ceil(len(dataset_split['train']) / args.batch_size * args.warmup_ratio)
+    warmup_steps = math.ceil(len(dataset_split['train']) / args.batch_size * args.warmup_ratio * args.num_train_epochs)
 
     print(f'[INFO] Number of train examples = {len(dataset["train"])}')
     print(f'[INFO] Number of validation examples = {len(dataset["validation"])}')
