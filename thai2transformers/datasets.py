@@ -315,7 +315,8 @@ class SequenceClassificationDataset(Dataset):
                      label_column_name,
                      max_length=128,
                      bs=1000,
-                     prepare_for_tokenization=True):
+                     prepare_for_tokenization=True,
+                     space_token='<_>'):
         
         input_ids, attention_masks, labels = SequenceClassificationDataset._build_from_dataset(tokenizer,
                      dataset,
@@ -323,7 +324,8 @@ class SequenceClassificationDataset(Dataset):
                      label_column_name,
                      max_length=128,
                      bs=1000,
-                     prepare_for_tokenization=True)
+                     prepare_for_tokenization=True,
+                     space_token=space_token)
 
         return cls(
             tokenizer=tokenizer,
@@ -336,8 +338,9 @@ class SequenceClassificationDataset(Dataset):
         )
     
     @staticmethod
-    def _build_from_dataset(tokenizer, dataset, text_column_name, label_column_name,
-                            max_length, prepare_for_tokenization=True, bs=1000):
+    def _build_from_dataset(tokenizer, dataset,
+                            text_column_name, label_column_name,
+                            space_token, max_length, prepare_for_tokenization=True, bs=1000):
         texts = dataset[text_column_name]
         labels = dataset[label_column_name]
         input_ids = []
@@ -345,7 +348,7 @@ class SequenceClassificationDataset(Dataset):
 
         if prepare_for_tokenization:
 
-            texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text)[0], texts))
+            texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text)[0], texts, space_token=space_token))
 
         for i in tqdm(range(math.ceil(len(texts) / bs))):
 

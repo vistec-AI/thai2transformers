@@ -144,7 +144,9 @@ if __name__ == '__main__':
     parser.add_argument('tokenizer_dir', type=str)
     parser.add_argument('tokenizer_type', type=str, help='The type token model used. Specify the name of tokenizer either `spm`, `newmm`, `syllable`, or `sefr`.')
     parser.add_argument('dataset_name', help='Specify the dataset name to finetune. Currently, sequence classification datasets include `wisesight_sentiment`, `generated_reviews_enth` and`wongnai_reviews`.')
-    
+    parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
+    parser.add_argument('--space_token', action='store_true', default='<_>', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
+
     # Finetuning
     parser.add_argument('output_dir', type=str)
     parser.add_argument('log_dir', type=str)
@@ -201,7 +203,8 @@ if __name__ == '__main__':
                         DATASET_METADATA[args.dataset_name]['text_input'],
                         DATASET_METADATA[args.dataset_name]['label'],
                         max_length=config.max_position_embeddings - 2,
-                        prepare_for_tokenization=True) for split_name in ['train', 'validation', 'test']
+                        space_token=args.space_token,
+                        prepare_for_tokenization=args.prepare_for_tokenization) for split_name in ['train', 'validation', 'test']
                     }
 
         
