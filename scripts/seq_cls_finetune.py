@@ -119,7 +119,7 @@ def init_trainer(model, train_dataset, val_dataset,
                         dataloader_drop_last=True,
                         no_cuda=no_cuda,
                         metric_for_best_model=metric_for_best_model,
-                        prediction_loss_only=True
+                        prediction_loss_only=False
                     )
 
     trainer = Trainer(
