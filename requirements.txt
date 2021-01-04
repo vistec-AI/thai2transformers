@@ -12,6 +12,6 @@ tensorboard==2.3.0
 pydantic==1.7.3
 jsonlines==1.2.0
 nltk==3.4.5
-numpy>=1.19.2
+wrapt
 tensorflow>=2.0.0
 sefr_cut==0.2
