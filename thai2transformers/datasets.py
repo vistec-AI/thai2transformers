@@ -338,7 +338,9 @@ class SequenceClassificationDataset(Dataset):
                             max_length, prepare_for_tokenization=True, bs=1000):
         texts = dataset[text_column_name]
         labels = dataset[label_column_name]
-
+        input_ids = []
+        attention_masks = []
+        
         if prepare_for_tokenization:
 
             texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text)[0], texts))
