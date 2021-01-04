@@ -147,6 +147,11 @@ if __name__ == '__main__':
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
     parser.add_argument('--space_token', type=str, default='<_>', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
 
+
+    parser.add_argument('--target_class', type=str, default='multiclass', help='Specify the type for target class either `multilabel` or `multiclass`.')
+    
+    parser.add_argument('--max_seq_length', type=int, default=512)
+
     # Finetuning
     parser.add_argument('output_dir', type=str)
     parser.add_argument('log_dir', type=str)
@@ -205,7 +210,7 @@ if __name__ == '__main__':
     dataset_split = { split_name: SequenceClassificationDataset.from_dataset(tokenizer, dataset[split_name],
                         DATASET_METADATA[args.dataset_name]['text_input'],
                         DATASET_METADATA[args.dataset_name]['label'],
-                        max_length=config.max_position_embeddings - 2,
+                        max_length=args.max_seq_length - 2,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization) for split_name in ['train', 'validation', 'test']
                     }
