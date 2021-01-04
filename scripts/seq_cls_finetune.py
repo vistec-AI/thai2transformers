@@ -91,6 +91,7 @@ def init_trainer(model, train_dataset, val_dataset,
                  seed=2020,
                  logging_steps=10,
                  greater_is_better=False,
+                 fp16=False,
                  metric_for_best_model='eval_loss'):
         
     training_args = TrainingArguments(
@@ -115,7 +116,7 @@ def init_trainer(model, train_dataset, val_dataset,
                         eval_steps=eval_steps,
                         #others
                         seed=seed,
-                        fp16=False,
+                        fp16=fp16,
                         fp16_opt_level="O1",
                         dataloader_drop_last=True,
                         no_cuda=no_cuda,
@@ -151,7 +152,7 @@ if __name__ == '__main__':
     parser.add_argument('--warmup_ratio', type=float, default=0.06)
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--no_cuda', action='store_true', default=False)
-    
+    parser.add_argument('--fp16', action='store_true', default=False)
     parser.add_argument('--greater_is_better', action='store_true', default=False)
     parser.add_argument('--metric_for_best_model', type=str, default='eval_loss')
     parser.add_argument('--eval_steps', type=int, default=250)
@@ -222,7 +223,8 @@ if __name__ == '__main__':
                                 weight_decay=args.weight_decay,
                                 warmup_steps=warmup_steps,
                                 batch_size=args.batch_size,
-                                no_cuda=args.no_cuda)
+                                no_cuda=args.no_cuda,
+                                fp16=args.fp16)
 
     print('[INFO] TrainingArguments:')
     print(training_args)
