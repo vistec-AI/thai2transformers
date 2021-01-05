@@ -44,25 +44,19 @@ TOKENIZER_CLS = {
 
 DATASET_METADATA = {
     'wisesight_sentiment': {
-        'text_input': 'texts',
-        'label': 'category',
-        'num_labels': 4
+        'text_input_col_name': 'texts',
+        'label_col_name': 'category',
     },
     'wongnai_reviews': {
-        'text_input': 'review_body',
-        'label': 'star_rating',
-        'num_labels': 5
+        'text_input_col_name': 'review_body',
+        'label_col_name': 'star_rating',
+        'num_labels': 5,
     },
-    'generated_reviews_then': { # th review rating , correct translation only
-        'text_input': 'translation.th',
-        'label': 'review_star',
-        'num_labels': 5
+        'text_input_col_name': 'translation.th',
+        'label_col_name': 'review_star',
     }
-    # 'prachathai67k': {
-    #     'text_input': 'body_text',
-    #     'label': '..',
-    #     'num_labels': 12
-    # }
+        'text_input_col_name': 'body_text',
+        'label_col_name': '..',
 }
 
 def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, num_labels):
@@ -189,7 +183,7 @@ if __name__ == '__main__':
             sefr_cut.load_model('best')
             sefr_tokenize = lambda x: sefr_cut.tokenize(x)
             
-            text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input']
+            text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
 
             for split_name in ['train', 'validation', 'test']:
 
@@ -214,8 +208,8 @@ if __name__ == '__main__':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
     dataset_split = { split_name: SequenceClassificationDataset.from_dataset(tokenizer, dataset[split_name],
-                        DATASET_METADATA[args.dataset_name]['text_input'],
-                        DATASET_METADATA[args.dataset_name]['label'],
+                        DATASET_METADATA[args.dataset_name]['text_input_col_name'],
+                        DATASET_METADATA[args.dataset_name]['label_col_name'],
                         max_length=args.max_seq_length - 2,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization) for split_name in ['train', 'validation', 'test']
