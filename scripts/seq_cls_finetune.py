@@ -16,7 +16,9 @@ from transformers import (
     Trainer, 
     TrainingArguments,
     RobertaConfig,
-    CamembertTokenizer
+    CamembertTokenizer,
+    BertTokenizer,
+    XLMRobertaTokenizer
 )
 
 from datasets import load_dataset, list_metrics, load_dataset
@@ -33,6 +35,8 @@ from thai2transformers.utils import get_dict_val
 
 
 TOKENIZER_CLS = {
+    'mbert': BertTokenizer,
+    'xlmr': XLMRobertaTokenizer,
     'spm_camembert': CamembertTokenizer,
     'spm': ThaiRobertaTokenizer,
     'newmm': ThaiWordsNewmmTokenizer,
