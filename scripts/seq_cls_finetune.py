@@ -69,6 +69,7 @@ DATASET_METADATA = {
         'text_input_col_name': 'body_text',
         'label_col_name': '..',
         'num_labels': 12
+    }
 }
 
 def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, num_labels):
@@ -88,6 +89,8 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, nu
     )
 
     print(f'\n[INFO] Model architecute: {model} \n\n')
+    print(f'\n[INFO] tokenizer: {tokenizer} \n\n')
+
     return model, tokenizer, config
 
 def init_trainer(model, train_dataset, val_dataset,
