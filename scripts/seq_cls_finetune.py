@@ -44,19 +44,31 @@ TOKENIZER_CLS = {
 
 DATASET_METADATA = {
     'wisesight_sentiment': {
+        'task': 'multiclass_classification',
         'text_input_col_name': 'texts',
         'label_col_name': 'category',
+        'num_labels': 4,
+        'split_names': ['train', 'validation', 'test']
     },
     'wongnai_reviews': {
+        'task': 'multiclass_classification',
         'text_input_col_name': 'review_body',
         'label_col_name': 'star_rating',
         'num_labels': 5,
+        'split_names': ['train', 'test']
     },
+    'generated_reviews_enth': { # th review rating , correct translation only
+        'task': 'multiclass_classification',
         'text_input_col_name': 'translation.th',
         'label_col_name': 'review_star',
+        'num_labels': 5,
+        'split_names': ['train', 'validation', 'test']
     }
+    'prachathai67k': {
+        'task': 'multilabel_classification',
         'text_input_col_name': 'body_text',
         'label_col_name': '..',
+        'num_labels': 12
 }
 
 def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, num_labels):
