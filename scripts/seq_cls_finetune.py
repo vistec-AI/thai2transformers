@@ -23,14 +23,13 @@ from datasets import load_dataset, list_metrics, load_dataset
 from thai2transformers.datasets import SequenceClassificationDataset
 from thai2transformers.metrics import classification_metrics
 from thai2transformers.finetuners import SequenceClassificationFinetuner
-
 from thai2transformers.tokenizers import (
     ThaiRobertaTokenizer,
     ThaiWordsNewmmTokenizer,
     ThaiWordsSyllableTokenizer,
     FakeSefrCutTokenizer,
 )
-
+from thai2transformers.utils import get_dict_val
 
 
 TOKENIZER_CLS = {
@@ -59,11 +58,11 @@ DATASET_METADATA = {
     },
     'generated_reviews_enth': { # th review rating , correct translation only
         'task': 'multiclass_classification',
-        'text_input_col_name': 'translation.th',
+        'text_input_col_name': ['translation', 'th'],
         'label_col_name': 'review_star',
         'num_labels': 5,
         'split_names': ['train', 'validation', 'test']
-    }
+    },
     'prachathai67k': {
         'task': 'multilabel_classification',
         'text_input_col_name': 'body_text',
@@ -71,6 +70,7 @@ DATASET_METADATA = {
         'num_labels': 12
     }
 }
+
 
 def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, num_labels):
     
@@ -203,7 +203,7 @@ if __name__ == '__main__':
             for split_name in ['train', 'validation', 'test']:
 
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
-                                        text_input_col_name: '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(batch[text_input_col_name].split()) ]) 
+                                        text_input_col_name: '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch, text_input_col_name).split()) ]) 
                                     }, batched=False, batch_size=1)
             
     except Exception as e:

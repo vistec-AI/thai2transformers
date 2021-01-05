@@ -13,6 +13,7 @@ from filelock import FileLock
 import logging, time
 from typing import Optional
 import joblib
+from utils import get_dict_val
 nb_cores = multiprocessing.cpu_count()
 
 @contextmanager
@@ -341,8 +342,8 @@ class SequenceClassificationDataset(Dataset):
     def _build_from_dataset(tokenizer, dataset,
                             text_column_name, label_column_name,
                             space_token, max_length, prepare_for_tokenization=True, bs=1000):
-        texts = dataset[text_column_name]
-        labels = dataset[label_column_name]
+        texts = get_dict_val(dataset, text_column_name)
+        labels = get_dict_val(dataset, label_column_name)
         input_ids = []
         attention_masks = []
 
