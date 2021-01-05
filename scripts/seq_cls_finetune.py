@@ -159,10 +159,6 @@ if __name__ == '__main__':
     parser.add_argument('dataset_name', help='Specify the dataset name to finetune. Currently, sequence classification datasets include `wisesight_sentiment`, `generated_reviews_enth` and`wongnai_reviews`.')
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
     parser.add_argument('--space_token', type=str, default='<_>', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
-
-
-    parser.add_argument('--target_class', type=str, default='multiclass', help='Specify the type for target class either `multilabel` or `multiclass`.')
-    
     parser.add_argument('--max_seq_length', type=int, default=512)
 
     # Finetuning
