@@ -29,7 +29,7 @@ from transformers import (
 
 from datasets import load_dataset, list_metrics, load_dataset, Dataset
 from thai2transformers.datasets import SequenceClassificationDataset
-from thai2transformers.metrics import classification_metrics
+from thai2transformers.metrics import classification_metrics, multilabel_classification_metrics
 from thai2transformers.finetuners import SequenceClassificationFinetuner
 from thai2transformers.models import RobertaForMultiLabelSequenceClassification
 from thai2transformers.tokenizers import (
@@ -43,6 +43,10 @@ from thai2transformers.conf import Task
 
 CACHE_DIR = f'{str(Path.home())}/.cache/huggingface_datasets'
 
+METRICS = {
+    Task.MULTICLASS_CLS: classification_metrics,
+    Task.MULTILABEL_CLS: multilabel_classification_metrics
+}
 
 TOKENIZER_CLS = {
     'mbert': BertTokenizer,
@@ -117,7 +121,7 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, ta
 
     return model, tokenizer, config
 
-def init_trainer(model, train_dataset, val_dataset, warmup_steps, args): 
+def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args): 
         
     training_args = TrainingArguments(
                         num_train_epochs=args.num_train_epochs,
@@ -148,11 +152,11 @@ def init_trainer(model, train_dataset, val_dataset, warmup_steps, args):
                         metric_for_best_model=args.metric_for_best_model,
                         prediction_loss_only=False
                     )
-
+    
     trainer = Trainer(
         model=model,
         args=training_args,
-        compute_metrics=classification_metrics,
+        compute_metrics=METRICS[task],
         train_dataset=train_dataset,
         eval_dataset=val_dataset    
     )
@@ -316,7 +320,8 @@ if __name__ == '__main__':
     
 
 
-    trainer, training_args = init_trainer(model=model,
+    trainer, training_args = init_trainer(task=task,
+                                model=model,
                                 train_dataset=dataset_split['train'],
                                 val_dataset=dataset_split['validation'],
                                 warmup_steps=warmup_steps,
