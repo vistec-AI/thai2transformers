@@ -113,9 +113,9 @@ def init_public_model_tokenizer_for_seq_cls(public_model_name, task, num_labels)
     config.num_labels = num_labels
     tokenizer = PUBLIC_MODEL[public_model_name]['tokenizer']
     if task == Task.MULTICLASS_CLS:
-        model = AutoModelForSequenceClassification.from_config(config=config)
+        model = AutoModelForSequenceClassification.from_pretrained(config=config)
     if task == Task.MULTILABEL_CLS:
-        model = AutoModelForMultiLabelSequenceClassification.from_config(config=config)
+        model = AutoModelForMultiLabelSequenceClassification.from_pretrained(config=config)
 
     print(f'\n[INFO] Model architecture: {model} \n\n')
     print(f'\n[INFO] tokenizer: {tokenizer} \n\n')
