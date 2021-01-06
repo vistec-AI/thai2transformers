@@ -40,6 +40,8 @@ from thai2transformers.tokenizers import (
 )
 from thai2transformers.utils import get_dict_val
 from thai2transformers.conf import Task
+from thai2transformers.preprocess import process_transformers
+
 
 CACHE_DIR = f'{str(Path.home())}/.cache/huggingface_datasets'
 
@@ -288,11 +290,7 @@ if __name__ == '__main__':
     if args.tokenizer_type == 'spm_camembert':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
-    print('\n[INFO] Preprocess texts in datasets')
-    # 
-    print('[INFO] Done.')
-
-    print('\n[INFO] Tokenizing texts in datasets')
+    print('\n[INFO] Preprocess and tokenizing texts in datasets')
     dataset_split = { split_name: SequenceClassificationDataset.from_dataset(
                         task,
                         tokenizer,
@@ -301,7 +299,8 @@ if __name__ == '__main__':
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
                         max_length=args.max_seq_length - 2,
                         space_token=args.space_token,
-                        prepare_for_tokenization=args.prepare_for_tokenization) for split_name in ['train', 'validation', 'test']
+                        prepare_for_tokenization=args.prepare_for_tokenization) for split_name in ['train', 'validation', 'test'],
+                        preprocess_fn=process_transformers
                     }
     print('[INFO] Done.')
         
