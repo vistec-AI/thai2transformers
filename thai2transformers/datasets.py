@@ -14,6 +14,7 @@ import logging, time
 from typing import Optional
 import joblib
 from .utils import get_dict_val
+from .conf import Task
 nb_cores = multiprocessing.cpu_count()
 
 @contextmanager
@@ -279,13 +280,14 @@ class SequenceClassificationDataset(Dataset):
         self,
         tokenizer,
         data_dir,
+        task=Task.MULTICLASS_CLS,
         max_length=128,
         ext=".csv",
         bs=10000,
         preprocessor=None,
         input_ids=[],
         attention_masks=[],
-        labels=[],
+        labels=[]
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
@@ -295,7 +297,7 @@ class SequenceClassificationDataset(Dataset):
         self.input_ids = input_ids
         self.attention_masks = attention_masks
         self.labels = labels
-
+        self.task = task
         self._build()
 
     def __len__(self):
@@ -346,9 +348,9 @@ class SequenceClassificationDataset(Dataset):
                             text_column_name, label_column_name,
                             space_token, max_length, prepare_for_tokenization=True, bs=1000):
         texts = get_dict_val(dataset, text_column_name)
-        if task.value == 'multiclass_classification':
+        if self.task == Task.MULTICLASS_CLS:
             labels = get_dict_val(dataset, label_column_name)
-        elif task.value == 'multilabel_classification':
+        elif self.task == Task.MULTILABEL_CLS:
             _labels = []
             for i, name in enumerate(label_column_name):
                 # print(name)

@@ -5,7 +5,6 @@ import sys
 
 sys.path.append('..')
 
-from enum import Enum
 from functools import partial
 import urllib.request
 from tqdm import tqdm
@@ -40,12 +39,10 @@ from thai2transformers.tokenizers import (
     FakeSefrCutTokenizer,
 )
 from thai2transformers.utils import get_dict_val
+from thai2transformers.conf import Task
 
 CACHE_DIR = f'{str(Path.home())}/.cache/huggingface_datasets'
 
-class Task(Enum):
-    MULTICLASS_CLS = 'multiclass_classification'
-    MULTILABEL_CLS = 'multilabel_classification'
 
 TOKENIZER_CLS = {
     'mbert': BertTokenizer,
