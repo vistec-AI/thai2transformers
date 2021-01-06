@@ -208,7 +208,7 @@ if __name__ == '__main__':
     parser.add_argument('--tokenizer_dir', type=str)
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
     parser.add_argument('--space_token', type=str, default='<_>', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
-    parser.add_argument('--max_seq_length', type=int, default=512)
+    parser.add_argument('--max_seq_length', type=int, default=None)
 
     # Finetuning
     parser.add_argument('--num_train_epochs', type=int, default=1)
@@ -335,7 +335,7 @@ if __name__ == '__main__':
                         dataset[split_name],
                         DATASET_METADATA[args.dataset_name]['text_input_col_name'],
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
-                        max_length=args.max_seq_length,
+                        max_length= args.max_seq_length if args.max_seq_length else config.max_position_embeddings,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
                         preprocessor=process_transformers) for split_name in ['train', 'validation', 'test']
