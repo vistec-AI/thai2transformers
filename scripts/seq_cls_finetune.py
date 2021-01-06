@@ -1,10 +1,17 @@
 import argparse
 import math
+import os
 import sys
+
 sys.path.append('..')
 
+from enum import Enum
 from functools import partial
+import urllib.request
+from tqdm import tqdm
+from pathlib import Path
 
+import pandas as pd
 from transformers import (
     AdamW, 
     get_linear_schedule_with_warmup, 
@@ -21,10 +28,11 @@ from transformers import (
     XLMRobertaTokenizer
 )
 
-from datasets import load_dataset, list_metrics, load_dataset
+from datasets import load_dataset, list_metrics, load_dataset, Dataset
 from thai2transformers.datasets import SequenceClassificationDataset
 from thai2transformers.metrics import classification_metrics
 from thai2transformers.finetuners import SequenceClassificationFinetuner
+from thai2transformers.models import RobertaForMultiLabelSequenceClassification
 from thai2transformers.tokenizers import (
     ThaiRobertaTokenizer,
     ThaiWordsNewmmTokenizer,
@@ -33,6 +41,11 @@ from thai2transformers.tokenizers import (
 )
 from thai2transformers.utils import get_dict_val
 
+CACHE_DIR = f'{str(Path.home())}/.cache/huggingface_datasets'
+
+class Task(Enum):
+    MULTICLASS_CLS = 'multiclass_classification'
+    MULTILABEL_CLS = 'multilabel_classification'
 
 TOKENIZER_CLS = {
     'mbert': BertTokenizer,
@@ -47,39 +60,41 @@ TOKENIZER_CLS = {
 
 DATASET_METADATA = {
     'wisesight_sentiment': {
-        'task': 'multiclass_classification',
+        'task': Task.MULTICLASS_CLS,
         'text_input_col_name': 'texts',
         'label_col_name': 'category',
         'num_labels': 4,
         'split_names': ['train', 'validation', 'test']
     },
     'wongnai_reviews': {
-        'task': 'multiclass_classification',
+        'task': Task.MULTICLASS_CLS,
         'text_input_col_name': 'review_body',
         'label_col_name': 'star_rating',
         'num_labels': 5,
         'split_names': ['train', 'test']
     },
     'generated_reviews_enth': { # th review rating , correct translation only
-        'task': 'multiclass_classification',
+        'task': Task.MULTICLASS_CLS,
         'text_input_col_name': ['translation', 'th'],
         'label_col_name': 'review_star',
         'num_labels': 5,
         'split_names': ['train', 'validation', 'test']
     },
     'prachathai67k': {
-        'task': 'multilabel_classification',
+        'url': 'https://archive.org/download/prachathai67k/data.zip',
+        'task': Task.MULTILABEL_CLS,
         'text_input_col_name': 'body_text',
         'label_col_name': ['politics', 'human_rights', 'quality_of_life',
                            'international', 'social', 'environment',
                            'economics', 'culture', 'labor',
                            'national_security', 'ict', 'education'],
-        'num_labels': 12
+        'num_labels': 12,
+        'split_names': ['train', 'validation', 'test']
     }
 }
 
 
-def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, num_labels):
+def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, task, num_labels):
     
     config = AutoConfig.from_pretrained(
         model_dir,
@@ -89,13 +104,18 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, nu
     tokenizer = tokenizer_cls.from_pretrained(
         tokenizer_dir,
     )
+    if task == Task.MULTICLASS_CLS:
+        model = AutoModelForSequenceClassification.from_pretrained(
+            model_dir,
+            config=config,
+        )
+    if task == Task.MULTILABEL_CLS:
+        model = RobertaForMultiLabelSequenceClassification.from_pretrained(
+            model_dir,
+            config=config,
+        )
 
-    model = AutoModelForSequenceClassification.from_pretrained(
-        model_dir,
-        config=config,
-    )
-
-    print(f'\n[INFO] Model architecute: {model} \n\n')
+    print(f'\n[INFO] Model architecture: {model} \n\n')
     print(f'\n[INFO] tokenizer: {tokenizer} \n\n')
 
     return model, tokenizer, config
@@ -179,11 +199,62 @@ if __name__ == '__main__':
 
 
     try:
-        print(f'\n\n[INFO] Dataset: {args.dataset_name}\n')
-        dataset = load_dataset(args.dataset_name)
-
+        print(f'\n\n[INFO] Dataset: {args.dataset_name}')
+        print(f'[INFO] Task: {DATASET_METADATA[args.dataset_name]["task"].value}')
         print(f'\n[INFO] space_token: {args.space_token}')
         print(f'[INFO] prepare_for_tokenization: {args.prepare_for_tokenization}\n')
+        # Hotfix: As currently (Wed 6 Jan 2021), the `prachathai67k` dataset can't be download directly with `datasets.load_dataset` method
+        if args.dataset_name == 'prachathai67k':
+        
+
+            import jsonlines
+            import zipfile
+
+            class DownloadProgressBar(tqdm):
+                def update_to(self, b=1, bsize=1, tsize=None):
+                    if tsize is not None:
+                        self.total = tsize
+                    self.update(b * bsize - self.n)
+                        
+            # 1. Download prachathai67k dataset from Internet Archive direct link
+
+            
+            download_dir = f'{CACHE_DIR}/prachathai67k'
+            out_zip_path = os.path.join(download_dir, 'data.zip')
+            out_dir = f'{CACHE_DIR}/prachathai67k/'                 
+            data_dir = f'{CACHE_DIR}/prachathai67k/data'  
+            
+            if not os.path.exists(out_zip_path):
+                os.makedirs(download_dir, exist_ok=True)
+                print(f'\n[INFO] Start downloading `prachathai67k` dataset.')
+                with DownloadProgressBar(unit='B', unit_scale=True,
+                                miniters=1, desc=DATASET_METADATA[args.dataset_name]['url'].split('/')[-1]) as t:
+                    urllib.request.urlretrieve(DATASET_METADATA[args.dataset_name]['url'], filename=out_zip_path, reporthook=t.update_to)
+                print(f'\n[INFO] Done.')
+
+                print(f'\n[INFO] Start extracting zipped file from {out_zip_path}')  
+                with zipfile.ZipFile(out_zip_path, 'r') as zip_ref:
+                    zip_ref.extractall(out_dir)
+                print(f'\n[INFO] Done.')
+
+            # 2. Read jsonlines object (`train.jsonl`, `val.jsonl`, and `test.jsonl`)
+            print(f'\n[INFO] Loading dataset from local files stored in `{data_dir}`.')
+            _dataset = dict()
+            for split_name in ['train', 'valid', 'test']:
+                with jsonlines.open(os.path.join(data_dir, f'{split_name}.jsonl')) as f:
+                    _dataset[split_name] = list(iter(f))
+
+            # 3. Convert list of objects into DataFrame
+            _dataset_df = { split_name: pd.DataFrame(_dataset[split_name]) for split_name in ['train', 'valid', 'test']}
+
+            # 4. Convert DataFrame into datasets.Dataset instance
+            dataset = { split_name: Dataset.from_pandas(_dataset_df[split_name]) for split_name in ['train', 'valid', 'test']}
+            dataset['validation'] = dataset.pop('valid') # rename key
+            print(f'dataset: {dataset}')
+            print(f'\nDone.')
+
+        else:
+            dataset = load_dataset(args.dataset_name)
 
         if args.tokenizer_type == 'sefr_cut':
             print(f'Apply `sefr_cut` tokenizer to the text inputs of {args.dataset_name} dataset')
@@ -206,16 +277,19 @@ if __name__ == '__main__':
         raise f"The tokenizer type `{args.tokenizer_type}`` is not supported"
     
     tokenizer_cls = TOKENIZER_CLS[args.tokenizer_type]
-
+    task = DATASET_METADATA[args.dataset_name]['task']
     
     model, tokenizer, config = init_model_tokenizer_for_seq_cls(args.model_dir,
                                                         tokenizer_cls,
                                                         args.tokenizer_dir,
+                                                        task=task,
                                                         num_labels=DATASET_METADATA[args.dataset_name]['num_labels'])
     if args.tokenizer_type == 'spm_camembert':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
-    dataset_split = { split_name: SequenceClassificationDataset.from_dataset(tokenizer,
+    dataset_split = { split_name: SequenceClassificationDataset.from_dataset(
+                        task,
+                        tokenizer,
                         dataset[split_name],
                         DATASET_METADATA[args.dataset_name]['text_input_col_name'],
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
