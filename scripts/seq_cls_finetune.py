@@ -31,7 +31,7 @@ from datasets import load_dataset, list_metrics, load_dataset, Dataset
 from thai2transformers.datasets import SequenceClassificationDataset
 from thai2transformers.metrics import classification_metrics, multilabel_classification_metrics
 from thai2transformers.finetuners import SequenceClassificationFinetuner
-from thai2transformers.models import RobertaForMultiLabelSequenceClassification
+from thai2transformers.auto import AutoModelForMultiLabelSequenceClassification
 from thai2transformers.tokenizers import (
     ThaiRobertaTokenizer,
     ThaiWordsNewmmTokenizer,
@@ -58,7 +58,6 @@ TOKENIZER_CLS = {
     'newmm': ThaiWordsNewmmTokenizer,
     'syllable': ThaiWordsSyllableTokenizer,
     'sefr_cut': FakeSefrCutTokenizer,
-    
 }
 
 DATASET_METADATA = {
@@ -113,7 +112,7 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, ta
             config=config,
         )
     if task == Task.MULTILABEL_CLS:
-        model = RobertaForMultiLabelSequenceClassification.from_pretrained(
+        model = AutoModelForMultiLabelSequenceClassification.from_pretrained(
             model_dir,
             config=config,
         )
