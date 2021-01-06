@@ -299,7 +299,7 @@ if __name__ == '__main__':
         raise e
 
     if args.tokenizer_type_or_public_model_name not in list(TOKENIZER_CLS.keys()) \
-       or args.tokenizer_type_or_public_model_name not in list(PUBLIC_MODEL.keys()):
+       and args.tokenizer_type_or_public_model_name not in list(PUBLIC_MODEL.keys()):
         raise f"The tokenizer type or public model name `{args.tokenizer_type_or_public_model_name}`` is not supported"
 
     if args.tokenizer_type_or_public_model_name in list(TOKENIZER_CLS.keys()):
