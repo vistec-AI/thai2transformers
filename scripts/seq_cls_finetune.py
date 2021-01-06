@@ -70,7 +70,10 @@ DATASET_METADATA = {
     'prachathai67k': {
         'task': 'multilabel_classification',
         'text_input_col_name': 'body_text',
-        'label_col_name': '..',
+        'label_col_name': ['politics', 'human_rights', 'quality_of_life',
+                           'international', 'social', 'environment',
+                           'economics', 'culture', 'labor',
+                           'national_security', 'ict', 'education'],
         'num_labels': 12
     }
 }
