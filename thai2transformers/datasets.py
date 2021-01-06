@@ -329,7 +329,7 @@ class SequenceClassificationDataset(Dataset):
                      bs=1000,
                      prepare_for_tokenization=True,
                      space_token='<_>',
-                     preprocess_fn=None):
+                     preprocessor=None):
         
         input_ids, attention_masks, labels = SequenceClassificationDataset._build_from_dataset(
                      task,
@@ -341,7 +341,7 @@ class SequenceClassificationDataset(Dataset):
                      bs=1000,
                      prepare_for_tokenization=True,
                      space_token=space_token,
-                     preprocess_fn=preprocess_fn)
+                     preprocessor=preprocessor)
 
         return cls(
             tokenizer=tokenizer,
@@ -351,7 +351,8 @@ class SequenceClassificationDataset(Dataset):
             input_ids=input_ids,
             attention_masks=attention_masks,
             labels=labels,
-            task=task
+            task=task,
+            preprocessor=preprocessor
         )
     
     @staticmethod
@@ -360,7 +361,7 @@ class SequenceClassificationDataset(Dataset):
                             space_token, max_length,
                             prepare_for_tokenization=True,
                             bs=1000,
-                            preprocess_fn=None):
+                            preprocessor=None):
         texts = get_dict_val(dataset, text_column_name)
         if task == Task.MULTICLASS_CLS:
             labels = get_dict_val(dataset, label_column_name)
@@ -379,8 +380,8 @@ class SequenceClassificationDataset(Dataset):
         if prepare_for_tokenization:
             texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text, space_token=space_token)[0], texts))
 
-        if type(preprocess_fn) == callable:
-            texts = list(map(preprocess_fn, texts))
+        if type(preprocessor) == callable:
+            texts = list(map(preprocessor, texts))
 
         for i in tqdm(range(math.ceil(len(texts) / bs))):
 
