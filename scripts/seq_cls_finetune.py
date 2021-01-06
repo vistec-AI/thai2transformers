@@ -212,7 +212,8 @@ if __name__ == '__main__':
     if args.tokenizer_type == 'spm_camembert':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
-    dataset_split = { split_name: SequenceClassificationDataset.from_dataset(tokenizer, dataset[split_name],
+    dataset_split = { split_name: SequenceClassificationDataset.from_dataset(tokenizer,
+                        dataset[split_name],
                         DATASET_METADATA[args.dataset_name]['text_input_col_name'],
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
                         max_length=args.max_seq_length - 2,
