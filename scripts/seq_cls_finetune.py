@@ -21,10 +21,11 @@ from transformers import (
     AutoConfig,
     Trainer, 
     TrainingArguments,
-    RobertaConfig,
     CamembertTokenizer,
     BertTokenizer,
-    XLMRobertaTokenizer
+    BertConfig,
+    XLMRobertaTokenizer,
+    XLMRobertaConfig,
 )
 
 from datasets import load_dataset, list_metrics, load_dataset, Dataset
@@ -50,9 +51,18 @@ METRICS = {
     Task.MULTILABEL_CLS: multilabel_classification_metrics
 }
 
+PUBLIC_MODEL = {
+    'mbert': {
+        'tokenizer': BertTokenizer('bert-base-multilingual-cased'),
+        'config': BertConfig('bert-base-multilingual-cased'),
+    },
+    'xlmr': {
+        'tokenizer': XLMRobertaTokenizer('xlm-mlm-100-1280'),
+        'config': XLMRobertaConfig('xlm-mlm-100-1280'),
+    },
+}
+
 TOKENIZER_CLS = {
-    'mbert': BertTokenizer,
-    'xlmr': XLMRobertaTokenizer,
     'spm_camembert': CamembertTokenizer,
     'spm': ThaiRobertaTokenizer,
     'newmm': ThaiWordsNewmmTokenizer,
@@ -95,6 +105,19 @@ DATASET_METADATA = {
     }
 }
 
+def init_public_model_tokenizer_for_seq_cls(public_model_name, task, num_labels):
+    
+    config = AutoConfig.from_pretrained(public_model_name, num_labels=num_labels)
+    tokenizer = AutoTokenizer.from_pretrained(public_model_name)
+    if task == Task.MULTICLASS_CLS:
+        model = AutoModelForSequenceClassification.from_config(config=config)
+    if task == Task.MULTILABEL_CLS:
+        model = AutoModelForMultiLabelSequenceClassification.from_config(config=config)
+
+    print(f'\n[INFO] Model architecture: {model} \n\n')
+    print(f'\n[INFO] tokenizer: {tokenizer} \n\n')
+
+    return model, tokenizer, config
 
 def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, task, num_labels):
     
@@ -170,6 +193,8 @@ if __name__ == '__main__':
 
     parser.add_argument('tokenizer_type_or_public_model_name', type=str, help='The type token model used. Specify the name of tokenizer either `spm`, `newmm`, `syllable`, or `sefr_cut`.')
     parser.add_argument('dataset_name', help='Specify the dataset name to finetune. Currently, sequence classification datasets include `wisesight_sentiment`, `generated_reviews_enth` and`wongnai_reviews`.')
+    parser.add_argument('--model_dir', type=str)
+    parser.add_argument('--tokenizer_dir', type=str)
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
     parser.add_argument('--space_token', type=str, default='<_>', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
     parser.add_argument('--max_seq_length', type=int, default=512)
@@ -256,7 +281,7 @@ if __name__ == '__main__':
         else:
             dataset = load_dataset(args.dataset_name)
 
-        if args.tokenizer_type == 'sefr_cut':
+        if args.tokenizer_type_or_public_model_name == 'sefr_cut':
             print(f'Apply `sefr_cut` tokenizer to the text inputs of {args.dataset_name} dataset')
             import sefr_cut
             sefr_cut.load_model('best')
@@ -269,22 +294,29 @@ if __name__ == '__main__':
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
                                         text_input_col_name: '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch, text_input_col_name).split()) ]) 
                                     }, batched=False, batch_size=1)
-            
     except Exception as e:
         raise e
 
-    if args.tokenizer_type not in list(TOKENIZER_CLS.keys()):
-        raise f"The tokenizer type `{args.tokenizer_type}`` is not supported"
-    
-    tokenizer_cls = TOKENIZER_CLS[args.tokenizer_type]
+    if args.tokenizer_type_or_public_model_name not in list(TOKENIZER_CLS.keys()) \
+       or args.tokenizer_type_or_public_model_name not in list(PUBLIC_MODEL.keys()):
+        raise f"The tokenizer type or public model name `{args.tokenizer_type_or_public_model_name}`` is not supported"
+
+    if args.tokenizer_type_or_public_model_name in list(TOKENIZER_CLS.keys()):
+        tokenizer_cls = TOKENIZER_CLS[args.tokenizer_type_or_public_model_name]
+
     task = DATASET_METADATA[args.dataset_name]['task']
     
-    model, tokenizer, config = init_model_tokenizer_for_seq_cls(args.model_dir,
-                                                        tokenizer_cls,
-                                                        args.tokenizer_dir,
-                                                        task=task,
-                                                        num_labels=DATASET_METADATA[args.dataset_name]['num_labels'])
-    if args.tokenizer_type == 'spm_camembert':
+    if args.tokenizer_type_or_public_model_name in PUBLIC_MODEL.keys():
+        model, tokenizer, config = init_public_model_tokenizer_for_seq_cls(args.tokenizer_type_or_public_model_name,
+                                                            task=task,
+                                                            num_labels=DATASET_METADATA[args.dataset_name]['num_labels'])
+    else:
+        model, tokenizer, config = init_model_tokenizer_for_seq_cls(args.model_dir,
+                                                            tokenizer_cls,
+                                                            args.tokenizer_dir,
+                                                            task=task,
+                                                            num_labels=DATASET_METADATA[args.dataset_name]['num_labels'])
+    if args.tokenizer_type_or_public_model_name == 'spm_camembert':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
     print('\n[INFO] Preprocess and tokenizing texts in datasets')
