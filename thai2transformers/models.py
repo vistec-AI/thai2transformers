@@ -25,12 +25,14 @@ from transformers.modeling_outputs import (
 from transformers.modeling_bert import (
     BertPreTrainedModel,
     BertModel,
+    BertConfig,
     BertClassificationHead
 )
 
 from transformers.modeling_roberta import (
     RobertaPreTrainedModel,
     RobertaModel,
+    RobertaConfig,
     RobertaClassificationHead
 )
 
