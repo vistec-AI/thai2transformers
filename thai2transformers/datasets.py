@@ -314,7 +314,7 @@ class SequenceClassificationDataset(Dataset):
             return {
                 "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
                 "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
-                "label_ids": torch.tensor(self.labels[i], dtype=torch.long),
+                "label_ids": torch.tensor([self.labels[i]], dtype=torch.long),
             }
         else:
             raise NotImplementedError
