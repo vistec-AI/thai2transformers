@@ -53,12 +53,12 @@ METRICS = {
 
 PUBLIC_MODEL = {
     'mbert': {
-        'tokenizer': BertTokenizer('bert-base-multilingual-cased'),
-        'config': BertConfig('bert-base-multilingual-cased'),
+        'tokenizer': BertTokenizer.from_pretrained('bert-base-multilingual-cased'),
+        'config': BertConfig.from_pretrained('bert-base-multilingual-cased'),
     },
     'xlmr': {
-        'tokenizer': XLMRobertaTokenizer('xlm-mlm-100-1280'),
-        'config': XLMRobertaConfig('xlm-mlm-100-1280'),
+        'tokenizer': XLMRobertaTokenizer.from_pretrained('xlm-mlm-100-1280'),
+        'config': XLMRobertaConfig.from_pretrained('xlm-mlm-100-1280'),
     },
 }
 
@@ -107,8 +107,8 @@ DATASET_METADATA = {
 
 def init_public_model_tokenizer_for_seq_cls(public_model_name, task, num_labels):
     
-    config = AutoConfig.from_pretrained(public_model_name, num_labels=num_labels)
-    tokenizer = AutoTokenizer.from_pretrained(public_model_name)
+    config = PUBLIC_MODEL[public_model_name]['config']
+    tokenizer = PUBLIC_MODEL[public_model_name]['tokenzier']
     if task == Task.MULTICLASS_CLS:
         model = AutoModelForSequenceClassification.from_config(config=config)
     if task == Task.MULTILABEL_CLS:
