@@ -318,6 +318,7 @@ class SequenceClassificationDataset(Dataset):
             }
         else:
             raise NotImplementedError
+
     @classmethod
     def from_dataset(cls,
                      task,
@@ -337,8 +338,8 @@ class SequenceClassificationDataset(Dataset):
                      dataset,
                      text_column_name,
                      label_column_name,
-                     max_length=128,
-                     bs=1000,
+                     max_length=max_length,
+                     bs=bs,
                      prepare_for_tokenization=prepare_for_tokenization,
                      space_token=space_token,
                      preprocessor=preprocessor)
@@ -358,9 +359,8 @@ class SequenceClassificationDataset(Dataset):
     @staticmethod
     def _build_from_dataset(task, tokenizer, dataset,
                             text_column_name, label_column_name,
-                            space_token, max_length,
+                            space_token, max_length, bs,
                             prepare_for_tokenization,
-                            bs=1000,
                             preprocessor=None):
         texts = get_dict_val(dataset, text_column_name)
         if task == Task.MULTICLASS_CLS:
