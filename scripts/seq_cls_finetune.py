@@ -55,10 +55,12 @@ METRICS = {
 
 PUBLIC_MODEL = {
     'mbert': {
+        'name': 'bert-base-multilingual-cased',
         'tokenizer': BertTokenizerFast.from_pretrained('bert-base-multilingual-cased'),
         'config': BertConfig.from_pretrained('bert-base-multilingual-cased'),
     },
     'xlmr': {
+        'name': 'xlm-roberta-base',
         'tokenizer': XLMRobertaTokenizerFast.from_pretrained('xlm-roberta-base'),
         'config': XLMRobertaConfig.from_pretrained('xlm-roberta-base'),
     },
@@ -112,11 +114,12 @@ def init_public_model_tokenizer_for_seq_cls(public_model_name, task, num_labels)
     config = PUBLIC_MODEL[public_model_name]['config']
     config.num_labels = num_labels
     tokenizer = PUBLIC_MODEL[public_model_name]['tokenizer']
+    model_name = PUBLIC_MODEL[public_model_name]['name']
     if task == Task.MULTICLASS_CLS:
-        model = AutoModelForSequenceClassification.from_pretrained(public_model_name,
+        model = AutoModelForSequenceClassification.from_pretrained(model_name,
                                                                    config=config)
     if task == Task.MULTILABEL_CLS:
-        model = AutoModelForMultiLabelSequenceClassification.from_pretrained(public_model_name,
+        model = AutoModelForMultiLabelSequenceClassification.from_pretrained(model_name,
                                                                              config=config)
 
     print(f'\n[INFO] Model architecture: {model} \n\n')
