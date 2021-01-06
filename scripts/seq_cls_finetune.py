@@ -57,8 +57,8 @@ PUBLIC_MODEL = {
         'config': BertConfig.from_pretrained('bert-base-multilingual-cased'),
     },
     'xlmr': {
-        'tokenizer': XLMRobertaTokenizer.from_pretrained('xlm-mlm-100-1280'),
-        'config': XLMRobertaConfig.from_pretrained('xlm-mlm-100-1280'),
+        'tokenizer': XLMRobertaTokenizer.from_pretrained('xlm-roberta-base'),
+        'config': XLMRobertaConfig.from_pretrained('xlm-roberta-base'),
     },
 }
 
