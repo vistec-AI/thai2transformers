@@ -108,6 +108,7 @@ DATASET_METADATA = {
 def init_public_model_tokenizer_for_seq_cls(public_model_name, task, num_labels):
     
     config = PUBLIC_MODEL[public_model_name]['config']
+    config.num_labels = num_labels
     tokenizer = PUBLIC_MODEL[public_model_name]['tokenizer']
     if task == Task.MULTICLASS_CLS:
         model = AutoModelForSequenceClassification.from_config(config=config)
