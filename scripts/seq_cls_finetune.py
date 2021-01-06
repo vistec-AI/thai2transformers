@@ -190,9 +190,12 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-
+    # Required
     parser.add_argument('tokenizer_type_or_public_model_name', type=str, help='The type token model used. Specify the name of tokenizer either `spm`, `newmm`, `syllable`, or `sefr_cut`.')
     parser.add_argument('dataset_name', help='Specify the dataset name to finetune. Currently, sequence classification datasets include `wisesight_sentiment`, `generated_reviews_enth` and`wongnai_reviews`.')
+    parser.add_argument('output_dir', type=str)
+    parser.add_argument('log_dir', type=str)
+
     parser.add_argument('--model_dir', type=str)
     parser.add_argument('--tokenizer_dir', type=str)
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
@@ -200,8 +203,6 @@ if __name__ == '__main__':
     parser.add_argument('--max_seq_length', type=int, default=512)
 
     # Finetuning
-    parser.add_argument('output_dir', type=str)
-    parser.add_argument('log_dir', type=str)
     parser.add_argument('--num_train_epochs', type=int, default=1)
     parser.add_argument('--learning_rate', type=float, default=1e-05)
     parser.add_argument('--weight_decay', type=float, default=0.1)
