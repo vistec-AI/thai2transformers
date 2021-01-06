@@ -274,15 +274,15 @@ if __name__ == '__main__':
             # 2. Read jsonlines object (`train.jsonl`, `val.jsonl`, and `test.jsonl`)
             print(f'\n[INFO] Loading dataset from local files stored in `{data_dir}`.')
             _dataset = dict()
-            for split_name in ['train', 'valid', 'test']:
+            for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
                 with jsonlines.open(os.path.join(data_dir, f'{split_name}.jsonl')) as f:
                     _dataset[split_name] = list(iter(f))
 
             # 3. Convert list of objects into DataFrame
-            _dataset_df = { split_name: pd.DataFrame(_dataset[split_name]) for split_name in ['train', 'valid', 'test']}
+            _dataset_df = { split_name: pd.DataFrame(_dataset[split_name]) for split_name in DATASET_METADATA[args.dataset_name]['split_names']}
 
             # 4. Convert DataFrame into datasets.Dataset instance
-            dataset = { split_name: Dataset.from_pandas(_dataset_df[split_name]) for split_name in ['train', 'valid', 'test']}
+            dataset = { split_name: Dataset.from_pandas(_dataset_df[split_name]) for split_name in DATASET_METADATA[args.dataset_name]['split_names']}
             dataset['validation'] = dataset.pop('valid') # rename key
             print(f'dataset: {dataset}')
             print(f'\nDone.')
@@ -298,7 +298,7 @@ if __name__ == '__main__':
             
             text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
 
-            for split_name in ['train', 'validation', 'test']:
+            for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
 
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
                                         text_input_col_name: '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch, text_input_col_name).split()) ]) 
@@ -338,7 +338,7 @@ if __name__ == '__main__':
                         max_length= args.max_seq_length if args.max_seq_length else config.max_position_embeddings,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
-                        preprocessor=process_transformers) for split_name in ['train', 'validation', 'test']
+                        preprocessor=process_transformers) for DATASET_METADATA[args.dataset_name]['split_names']
                     }
     print('[INFO] Done.')
         
@@ -360,7 +360,7 @@ if __name__ == '__main__':
     trainer, training_args = init_trainer(task=task,
                                 model=model,
                                 train_dataset=dataset_split['train'],
-                                val_dataset=dataset_split['validation'],
+                                val_dataset=dataset_split['validation'] if 'validation' in DATASET_METADATA[args.dataset_name]['split_names'] else None,
                                 warmup_steps=warmup_steps,
                                 args=args)
 
