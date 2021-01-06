@@ -365,7 +365,6 @@ class SequenceClassificationDataset(Dataset):
                 # print(name)
                 _labels.append(get_dict_val(dataset, name))
             labels = list(zip(*_labels))
-            print(f'[DEBUG]: labels {labels}')
         else:
             raise NotImplementedError
 
