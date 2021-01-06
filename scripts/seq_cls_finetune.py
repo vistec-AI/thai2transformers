@@ -335,7 +335,7 @@ if __name__ == '__main__':
                         dataset[split_name],
                         DATASET_METADATA[args.dataset_name]['text_input_col_name'],
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
-                        max_length=args.max_seq_length - 2,
+                        max_length=args.max_seq_length,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
                         preprocessor=process_transformers) for split_name in ['train', 'validation', 'test']
