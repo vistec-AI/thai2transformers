@@ -23,8 +23,10 @@ from transformers import (
     TrainingArguments,
     CamembertTokenizer,
     BertTokenizer,
+    BertTokenizerFast,
     BertConfig,
     XLMRobertaTokenizer,
+    XLMRobertaTokenizerFast,
     XLMRobertaConfig,
 )
 
@@ -53,11 +55,11 @@ METRICS = {
 
 PUBLIC_MODEL = {
     'mbert': {
-        'tokenizer': BertTokenizer.from_pretrained('bert-base-multilingual-cased'),
+        'tokenizer': BertTokenizerFast.from_pretrained('bert-base-multilingual-cased'),
         'config': BertConfig.from_pretrained('bert-base-multilingual-cased'),
     },
     'xlmr': {
-        'tokenizer': XLMRobertaTokenizer.from_pretrained('xlm-roberta-base'),
+        'tokenizer': XLMRobertaTokenizerFast.from_pretrained('xlm-roberta-base'),
         'config': XLMRobertaConfig.from_pretrained('xlm-roberta-base'),
     },
 }
