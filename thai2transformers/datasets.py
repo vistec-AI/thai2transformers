@@ -348,7 +348,8 @@ class SequenceClassificationDataset(Dataset):
             bs=bs,
             input_ids=input_ids,
             attention_masks=attention_masks,
-            labels=labels
+            labels=labels,
+            task=task
         )
     
     @staticmethod
