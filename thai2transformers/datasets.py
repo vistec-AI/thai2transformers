@@ -356,9 +356,9 @@ class SequenceClassificationDataset(Dataset):
                             text_column_name, label_column_name,
                             space_token, max_length, prepare_for_tokenization=True, bs=1000):
         texts = get_dict_val(dataset, text_column_name)
-        if self.task == Task.MULTICLASS_CLS:
+        if task == Task.MULTICLASS_CLS:
             labels = get_dict_val(dataset, label_column_name)
-        elif self.task == Task.MULTILABEL_CLS:
+        elif task == Task.MULTILABEL_CLS:
             _labels = []
             for i, name in enumerate(label_column_name):
                 # print(name)
