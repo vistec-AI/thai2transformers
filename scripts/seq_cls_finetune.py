@@ -97,49 +97,35 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, nu
 
     return model, tokenizer, config
 
-def init_trainer(model, train_dataset, val_dataset,
-                 output_dir, log_dir,
-                 num_train_epochs=1,
-                 learning_rate=1e-05,
-                 weight_decay=0.1,
-                 warmup_steps=0,
-                 batch_size=16,
-                 eval_steps=250,
-                 no_cuda=True,
-                 save_steps=500,
-                 seed=2020,
-                 logging_steps=10,
-                 greater_is_better=False,
-                 fp16=False,
-                 metric_for_best_model='eval_loss'):
+def init_trainer(model, train_dataset, val_dataset, warmup_steps, args): 
         
     training_args = TrainingArguments(
-                        num_train_epochs=num_train_epochs,
-                        per_device_train_batch_size=batch_size,
-                        per_device_eval_batch_size=batch_size,
-                        gradient_accumulation_steps=1,
-                        learning_rate=learning_rate,
+                        num_train_epochs=args.num_train_epochs,
+                        per_device_train_batch_size=args.batch_size,
+                        per_device_eval_batch_size=args.batch_size,
+                        gradient_accumulation_steps=args.gradient_accumulation_steps,
+                        learning_rate=args.learning_rate,
                         warmup_steps=warmup_steps,
-                        weight_decay=weight_decay,
-                        adam_epsilon=1e-08,
-                        max_grad_norm=1.0,
+                        weight_decay=args.weight_decay,
+                        adam_epsilon=args.adam_epsilon,
+                        max_grad_norm=args.max_grad_norm,
                         #checkpoint
-                        output_dir=output_dir,
+                        output_dir=args.output_dir,
                         overwrite_output_dir=True,
                         #logs
-                        logging_dir=log_dir,
+                        logging_dir=args.log_dir,
                         logging_first_step=True,
-                        logging_steps=logging_steps,
+                        logging_steps=args.logging_steps,
                         #eval
                         evaluation_strategy='steps',
-                        eval_steps=eval_steps,
+                        eval_steps=args.eval_steps,
                         #others
-                        seed=seed,
-                        fp16=fp16,
-                        fp16_opt_level="O1",
+                        seed=args.seed,
+                        fp16=args.fp16,
+                        fp16_opt_level=args.fp16_opt_level,
                         dataloader_drop_last=True,
-                        no_cuda=no_cuda,
-                        metric_for_best_model=metric_for_best_model,
+                        no_cuda=args.no_cuda,
+                        metric_for_best_model=args.metric_for_best_model,
                         prediction_loss_only=False
                     )
 
@@ -249,15 +235,8 @@ if __name__ == '__main__':
     trainer, training_args = init_trainer(model=model,
                                 train_dataset=dataset_split['train'],
                                 val_dataset=dataset_split['validation'],
-                                output_dir=args.output_dir,
-                                log_dir=args.log_dir,
-                                num_train_epochs=args.num_train_epochs,
-                                learning_rate=args.learning_rate,
-                                weight_decay=args.weight_decay,
                                 warmup_steps=warmup_steps,
-                                batch_size=args.batch_size,
-                                no_cuda=args.no_cuda,
-                                fp16=args.fp16)
+                                args=args)
 
     print('[INFO] TrainingArguments:')
     print(training_args)
