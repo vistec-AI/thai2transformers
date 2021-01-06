@@ -25,8 +25,7 @@ from transformers.modeling_outputs import (
 from transformers.modeling_bert import (
     BertPreTrainedModel,
     BertModel,
-    BertConfig,
-    BertClassificationHead
+    BertConfig
 )
 
 from transformers.modeling_roberta import (
