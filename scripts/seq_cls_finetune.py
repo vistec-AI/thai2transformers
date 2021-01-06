@@ -276,7 +276,7 @@ if __name__ == '__main__':
             _dataset = dict()
             for split_name in ['train', 'valid', 'test']:
                 with jsonlines.open(os.path.join(data_dir, f'{split_name}.jsonl')) as f:
-                    _dataset[split_name] = list(iter(f))[:1000]
+                    _dataset[split_name] = list(iter(f))
 
             # 3. Convert list of objects into DataFrame
             _dataset_df = { split_name: pd.DataFrame(_dataset[split_name]) for split_name in ['train', 'valid', 'test']}
