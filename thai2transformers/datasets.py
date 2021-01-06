@@ -310,6 +310,7 @@ class SequenceClassificationDataset(Dataset):
 
     @classmethod
     def from_dataset(cls,
+                     task,
                      tokenizer,
                      dataset,
                      text_column_name,
@@ -319,7 +320,9 @@ class SequenceClassificationDataset(Dataset):
                      prepare_for_tokenization=True,
                      space_token='<_>'):
         
-        input_ids, attention_masks, labels = SequenceClassificationDataset._build_from_dataset(tokenizer,
+        input_ids, attention_masks, labels = SequenceClassificationDataset._build_from_dataset(
+                     task,
+                     tokenizer,
                      dataset,
                      text_column_name,
                      label_column_name,
@@ -339,11 +342,21 @@ class SequenceClassificationDataset(Dataset):
         )
     
     @staticmethod
-    def _build_from_dataset(tokenizer, dataset,
+    def _build_from_dataset(task, tokenizer, dataset,
                             text_column_name, label_column_name,
                             space_token, max_length, prepare_for_tokenization=True, bs=1000):
         texts = get_dict_val(dataset, text_column_name)
-        labels = get_dict_val(dataset, label_column_name)
+        if task.value == 'multiclass_classification':
+            labels = get_dict_val(dataset, label_column_name)
+        elif task.value == 'multilabel_classification':
+            _labels = []
+            for i, name in enumerate(label_column_name):
+                # print(name)
+                _labels.append(get_dict_val(dataset, name))
+            labels = list(zip(*_labels))
+        else:
+            raise NotImplementedError
+
         input_ids = []
         attention_masks = []
 
