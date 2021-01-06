@@ -304,12 +304,20 @@ class SequenceClassificationDataset(Dataset):
         return len(self.labels)
 
     def __getitem__(self, i):
-        return {
-            "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
-            "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
-            "label": torch.tensor(self.labels[i], dtype=torch.long),
-        }
-
+        if self.task == Task.MULTICLASS_CLS:
+            return {
+                "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
+                "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
+                "label": torch.tensor(self.labels[i], dtype=torch.long),
+            }
+        elif self.task == Task.MULTILABEL_CLS:
+            return {
+                "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
+                "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
+                "label_ids": torch.tensor(self.labels[i], dtype=torch.long),
+            }
+        else:
+            raise NotImplementedError
     @classmethod
     def from_dataset(cls,
                      task,
