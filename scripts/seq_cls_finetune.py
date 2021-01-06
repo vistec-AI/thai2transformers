@@ -138,7 +138,7 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args):
                         overwrite_output_dir=True,
                         #logs
                         logging_dir=args.log_dir,
-                        logging_first_step=True,
+                        logging_first_step=False,
                         logging_steps=args.logging_steps,
                         #eval
                         evaluation_strategy='steps',
