@@ -338,7 +338,7 @@ if __name__ == '__main__':
                         max_length= args.max_seq_length if args.max_seq_length else config.max_position_embeddings,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
-                        preprocessor=process_transformers) for DATASET_METADATA[args.dataset_name]['split_names']
+                        preprocessor=process_transformers) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
                     }
     print('[INFO] Done.')
         
