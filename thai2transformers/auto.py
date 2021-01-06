@@ -63,7 +63,7 @@ class AutoModelForMultiLabelSequenceClassification:
             "Model type should be one of {}.".format(
                 config.__class__,
                 cls.__name__,
-                ", ".join(c.__name__ for c in MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING.keys()),
+                ", ".join(c.__name__ for c in MODEL_FOR_MULTI_LABEL_SEQUENCE_CLASSIFICATION_MAPPING.keys()),
             )
         )
 
