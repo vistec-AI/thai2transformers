@@ -287,6 +287,11 @@ if __name__ == '__main__':
     if args.tokenizer_type == 'spm_camembert':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
+    print('\n[INFO] Preprocess texts in datasets')
+    # 
+    print('[INFO] Done.')
+
+    print('\n[INFO] Tokenizing texts in datasets')
     dataset_split = { split_name: SequenceClassificationDataset.from_dataset(
                         task,
                         tokenizer,
@@ -297,11 +302,11 @@ if __name__ == '__main__':
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization) for split_name in ['train', 'validation', 'test']
                     }
-
+    print('[INFO] Done.')
         
     warmup_steps = math.ceil(len(dataset_split['train']) / args.batch_size * args.warmup_ratio * args.num_train_epochs)
 
-    print(f'[INFO] Number of train examples = {len(dataset["train"])}')
+    print(f'\n[INFO] Number of train examples = {len(dataset["train"])}')
     print(f'[INFO] Number of validation examples = {len(dataset["validation"])}')
     print(f'[INFO] Number of batches per epoch (training set) = {math.ceil(len(dataset_split["train"]) / args.batch_size)}')
     print(f'[INFO] Number of batches per epoch (validation set) = {math.ceil(len(dataset_split["validation"]))}')
