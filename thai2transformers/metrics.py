@@ -18,10 +18,10 @@ def classification_metrics(pred, pred_labs=False):
         'nb_samples': len(labels)
     }
 
-def multilabel_classification_metrics(pred, pred_labs=False):
+def multilabel_classification_metrics(pred, pred_labs=False, threshold=0.5):
 
     labels = pred.label_ids
-    preds = np.array(pred.predictions >= 0.5)
+    preds = np.array(pred.predictions >= threshold)
     precision_macro, recall_macro, f1_macro, _ = precision_recall_fscore_support(labels, preds, average='macro')
     precision_micro, recall_micro, f1_micro, _ = precision_recall_fscore_support(labels, preds, average='micro')
     acc = accuracy_score(labels, preds)
