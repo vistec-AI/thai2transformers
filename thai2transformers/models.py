@@ -41,7 +41,7 @@ from transformers.modeling_xlmroberta import (
 MODEL_FOR_MULTI_LABEL_SEQUENCE_CLASSIFICATION_MAPPING = OrderedDict(
     [
         (XLMRobertaConfig, XLMRobertaForMultiLabelSequenceClassification),
-        (BartConfig, BartForMultiLabelSequenceClassification),        
+        (BertConfig, BertForMultiLabelSequenceClassification),        
         (RobertaConfig, RobertaForMultiLabelSequenceClassification),
     ]
 )
