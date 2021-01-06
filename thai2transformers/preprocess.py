@@ -227,7 +227,7 @@ def process_transformers(
     ],
     tok_func: Callable = word_tokenize,
     post_rules: Collection[Callable] = [ungroup_emoji, replace_wrep_post],
-):
+) -> str:
     text = text.lower()
     for rule in pre_rules:
         text = rule(text)
