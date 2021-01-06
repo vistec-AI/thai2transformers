@@ -75,7 +75,7 @@ class RobertaForMultiLabelSequenceClassification(RobertaPreTrainedModel):
         if labels is not None:
             if self.num_labels > 1:
                 loss_fct = torch.nn.BCEWithLogitsLoss()
-                loss = loss_fct(logits(self.num_labels), labels)
+                loss = loss_fct(logits, labels)
 
         if not return_dict:
             output = (logits,) + outputs[2:]
