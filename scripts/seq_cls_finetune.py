@@ -347,7 +347,7 @@ if __name__ == '__main__':
     print(f'\n[INFO] Number of train examples = {len(dataset["train"])}')
     print(f'[INFO] Number of batches per epoch (training set) = {math.ceil(len(dataset_split["train"]) / args.batch_size)}')
 
-    if 'validation' in DATASET_METADATA[args.dataset_name]['split_names']
+    if 'validation' in DATASET_METADATA[args.dataset_name]['split_names']:
         print(f'[INFO] Number of validation examples = {len(dataset["validation"])}')
         print(f'[INFO] Number of batches per epoch (validation set) = {math.ceil(len(dataset_split["validation"]))}')
     print(f'[INFO] Warmup ratio = {args.warmup_ratio}')
