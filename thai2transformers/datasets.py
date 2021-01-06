@@ -13,7 +13,7 @@ from filelock import FileLock
 import logging, time
 from typing import Optional
 import joblib
-from utils import get_dict_val
+from .utils import get_dict_val
 nb_cores = multiprocessing.cpu_count()
 
 @contextmanager
