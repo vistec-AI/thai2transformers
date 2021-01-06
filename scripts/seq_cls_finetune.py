@@ -299,8 +299,8 @@ if __name__ == '__main__':
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
                         max_length=args.max_seq_length - 2,
                         space_token=args.space_token,
-                        prepare_for_tokenization=args.prepare_for_tokenization) for split_name in ['train', 'validation', 'test'],
-                        preprocess_fn=process_transformers
+                        prepare_for_tokenization=args.prepare_for_tokenization,
+                        preprocessor=process_transformers) for split_name in ['train', 'validation', 'test']
                     }
     print('[INFO] Done.')
         
