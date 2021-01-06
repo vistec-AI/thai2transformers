@@ -173,7 +173,7 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args):
                         logging_first_step=False,
                         logging_steps=args.logging_steps,
                         #eval
-                        evaluation_strategy='steps',
+                        evaluation_strategy='steps' if 'validation' in DATASET_METADATA[args.dataset_name]['split_names'] else 'no',
                         eval_steps=args.eval_steps,
                         #others
                         seed=args.seed,
