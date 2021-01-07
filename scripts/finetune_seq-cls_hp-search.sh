@@ -9,12 +9,6 @@ SPACE_TOKEN=$8
 
 OPTIONAL_ARGS=$8
 
-echo "Pretrained model name: ${MODEL_NAME}"
-echo "Type of token: ${TOKENIZER_TYPE}"
-echo "Model directory: ${MODEL_DIR}"
-echo "Tokenizer directory: ${TOKENIZER_DIR}"
-echo "Dataset: ${DATASET}" 
-echo ""
 for N_EPOCHS in 1 3 5
 do
 	for BATCH_SIZE in 16 32
@@ -23,16 +17,25 @@ do
 		do 
 			for WARMUP_RATIO in 0.06 0.1
 			do
-				echo ""
-				echo "#N epochs: ${N_EPOCHS}"
-				echo "Batch size: ${BATCH_SIZE}"
-				echo "Learning rate: ${LR}"
-				echo "Warmup ratio: ${WARMUP_RATIO}"
+				
 
 				EXP_ID="${EXP_NAME}_n-epochs=${N_EPOCHS}_bz=${BATCH_SIZE}_lr=${LR}_warmup-ratio=${WARMUP_RATIO}"
 				OUTPUT_DIR="../checkpoints/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}"
 				TF_LOG_DIR="../checkpoints/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/tf_log"
 				TRAINER_OUTPUT_LOG_PATH"../checkpoints/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/output_log/trainer.log"
+
+				echo "Pretrained model name: ${MODEL_NAME}" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "Type of token: ${TOKENIZER_TYPE}" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "Model directory: ${MODEL_DIR}" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "Tokenizer directory: ${TOKENIZER_DIR}" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "Dataset: ${DATASET}" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "" |& tee -a TRAINER_OUTPUT_LOG_PATH
+
+				echo "" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "#N epochs: ${N_EPOCHS}" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "Batch size: ${BATCH_SIZE}" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "Learning rate: ${LR}" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "Warmup ratio: ${WARMUP_RATIO}" |& tee -a TRAINER_OUTPUT_LOG_PATH
 
 				python ./seq_cls_finetune.py \
 				$TOKENIZER_TYPE \
