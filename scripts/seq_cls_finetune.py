@@ -394,4 +394,7 @@ if __name__ == '__main__':
         print(f'{key} : {value:.4f}')
         if 'test_' in key:
             wandb.run.summary[key] = value
-    print('Done.\n')
+    print('[INFO] Done.\n')
+    print('[INDO] Begin savining last checkpoint.')
+    trainer.save_model(os.path.join(args.output_dir, 'checkpoint-final'))
+    print('[INFO] Done.\n')
