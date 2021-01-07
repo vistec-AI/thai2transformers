@@ -251,9 +251,15 @@ if __name__ == '__main__':
         print(f'[INFO] Task: {DATASET_METADATA[args.dataset_name]["task"].value}')
         print(f'\n[INFO] space_token: {args.space_token}')
         print(f'[INFO] prepare_for_tokenization: {args.prepare_for_tokenization}\n')
-        # Hotfix: As currently (Wed 6 Jan 2021), the `prachathai67k` dataset can't be download directly with `datasets.load_dataset` method
-        if args.dataset_name == 'prachathai67k':
-        
+
+        if args.dataset_name == 'wongnai_reviews':
+            dataset = load_dataset(args.dataset_name)
+            train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=args.seed)
+            dataset['train'] = train_val_split['train']
+            dataset['validation'] = train_val_split['test']
+
+        elif args.dataset_name == 'prachathai67k':
+            # Hotfix: As currently (Wed 6 Jan 2021), the `prachathai67k` dataset can't be download directly with `datasets.load_dataset` method
 
             import jsonlines
             import zipfile
@@ -266,7 +272,6 @@ if __name__ == '__main__':
                         
             # 1. Download prachathai67k dataset from Internet Archive direct link
 
-            
             download_dir = f'{CACHE_DIR}/prachathai67k'
             out_zip_path = os.path.join(download_dir, 'data.zip')
             out_dir = f'{CACHE_DIR}/prachathai67k/'                 
