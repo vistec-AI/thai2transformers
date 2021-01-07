@@ -258,7 +258,6 @@ if __name__ == '__main__':
             train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=args.seed)
             dataset['train'] = train_val_split['train']
             dataset['validation'] = train_val_split['test']
-
         elif args.dataset_name == 'prachathai67k':
             # Hotfix: As currently (Wed 6 Jan 2021), the `prachathai67k` dataset can't be download directly with `datasets.load_dataset` method
 
@@ -306,7 +305,6 @@ if __name__ == '__main__':
             dataset['validation'] = dataset.pop('valid') # rename key
             print(f'dataset: {dataset}')
             print(f'\nDone.')
-
         else:
             dataset = load_dataset(args.dataset_name)
 
