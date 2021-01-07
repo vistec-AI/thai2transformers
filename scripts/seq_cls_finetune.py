@@ -45,7 +45,6 @@ from thai2transformers.utils import get_dict_val
 from thai2transformers.conf import Task
 from thai2transformers.preprocess import process_transformers
 
-
 CACHE_DIR = f'{str(Path.home())}/.cache/huggingface_datasets'
 
 METRICS = {
@@ -381,9 +380,11 @@ if __name__ == '__main__':
 
 
     print('\nBegin model evaluation on test set.')
-    result = trainer.evaluate(eval_dataset=dataset_split['test'])
+    result = trainer.evaluate(
+                eval_dataset=dataset_split['test'],
+                metric_key_prefix='test')
     print(f'Evaluation on test set (dataset: {args.dataset_name})')    
+    
     for key, value in result.items():
         print(f'{key} : {value:.4f}')
-
     print('Done.\n')
