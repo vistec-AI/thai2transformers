@@ -350,7 +350,7 @@ if __name__ == '__main__':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
     print('\n[INFO] Preprocess and tokenizing texts in datasets')
-    max_length = args.max_seq_length if args.max_seq_length else config.max_position_embeddings,
+    max_length = args.max_seq_length if args.max_seq_length else config.max_position_embeddings
     print(f'[INFO] max_length = {max_length} \n')
     
     dataset_split = { split_name: SequenceClassificationDataset.from_dataset(
