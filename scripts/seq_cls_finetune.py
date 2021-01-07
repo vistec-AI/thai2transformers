@@ -180,7 +180,6 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args):
                         #eval
                         evaluation_strategy='epoch' if 'validation' in DATASET_METADATA[args.dataset_name]['split_names'] else 'no',
                         load_best_model_at_end=True,
-                        # eval_steps=args.eval_steps,
                         #others
                         seed=args.seed,
                         fp16=args.fp16,
@@ -227,9 +226,7 @@ if __name__ == '__main__':
     parser.add_argument('--fp16', action='store_true', default=False)
     parser.add_argument('--greater_is_better', action='store_true', default=True)
     parser.add_argument('--metric_for_best_model', type=str, default='f1_micro')
-    # parser.add_argument('--eval_steps', type=int, default=250)
     parser.add_argument('--logging_steps', type=int, default=10)
-    # parser.add_argument('--save_steps', type=int, default=500)
     parser.add_argument('--seed', type=int, default=2020)
     parser.add_argument('--fp16_opt_level', type=str, default='O1')
     parser.add_argument('--gradient_accumulation_steps', type=int, default=1)
@@ -364,7 +361,6 @@ if __name__ == '__main__':
     print(f'[INFO] Warmup steps = {warmup_steps}')
     print(f'[INFO] Learning rate: {args.learning_rate}')
     print(f'[INFO] Logging steps: {args.logging_steps}')
-    print(f'[INFO] Saving steps: {args.save_steps}')
     print(f'[INFO] FP16 training: {args.fp16}\n')
     
 
