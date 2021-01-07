@@ -46,7 +46,7 @@ do
 				${TOKENIZER_TYPE} \
 				${DATASET} \
 				${OUTPUT_DIR} \
-				${LOG_DIR} \
+				${TF_LOG_DIR} \
 				--tokenizer_dir ${TOKENIZER_DIR} \
 				--model_dir ${MODEL_DIR} \
 				--num_train_epochs ${N_EPOCHS} \
