@@ -40,6 +40,8 @@ do
 				echo "Batch size: ${BATCH_SIZE}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 				echo "Learning rate: ${LR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 				echo "Warmup ratio: ${WARMUP_RATIO}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "Space token: ${SPACE_TOKEN}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "Max sequence length: ${MAX_SEQ_LENGTH}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
 				python ./seq_cls_finetune.py \
 				${TOKENIZER_TYPE} \
