@@ -350,13 +350,16 @@ if __name__ == '__main__':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
     print('\n[INFO] Preprocess and tokenizing texts in datasets')
+    max_length = args.max_seq_length if args.max_seq_length else config.max_position_embeddings,
+    print(f'[INFO] max_length = {max_length} \n')
+    
     dataset_split = { split_name: SequenceClassificationDataset.from_dataset(
                         task,
                         tokenizer,
                         dataset[split_name],
                         DATASET_METADATA[args.dataset_name]['text_input_col_name'],
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
-                        max_length= args.max_seq_length if args.max_seq_length else config.max_position_embeddings,
+                        max_length=max_length,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
                         preprocessor=process_transformers) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
