@@ -253,6 +253,7 @@ if __name__ == '__main__':
         print(f'[INFO] prepare_for_tokenization: {args.prepare_for_tokenization}\n')
 
         if args.dataset_name == 'wongnai_reviews':
+            print(f'\n\n[INFO] For Wongnai reviews dataset, perform train-val set splitting (0.9,0.1)')
             dataset = load_dataset(args.dataset_name)
             train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=args.seed)
             dataset['train'] = train_val_split['train']
