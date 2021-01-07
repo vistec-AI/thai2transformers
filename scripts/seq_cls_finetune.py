@@ -395,6 +395,6 @@ if __name__ == '__main__':
         wandb.run.summary[f'test-set_{key}'] = value
 
     print('[INFO] Done.\n')
-    print('[INDO] Begin savining last checkpoint.')
-    trainer.save_model(os.path.join(args.output_dir, 'checkpoint-final'))
+    print('[INDO] Begin saving best checkpoint.')
+    trainer.save_model(os.path.join(args.output_dir, 'checkpoint-best'))
     print('[INFO] Done.\n')
