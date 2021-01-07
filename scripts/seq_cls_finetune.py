@@ -255,9 +255,12 @@ if __name__ == '__main__':
         if args.dataset_name == 'wongnai_reviews':
             print(f'\n\n[INFO] For Wongnai reviews dataset, perform train-val set splitting (0.9,0.1)')
             dataset = load_dataset(args.dataset_name)
+            print(f'\n\n[INFO] Perform dataset splitting')
             train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=args.seed)
             dataset['train'] = train_val_split['train']
             dataset['validation'] = train_val_split['test']
+            print(f'\n\n[INFO] Done')
+            print(f'dataset: {dataset}')
         elif args.dataset_name == 'prachathai67k':
             # Hotfix: As currently (Wed 6 Jan 2021), the `prachathai67k` dataset can't be download directly with `datasets.load_dataset` method
 
