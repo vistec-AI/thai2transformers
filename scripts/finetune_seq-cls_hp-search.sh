@@ -36,7 +36,8 @@ do
 				echo "Tokenizer directory: ${TOKENIZER_DIR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 				echo "Dataset: ${DATASET}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 				echo "" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
-
+				echo "WANDB_NAME: ${WANDB_NAME}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "WANDB_DIR: ${WANDB_DIR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 				echo "" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 				echo "#N epochs: ${N_EPOCHS}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 				echo "Batch size: ${BATCH_SIZE}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
@@ -57,6 +58,7 @@ do
 				--warmup_ratio ${WARMUP_RATIO} \
 				--max_seq_length ${MAX_SEQ_LENGTH} \
 				--space_token ${SPACE_TOKEN} \
+				--wandb_run_name $WANDB_NAME \
 				${OPTIONAL_ARGS} |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
 				echo ""

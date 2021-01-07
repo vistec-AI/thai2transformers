@@ -195,7 +195,8 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args):
         args=training_args,
         compute_metrics=METRICS[task],
         train_dataset=train_dataset,
-        eval_dataset=val_dataset    
+        eval_dataset=val_dataset,   
+        run_name=args.wandb_run_name
     )
     return trainer, training_args
 
@@ -233,6 +234,9 @@ if __name__ == '__main__':
     parser.add_argument('--gradient_accumulation_steps', type=int, default=1)
     parser.add_argument('--adam_epsilon', type=float, default=1e-08)
     parser.add_argument('--max_grad_norm', type=float, default=1.0)
+
+    # wandb
+    parser.add_argument('--wandb_run_name', type=str, default=None)
 
     args = parser.parse_args()
 
