@@ -8,13 +8,13 @@ MAX_SEQ_LENGTH=$7
 SPACE_TOKEN=$8
 OPTIONAL_ARGS=$9
 
-for N_EPOCHS in 1 3 5
+for N_EPOCHS in 5
 do
-	for BATCH_SIZE in 16 32
+	for BATCH_SIZE in 16
 	do
-		for LR in 1e-5 3e-5 5e-5
+		for LR in 1e-5
 		do 
-			for WARMUP_RATIO in 0.06 0.1
+			for WARMUP_RATIO in 0.1
 			do
 				
 
