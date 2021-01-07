@@ -21,10 +21,11 @@ do
 
 				EXP_ID="${EXP_NAME}_n-epochs=${N_EPOCHS}_bz=${BATCH_SIZE}_lr=${LR}_warmup-ratio=${WARMUP_RATIO}"
 				OUTPUT_DIR="../checkpoints/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}"
-				TF_LOG_DIR="../checkpoints/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/tf_log"
-				TRAINER_OUTPUT_LOG_PATH"../checkpoints/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/output_log/trainer.log"
+				TF_LOG_DIR="../logs/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/tf_log"
+				TRAINER_OUTPUT_LOG_PATH"../logs/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/output_log/trainer.log"
 				export WANDB_NAME="${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}"
-				export WANDB_DIR="../checkpoints/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/wandb_log"
+				export WANDB_DIR="../logs/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/wandb_log"
+
 				echo "Pretrained model name: ${MODEL_NAME}" |& tee -a TRAINER_OUTPUT_LOG_PATH
 				echo "Type of token: ${TOKENIZER_TYPE}" |& tee -a TRAINER_OUTPUT_LOG_PATH
 				echo "Model directory: ${MODEL_DIR}" |& tee -a TRAINER_OUTPUT_LOG_PATH
