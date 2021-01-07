@@ -24,8 +24,8 @@ do
 				TF_LOG_DIR="../logs/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/tf_log"
 				TRAINER_OUTPUT_LOG_PATH"../logs/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}/output_log/trainer.log"
 				export WANDB_NAME="${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}"
-				mkdir -p WANDB_DIR
-				chmod 777 WANDB_DIR
+				mkdir -p ${WANDB_DIR}
+				chmod 777 ${WANDB_DIR}
 				export WANDB_DIR="../logs/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}"
 
 				echo "Pretrained model name: ${MODEL_NAME}" |& tee -a TRAINER_OUTPUT_LOG_PATH
@@ -42,12 +42,12 @@ do
 				echo "Warmup ratio: ${WARMUP_RATIO}" |& tee -a TRAINER_OUTPUT_LOG_PATH
 
 				python ./seq_cls_finetune.py \
-				$TOKENIZER_TYPE \
-				$DATASET \
-				$OUTPUT_DIR \
-				$LOG_DIR \
-				--tokenizer_dir $TOKENIZER_DIR \
-				--model_dir $MODEL_DIR \
+				${TOKENIZER_TYPE} \
+				${DATASET} \
+				${OUTPUT_DIR} \
+				${LOG_DIR} \
+				--tokenizer_dir ${TOKENIZER_DIR} \
+				--model_dir ${MODEL_DIR} \
 				--num_train_epochs \
 				--learning_rate \
 				--warmup_ratio ${WARMUP_RATIO} \
