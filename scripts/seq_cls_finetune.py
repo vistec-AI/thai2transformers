@@ -213,7 +213,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # Required
     parser.add_argument('tokenizer_type_or_public_model_name', type=str, help='The type token model used. Specify the name of tokenizer either `spm`, `newmm`, `syllable`, or `sefr_cut`.')
-    parser.add_argument('dataset_name', help='Specify the dataset name to finetune. Currently, sequence classification datasets include `wisesight_sentiment`, `generated_reviews_enth` and`wongnai_reviews`.')
+    parser.add_argument('dataset_name', help='Specify the dataset name to finetune. Currently, sequence classification datasets include `wisesight_sentiment`, `generated_reviews_enth-correct_translation`, `generated_reviews_enth-review_star` and`wongnai_reviews`.')
     parser.add_argument('output_dir', type=str)
     parser.add_argument('log_dir', type=str)
 
