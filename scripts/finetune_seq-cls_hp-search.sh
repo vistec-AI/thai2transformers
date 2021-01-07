@@ -48,8 +48,8 @@ do
 				${LOG_DIR} \
 				--tokenizer_dir ${TOKENIZER_DIR} \
 				--model_dir ${MODEL_DIR} \
-				--num_train_epochs \
-				--learning_rate \
+				--num_train_epochs ${N_EPOCHS} \
+				--learning_rate ${LR} \
 				--warmup_ratio ${WARMUP_RATIO} \
 				--max_seq_length ${MAX_SEQ_LENGTH} \
 				--space_token ${SPACE_TOKEN} \
