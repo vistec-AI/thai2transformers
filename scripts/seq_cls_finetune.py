@@ -67,7 +67,7 @@ PUBLIC_MODEL = {
     'xlmr-large': {
         'name': 'xlm-roberta-large',
         'tokenizer': XLMRobertaTokenizerFast.from_pretrained('xlm-roberta-large'),
-        'config': XLMRobertaConfig.from_pretrained('xlm-roberta-large'),
+        'config': XLMRobertaConfig.from_pretrained('xlm-roberta-base'),
     },
 }
 
