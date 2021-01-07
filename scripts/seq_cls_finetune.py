@@ -92,7 +92,7 @@ DATASET_METADATA = {
         'text_input_col_name': 'review_body',
         'label_col_name': 'star_rating',
         'num_labels': 5,
-        'split_names': ['train', 'test']
+        'split_names': ['train', 'validation', 'test']
     },
     'generated_reviews_enth-correct_translation': { 
         'task': Task.MULTICLASS_CLS,
