@@ -94,7 +94,14 @@ DATASET_METADATA = {
         'num_labels': 5,
         'split_names': ['train', 'test']
     },
-    'generated_reviews_enth': { # th review rating , correct translation only
+    'generated_reviews_enth-correct_translation': { 
+        'task': Task.MULTICLASS_CLS,
+        'text_input_col_name': ['translation', 'th'],
+        'label_col_name': 'correct',
+        'num_labels': 2,
+        'split_names': ['train', 'validation', 'test']
+    },
+    'generated_reviews_enth-review_star': { 
         'task': Task.MULTICLASS_CLS,
         'text_input_col_name': ['translation', 'th'],
         'label_col_name': 'review_star',
