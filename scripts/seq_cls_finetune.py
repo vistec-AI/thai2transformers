@@ -187,7 +187,8 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args):
                         dataloader_drop_last=True,
                         no_cuda=args.no_cuda,
                         metric_for_best_model=args.metric_for_best_model,
-                        prediction_loss_only=False
+                        prediction_loss_only=False,
+                        run_name=args.wandb_run_name
                     )
     
     trainer = Trainer(
@@ -195,8 +196,7 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args):
         args=training_args,
         compute_metrics=METRICS[task],
         train_dataset=train_dataset,
-        eval_dataset=val_dataset,   
-        run_name=args.wandb_run_name
+        eval_dataset=val_dataset
     )
     return trainer, training_args
 
