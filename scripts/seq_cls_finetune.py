@@ -11,6 +11,7 @@ from tqdm import tqdm
 from pathlib import Path
 
 import pandas as pd
+import wandb
 from transformers import (
     AdamW, 
     get_linear_schedule_with_warmup, 
@@ -387,4 +388,6 @@ if __name__ == '__main__':
     
     for key, value in result.items():
         print(f'{key} : {value:.4f}')
+        if 'test_' in key:
+            wandb.run.summary[key] = value
     print('Done.\n')
