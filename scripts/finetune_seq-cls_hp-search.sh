@@ -28,18 +28,18 @@ do
 				chmod 777 ${WANDB_DIR}
 				export WANDB_DIR="../logs/${MODEL_NAME}/${TOKENIZER_TYPE}/finetuned/${DATASET}/${EXP_ID}"
 
-				echo "Pretrained model name: ${MODEL_NAME}" |& tee -a TRAINER_OUTPUT_LOG_PATH
-				echo "Type of token: ${TOKENIZER_TYPE}" |& tee -a TRAINER_OUTPUT_LOG_PATH
-				echo "Model directory: ${MODEL_DIR}" |& tee -a TRAINER_OUTPUT_LOG_PATH
-				echo "Tokenizer directory: ${TOKENIZER_DIR}" |& tee -a TRAINER_OUTPUT_LOG_PATH
-				echo "Dataset: ${DATASET}" |& tee -a TRAINER_OUTPUT_LOG_PATH
-				echo "" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "Pretrained model name: ${MODEL_NAME}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "Type of token: ${TOKENIZER_TYPE}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "Model directory: ${MODEL_DIR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "Tokenizer directory: ${TOKENIZER_DIR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "Dataset: ${DATASET}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
-				echo "" |& tee -a TRAINER_OUTPUT_LOG_PATH
-				echo "#N epochs: ${N_EPOCHS}" |& tee -a TRAINER_OUTPUT_LOG_PATH
-				echo "Batch size: ${BATCH_SIZE}" |& tee -a TRAINER_OUTPUT_LOG_PATH
-				echo "Learning rate: ${LR}" |& tee -a TRAINER_OUTPUT_LOG_PATH
-				echo "Warmup ratio: ${WARMUP_RATIO}" |& tee -a TRAINER_OUTPUT_LOG_PATH
+				echo "" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "#N epochs: ${N_EPOCHS}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "Batch size: ${BATCH_SIZE}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "Learning rate: ${LR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+				echo "Warmup ratio: ${WARMUP_RATIO}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
 				python ./seq_cls_finetune.py \
 				${TOKENIZER_TYPE} \
@@ -53,7 +53,7 @@ do
 				--warmup_ratio ${WARMUP_RATIO} \
 				--max_seq_length ${MAX_SEQ_LENGTH} \
 				--space_token ${SPACE_TOKEN} \
-				${OPTIONAL_ARGS} |& tee -a TRAINER_OUTPUT_LOG_PATH
+				${OPTIONAL_ARGS} |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
 				echo ""
 			done
