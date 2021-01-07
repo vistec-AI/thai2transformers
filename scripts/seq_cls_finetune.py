@@ -386,14 +386,13 @@ if __name__ == '__main__':
 
     print('\nBegin model evaluation on test set.')
     result = trainer.evaluate(
-                eval_dataset=dataset_split['test'],
-                metric_key_prefix='test')
+                eval_dataset=dataset_split['test'])
     print(f'Evaluation on test set (dataset: {args.dataset_name})')    
     
     for key, value in result.items():
         print(f'{key} : {value:.4f}')
-        if 'test_' in key:
-            wandb.run.summary[key] = value
+        wandb.run.summary[f'test-set_{key}'] = value
+
     print('[INFO] Done.\n')
     print('[INDO] Begin savining last checkpoint.')
     trainer.save_model(os.path.join(args.output_dir, 'checkpoint-final'))
