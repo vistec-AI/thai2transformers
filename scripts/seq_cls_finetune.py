@@ -103,7 +103,7 @@ DATASET_METADATA = {
     'generated_reviews_enth-correct_translation': { 
         'huggingface_dataset_name': 'generated_reviews_enth',
         'task': Task.MULTICLASS_CLS,
-        'text_input_col_name': ['translation', 'th'],
+        'text_input_col_name': ('translation', 'th'),
         'label_col_name': 'correct',
         'num_labels': 2,
         'split_names': ['train', 'validation', 'test']
@@ -111,7 +111,7 @@ DATASET_METADATA = {
     'generated_reviews_enth-review_star': { 
         'huggingface_dataset_name': 'generated_reviews_enth',
         'task': Task.MULTICLASS_CLS,
-        'text_input_col_name': ['translation', 'th'],
+        'text_input_col_name': ('translation', 'th'),
         'label_col_name': 'review_star',
         'num_labels': 5,
         'split_names': ['train', 'validation', 'test']
