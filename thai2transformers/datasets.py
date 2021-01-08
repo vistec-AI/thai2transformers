@@ -390,7 +390,7 @@ class SequenceClassificationDataset(Dataset):
         if prepare_for_tokenization:
             texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text, space_token=space_token)[0], texts))
 
-        if type(preprocessor) == callable:
+        if preprocessor != None:
             print('[DEBUG] Apply preprocessor to texts.')
             texts = list(map(preprocessor, texts))
 
