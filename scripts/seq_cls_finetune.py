@@ -383,7 +383,7 @@ if __name__ == '__main__':
                         max_length=max_length,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
-                        preprocessor=process_transformers,
+                        preprocessor=partial(process_transformers, space_token=args.space_token),
                         label_encoder=label_encoder) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
                     }
     print('[INFO] Done.')
