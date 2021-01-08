@@ -30,7 +30,7 @@ def get_dict_val(root:Dict, keys:Union[str, List[str]]):
     """
     if type(keys) == str:
         return root[keys]
-    if type(keys) == list:
+    elif type(keys) == list:
         return reduce(operator.getitem, keys, root)
     
     return None
