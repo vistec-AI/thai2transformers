@@ -81,6 +81,7 @@ TOKENIZER_CLS = {
 
 DATASET_METADATA = {
     'wisesight_sentiment': {
+        'huggingface_dataset_name': 'wisesight_sentiment',
         'task': Task.MULTICLASS_CLS,
         'text_input_col_name': 'texts',
         'label_col_name': 'category',
@@ -88,6 +89,7 @@ DATASET_METADATA = {
         'split_names': ['train', 'validation', 'test']
     },
     'wongnai_reviews': {
+        'huggingface_dataset_name': 'wongnai_reviews',
         'task': Task.MULTICLASS_CLS,
         'text_input_col_name': 'review_body',
         'label_col_name': 'star_rating',
@@ -95,6 +97,7 @@ DATASET_METADATA = {
         'split_names': ['train', 'validation', 'test']
     },
     'generated_reviews_enth-correct_translation': { 
+        'huggingface_dataset_name': 'generated_reviews_enth',
         'task': Task.MULTICLASS_CLS,
         'text_input_col_name': ['translation', 'th'],
         'label_col_name': 'correct',
@@ -102,6 +105,7 @@ DATASET_METADATA = {
         'split_names': ['train', 'validation', 'test']
     },
     'generated_reviews_enth-review_star': { 
+        'huggingface_dataset_name': 'generated_reviews_enth',
         'task': Task.MULTICLASS_CLS,
         'text_input_col_name': ['translation', 'th'],
         'label_col_name': 'review_star',
@@ -109,6 +113,7 @@ DATASET_METADATA = {
         'split_names': ['train', 'validation', 'test']
     },
     'prachathai67k': {
+        'huggingface_dataset_name': 'prachathai67k',
         'url': 'https://archive.org/download/prachathai67k/data.zip',
         'task': Task.MULTILABEL_CLS,
         'text_input_col_name': 'body_text',
@@ -248,13 +253,14 @@ if __name__ == '__main__':
 
     try:
         print(f'\n\n[INFO] Dataset: {args.dataset_name}')
+        print(f'\n\n[INFO] Huggingface\'s dataset name: {DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"]} ')
         print(f'[INFO] Task: {DATASET_METADATA[args.dataset_name]["task"].value}')
         print(f'\n[INFO] space_token: {args.space_token}')
         print(f'[INFO] prepare_for_tokenization: {args.prepare_for_tokenization}\n')
 
         if args.dataset_name == 'wongnai_reviews':
             print(f'\n\n[INFO] For Wongnai reviews dataset, perform train-val set splitting (0.9,0.1)')
-            dataset = load_dataset(args.dataset_name)
+            dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
             print(f'\n\n[INFO] Perform dataset splitting')
             train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=args.seed)
             dataset['train'] = train_val_split['train']
@@ -309,7 +315,7 @@ if __name__ == '__main__':
             print(f'dataset: {dataset}')
             print(f'\nDone.')
         else:
-            dataset = load_dataset(args.dataset_name)
+            dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
 
         if args.tokenizer_type_or_public_model_name == 'sefr_cut':
             print(f'Apply `sefr_cut` tokenizer to the text inputs of {args.dataset_name} dataset')
