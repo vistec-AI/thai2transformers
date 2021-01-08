@@ -365,7 +365,8 @@ class SequenceClassificationDataset(Dataset):
     def _build_from_dataset(task, tokenizer, dataset,
                             text_column_name, label_column_name,
                             space_token, max_length, bs,
-                            prepare_for_tokenization,label_encoder,
+                            prepare_for_tokenization,
+                            label_encoder,
                             preprocessor=None):
         texts = get_dict_val(dataset, text_column_name)
         if task == Task.MULTICLASS_CLS:
