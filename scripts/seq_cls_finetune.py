@@ -394,10 +394,6 @@ if __name__ == '__main__':
                         ),
                         label_encoder=label_encoder) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
                     }
-
-    print(f'[DEBUG] train_set {dataset_split["train"][:2]}\n')
-    print(f'[DEBUG] validation_set {dataset_split["validation"][:2]}\n')
-    print(f'[DEBUG] test_set {dataset_split["test"][:2]}\n')
     
     print('[INFO] Done.')
         
