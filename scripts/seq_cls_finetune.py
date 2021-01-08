@@ -29,6 +29,8 @@ from transformers import (
     XLMRobertaTokenizer,
     XLMRobertaTokenizerFast,
     XLMRobertaConfig,
+    DataCollatorWithPadding,
+    default_data_collator
 )
 
 from datasets import load_dataset, list_metrics, load_dataset, Dataset
@@ -170,7 +172,7 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, ta
 
     return model, tokenizer, config
 
-def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args): 
+def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, data_collator=default_data_collator): 
         
     training_args = TrainingArguments(
                         num_train_epochs=args.num_train_epochs,
@@ -208,7 +210,8 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args):
         args=training_args,
         compute_metrics=METRICS[task],
         train_dataset=train_dataset,
-        eval_dataset=val_dataset
+        eval_dataset=val_dataset,
+        data_collator=data_collator
     )
     return trainer, training_args
 
@@ -392,14 +395,17 @@ if __name__ == '__main__':
     print(f'[INFO] Logging steps: {args.logging_steps}')
     print(f'[INFO] FP16 training: {args.fp16}\n')
     
-
+    data_collator = DataCollatorWithPadding(tokenizer,
+                                            padding=True,
+                                            pad_to_multiple_of=8 if args.fp16 else None)
 
     trainer, training_args = init_trainer(task=task,
                                 model=model,
                                 train_dataset=dataset_split['train'],
                                 val_dataset=dataset_split['validation'] if 'validation' in DATASET_METADATA[args.dataset_name]['split_names'] else None,
                                 warmup_steps=warmup_steps,
-                                args=args)
+                                args=args,
+                                data_collator=data_collator)
 
     print('[INFO] TrainingArguments:')
     print(training_args)
