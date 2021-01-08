@@ -431,6 +431,12 @@ if __name__ == '__main__':
     print('Done.\n')
 
 
+    print('[INFO] Done.\n')
+    print('[INDO] Begin saving best checkpoint.')
+    trainer.save_model(os.path.join(args.output_dir, 'checkpoint-best'))
+
+    print('[INFO] Done.\n')
+
     print('\nBegin model evaluation on test set.')
     result = trainer.evaluate(
                 eval_dataset=dataset_split['test'])
@@ -439,8 +445,3 @@ if __name__ == '__main__':
     for key, value in result.items():
         print(f'{key} : {value:.4f}')
         wandb.run.summary[f'test-set_{key}'] = value
-
-    print('[INFO] Done.\n')
-    print('[INDO] Begin saving best checkpoint.')
-    trainer.save_model(os.path.join(args.output_dir, 'checkpoint-best'))
-    print('[INFO] Done.\n')
