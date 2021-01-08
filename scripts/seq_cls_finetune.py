@@ -11,7 +11,9 @@ from tqdm import tqdm
 from pathlib import Path
 from sklearn import preprocessing
 import pandas as pd
+import numpy as np
 import wandb
+import torch
 from transformers import (
     AdamW, 
     get_linear_schedule_with_warmup, 
@@ -253,6 +255,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # Set seed
+    torch.set_deterministic(True)
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
 
     try:
         print(f'\n\n[INFO] Dataset: {args.dataset_name}')
