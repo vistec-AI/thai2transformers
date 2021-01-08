@@ -391,6 +391,7 @@ class SequenceClassificationDataset(Dataset):
             texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text, space_token=space_token)[0], texts))
 
         if type(preprocessor) == callable:
+            print('[DEBUG] Apply preprocessor to texts.')
             texts = list(map(preprocessor, texts))
 
         for i in tqdm(range(math.ceil(len(texts) / bs))):
