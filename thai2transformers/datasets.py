@@ -391,7 +391,7 @@ class SequenceClassificationDataset(Dataset):
                 batched_texts,
                 max_length=max_length,
                 truncation=True,
-                padding='max_length'            
+                padding=True            
             )
             # add to list
             input_ids += tokenized_inputs["input_ids"]
@@ -416,7 +416,7 @@ class SequenceClassificationDataset(Dataset):
                     texts,
                     max_length=self.max_length,
                     truncation=True,
-                    padding='max_length'
+                    padding=True
                 )
 
                 # add to list
