@@ -48,7 +48,7 @@ from thai2transformers.tokenizers import (
 )
 from thai2transformers.utils import get_dict_val
 from thai2transformers.conf import Task
-from thai2transformers.preprocess import process_transformers
+from thai2transformers import preprocess
 
 CACHE_DIR = f'{str(Path.home())}/.cache/huggingface_datasets'
 
@@ -383,7 +383,15 @@ if __name__ == '__main__':
                         max_length=max_length,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
-                        preprocessor=partial(process_transformers, space_token=args.space_token),
+                        preprocessor=partial(preprocess.process_transformers, 
+                            pre_rules = [
+                            preprocess.fix_html,
+                            preprocess.rm_brackets,
+                            preprocess.replace_newlines,
+                            preprocess.rm_useless_spaces,
+                            partial(preprocess.replace_spaces, space_token=args.space_token),
+                            preprocess.replace_rep_after]
+                        ),
                         label_encoder=label_encoder) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
                     }
     print('[INFO] Done.')
