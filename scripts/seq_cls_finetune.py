@@ -394,6 +394,11 @@ if __name__ == '__main__':
                         ),
                         label_encoder=label_encoder) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
                     }
+
+    print(f'[DEBUG] train_set {dataset_split["train"]}\n')
+    print(f'[DEBUG] validation_set {dataset_split["validation"]}\n')
+    print(f'[DEBUG] test_set {dataset_split["test"]}\n')
+    
     print('[INFO] Done.')
         
     warmup_steps = math.ceil(len(dataset_split['train']) / args.batch_size * args.warmup_ratio * args.num_train_epochs)
