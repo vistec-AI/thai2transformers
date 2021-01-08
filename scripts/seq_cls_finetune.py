@@ -256,7 +256,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Set seed
-    torch.set_deterministic(True)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
 
