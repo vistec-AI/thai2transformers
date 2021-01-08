@@ -387,8 +387,8 @@ class SequenceClassificationDataset(Dataset):
         input_ids = []
         attention_masks = []
         print(f'[DEBUG] labels {labels[:4]}\n')
-        print(f'[DEBUG] label_encoder {label_encoder.classes_}\n')
-
+        print(f'[DEBUG] label_encoder.classes_ {label_encoder.classes_}')
+        print(f'[DEBUG] label_encoder.get_params() {label_encoder.get_params()}\n')
 
       
         print(f'\n\n[DEBUG] (before: preprocessor) input_text {texts[:4]}\n')
