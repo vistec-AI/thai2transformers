@@ -9,7 +9,7 @@ from functools import partial
 import urllib.request
 from tqdm import tqdm
 from pathlib import Path
-
+from sklearn import preprocessing
 import pandas as pd
 import wandb
 from transformers import (
@@ -317,6 +317,12 @@ if __name__ == '__main__':
         else:
             dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
 
+        if DATASET_METADATA[args.dataset_name]['task'] == Task.MULTICLASS_CLS:
+
+            label_encoder = preprocessing.LabelEncoder()
+            label_encoder.fit = get_dict_val(dataset['train'][DATASET_METADATA[args.dataset_name]['label_col_name']]
+
+
         if args.tokenizer_type_or_public_model_name == 'sefr_cut':
             print(f'Apply `sefr_cut` tokenizer to the text inputs of {args.dataset_name} dataset')
             import sefr_cut
@@ -368,7 +374,8 @@ if __name__ == '__main__':
                         max_length=max_length,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
-                        preprocessor=process_transformers) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
+                        preprocessor=process_transformers,
+                        label_encoder=label_encoder) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
                     }
     print('[INFO] Done.')
         

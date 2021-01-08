@@ -287,7 +287,8 @@ class SequenceClassificationDataset(Dataset):
         preprocessor=None,
         input_ids=[],
         attention_masks=[],
-        labels=[]
+        labels=[],
+        label_encoder=None
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
@@ -298,6 +299,7 @@ class SequenceClassificationDataset(Dataset):
         self.attention_masks = attention_masks
         self.labels = labels
         self.task = task
+        self.label_encoder = label_encoder
         self._build()
 
     def __len__(self):
@@ -330,7 +332,8 @@ class SequenceClassificationDataset(Dataset):
                      max_length=128,
                      bs=1000,
                      space_token='<_>',
-                     preprocessor=None):
+                     preprocessor=None,
+                     label_encoder=None):
         
         input_ids, attention_masks, labels = SequenceClassificationDataset._build_from_dataset(
                      task,
@@ -342,7 +345,8 @@ class SequenceClassificationDataset(Dataset):
                      bs=bs,
                      prepare_for_tokenization=prepare_for_tokenization,
                      space_token=space_token,
-                     preprocessor=preprocessor)
+                     preprocessor=preprocessor,
+                     label_encoder=label_encoder)
 
         return cls(
             tokenizer=tokenizer,
@@ -353,18 +357,23 @@ class SequenceClassificationDataset(Dataset):
             attention_masks=attention_masks,
             labels=labels,
             task=task,
-            preprocessor=preprocessor
+            preprocessor=preprocessor,
+            label_encoder=label_encoder
         )
     
     @staticmethod
     def _build_from_dataset(task, tokenizer, dataset,
                             text_column_name, label_column_name,
                             space_token, max_length, bs,
-                            prepare_for_tokenization,
+                            prepare_for_tokenization,label_encoder,
                             preprocessor=None):
         texts = get_dict_val(dataset, text_column_name)
         if task == Task.MULTICLASS_CLS:
             labels = get_dict_val(dataset, label_column_name)
+
+            if label_encoder != None:
+                labels = label_encoder.transform(labels)
+
         elif task == Task.MULTILABEL_CLS:
             _labels = []
             for i, name in enumerate(label_column_name):
@@ -373,7 +382,7 @@ class SequenceClassificationDataset(Dataset):
             labels = list(zip(*_labels))
         else:
             raise NotImplementedError
-
+        
         input_ids = []
         attention_masks = []
 
