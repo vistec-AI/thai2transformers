@@ -60,6 +60,7 @@ do
 					--max_seq_length ${MAX_SEQ_LENGTH} \
 					--space_token ${SPACE_TOKEN} \
 					--wandb_run_name $WANDB_NAME \
+					--logging_steps 50 \
 					--fp16 \
 					${OPTIONAL_ARGS} |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
