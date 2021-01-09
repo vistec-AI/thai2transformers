@@ -2,8 +2,7 @@ TOKENIZER_TYPE=$1
 MODEL_NAME=$2
 EXP_NAME=$3
 MAX_SEQ_LENGTH=$4
-SPACE_TOKEN=$5
-OPTIONAL_ARGS=$6
+OPTIONAL_ARGS=$5
 
 for DATASET in wisesight_sentiment wongnai_reviews generated_reviews_enth-correct_translation generated_reviews_enth-review_star
 do
@@ -40,7 +39,6 @@ do
 					echo "Batch size: ${BATCH_SIZE}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "Learning rate: ${LR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "Warmup ratio: ${WARMUP_RATIO}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
-					echo "Space token: ${SPACE_TOKEN}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "Max sequence length: ${MAX_SEQ_LENGTH}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
 					python ./seq_cls_finetune.py \
@@ -52,7 +50,6 @@ do
 					--learning_rate ${LR} \
 					--warmup_ratio ${WARMUP_RATIO} \
 					--max_seq_length ${MAX_SEQ_LENGTH} \
-					--space_token ${SPACE_TOKEN} \
 					--wandb_run_name $WANDB_NAME \
 					--logging_steps 50 \
 					--fp16 \
