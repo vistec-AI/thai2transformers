@@ -329,9 +329,9 @@ if __name__ == '__main__':
             dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
 
         if args.dataset_name == 'prachathai67k':
-            dataset['train'] = dataset['train'][:100]
-            dataset['validation'] = dataset['validation'][:50]
-            dataset['test'] = dataset['test'][:50]
+            dataset['train'] = dataset['train']
+            dataset['validation'] = dataset['validation']
+            dataset['test'] = dataset['test']
 
         if DATASET_METADATA[args.dataset_name]['task'] == Task.MULTICLASS_CLS:
 
