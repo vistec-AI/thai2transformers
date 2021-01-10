@@ -1,3 +1,4 @@
+import torch
 import pandas as pd
 import numpy as np
 from sklearn.metrics import f1_score, accuracy_score, precision_recall_fscore_support
@@ -47,7 +48,9 @@ def _select_best_thresholds(targets, probs, n_labels):
 def multilabel_classification_metrics(labels, pred, n_labels):
 
     labels = pred.label_ids
-    probs = pred.predictions
+    logits = pred.predictions
+    probs = torch.sigmoid(logits)
+
     best_threshold_mapping = _select_best_thresholds(labels, probs, n_labels)
     best_thresholds = [ v[0] for k,v in best_threshold_mapping.items() ]
 
