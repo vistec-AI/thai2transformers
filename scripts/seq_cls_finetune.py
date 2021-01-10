@@ -332,6 +332,8 @@ if __name__ == '__main__':
 
             label_encoder = preprocessing.LabelEncoder()
             label_encoder.fit(get_dict_val(dataset['train'], keys=DATASET_METADATA[args.dataset_name]['label_col_name']))
+        else:
+            label_encoder = None
 
         if args.tokenizer_type_or_public_model_name == 'sefr_cut':
             print(f'Apply `sefr_cut` tokenizer to the text inputs of {args.dataset_name} dataset')
