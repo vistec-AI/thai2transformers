@@ -5,6 +5,7 @@
 raw_data
 
 #files
+logs
 data
 data_prep
 lightning_logs
@@ -19,6 +20,8 @@ checkpoints/
 dataset/
 cleaned_data/
 wandb/
+cache
+cache2
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
