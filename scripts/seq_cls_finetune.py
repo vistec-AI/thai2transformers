@@ -154,7 +154,7 @@ def init_model_tokenizer_for_seq_cls(model_dir, tokenizer_cls, tokenizer_dir, ta
         model_dir,
         num_labels=num_labels
     )
- 
+
     tokenizer = tokenizer_cls.from_pretrained(
         tokenizer_dir,
     )
@@ -200,7 +200,7 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, da
                         seed=args.seed,
                         fp16=args.fp16,
                         fp16_opt_level=args.fp16_opt_level,
-                        dataloader_drop_last=True,
+                        dataloader_drop_last=False,
                         no_cuda=args.no_cuda,
                         metric_for_best_model=args.metric_for_best_model,
                         prediction_loss_only=False,
@@ -328,6 +328,11 @@ if __name__ == '__main__':
         else:
             dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
 
+        if args.dataset_name == 'prachathai67k':
+            dataset['train'] = dataset['train'][:100]
+            dataset['validation'] = dataset['validation'][:50]
+            dataset['test'] = dataset['test'][:50]
+
         if DATASET_METADATA[args.dataset_name]['task'] == Task.MULTICLASS_CLS:
 
             label_encoder = preprocessing.LabelEncoder()
@@ -370,6 +375,7 @@ if __name__ == '__main__':
                                                             args.tokenizer_dir,
                                                             task=task,
                                                             num_labels=DATASET_METADATA[args.dataset_name]['num_labels'])
+    
     if args.tokenizer_type_or_public_model_name == 'spm_camembert':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
