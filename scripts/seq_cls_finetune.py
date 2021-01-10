@@ -278,60 +278,9 @@ if __name__ == '__main__':
             dataset['validation'] = train_val_split['test']
             print(f'\n\n[INFO] Done')
             print(f'dataset: {dataset}')
-        # elif args.dataset_name == 'prachathai67k':
-        #     # Hotfix: As currently (Wed 6 Jan 2021), the `prachathai67k` dataset can't be download directly with `datasets.load_dataset` method
-
-        #     import jsonlines
-        #     import zipfile
-
-        #     class DownloadProgressBar(tqdm):
-        #         def update_to(self, b=1, bsize=1, tsize=None):
-        #             if tsize is not None:
-        #                 self.total = tsize
-        #             self.update(b * bsize - self.n)
-                        
-        #     # 1. Download prachathai67k dataset from Internet Archive direct link
-
-        #     download_dir = f'{CACHE_DIR}/prachathai67k'
-        #     out_zip_path = os.path.join(download_dir, 'data.zip')
-        #     out_dir = f'{CACHE_DIR}/prachathai67k/'                 
-        #     data_dir = f'{CACHE_DIR}/prachathai67k/data'  
-            
-        #     if not os.path.exists(out_zip_path):
-        #         os.makedirs(download_dir, exist_ok=True)
-        #         print(f'\n[INFO] Start downloading `prachathai67k` dataset.')
-        #         with DownloadProgressBar(unit='B', unit_scale=True,
-        #                         miniters=1, desc=DATASET_METADATA[args.dataset_name]['url'].split('/')[-1]) as t:
-        #             urllib.request.urlretrieve(DATASET_METADATA[args.dataset_name]['url'], filename=out_zip_path, reporthook=t.update_to)
-        #         print(f'\n[INFO] Done.')
-
-        #         print(f'\n[INFO] Start extracting zipped file from {out_zip_path}')  
-        #         with zipfile.ZipFile(out_zip_path, 'r') as zip_ref:
-        #             zip_ref.extractall(out_dir)
-        #         print(f'\n[INFO] Done.')
-
-        #     # 2. Read jsonlines object (`train.jsonl`, `val.jsonl`, and `test.jsonl`)
-        #     print(f'\n[INFO] Loading dataset from local files stored in `{data_dir}`.')
-        #     _dataset = dict()
-        #     for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
-        #         with jsonlines.open(os.path.join(data_dir, f'{split_name}.jsonl')) as f:
-        #             _dataset[split_name] = list(iter(f))
-
-        #     # 3. Convert list of objects into DataFrame
-        #     _dataset_df = { split_name: pd.DataFrame(_dataset[split_name]) for split_name in DATASET_METADATA[args.dataset_name]['split_names']}
-
-        #     # 4. Convert DataFrame into datasets.Dataset instance
-        #     dataset = { split_name: Dataset.from_pandas(_dataset_df[split_name]) for split_name in DATASET_METADATA[args.dataset_name]['split_names']}
-        #     dataset['validation'] = dataset.pop('valid') # rename key
-        #     print(f'dataset: {dataset}')
-        #     print(f'\nDone.')
         else:
             dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
 
-        if args.dataset_name == 'prachathai67k':
-            dataset['train'] = dataset['train']
-            dataset['validation'] = dataset['validation']
-            dataset['test'] = dataset['test']
 
         if DATASET_METADATA[args.dataset_name]['task'] == Task.MULTICLASS_CLS:
 
