@@ -21,6 +21,7 @@ def main():
     parser.add_argument("--dataset_name_or_path", type=str, default="wisesight_sentiment")
     parser.add_argument("--feature_col", type=str, default="texts")
     parser.add_argument("--label_col", type=str, default="category")
+    parser.add_argument("--batch_size", type=int, default=64)
 
     args = parser.parse_args()
 
