@@ -120,7 +120,7 @@ DATASET_METADATA = {
         'huggingface_dataset_name': 'prachathai67k',
         # 'url': 'https://archive.org/download/prachathai67k/data.zip',
         'task': Task.MULTILABEL_CLS,
-        'text_input_col_name': 'body_text',
+        'text_input_col_name': 'title',
         'label_col_name': ['politics', 'human_rights', 'quality_of_life',
                            'international', 'social', 'environment',
                            'economics', 'culture', 'labor',
