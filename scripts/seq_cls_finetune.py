@@ -210,7 +210,7 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, da
     trainer = Trainer(
         model=model,
         args=training_args,
-        compute_metrics=METRICS[task],
+                                n_labels=DATASET_METADATA[args.dataset_name]['num_labels']),
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         data_collator=data_collator
