@@ -96,6 +96,8 @@ if __name__ == '__main__':
     parser.add_argument('--min_newmm_token_len', type=int, default=4)
     parser.add_argument('--max_newmm_token_len', type=int, default=500)
 
+    parser.add_argument('--space_token', type=str, default='<th_roberta_space_token>')
+
     args = parser.parse_args()
 
     print(f'INFO: Load csv file from {args.input_path}')
@@ -163,8 +165,8 @@ if __name__ == '__main__':
     print('\nINFO: Done sentence length filtering.\n')
     
 
-    print('\nINFO: Replace space token with <th_roberta_space_token>')
-    df['text'] = df['text'].apply(lambda x: x.replace(' ', '<th_roberta_space_token>'))
+    print(f'\nINFO: Replace space token with {args.space_token}')
+    df['text'] = df['text'].apply(lambda x: x.replace(' ', args.space_token))
     print('INFO: Done.>')
 
     print('INFO: Done.')
