@@ -40,7 +40,7 @@ def _select_best_thresholds(targets, probs, n_labels):
     best_thresholds = dict()
     for i in range(0, n_labels):
         
-        best_thresholds[f'label-{i}'] = _compute_best_threshold(targets[:,i], preds[:,i])
+        best_thresholds[f'label-{i}'] = _compute_best_threshold(targets[:,i], probs[:,i])
         
     return best_thresholds
 
@@ -51,9 +51,7 @@ def multilabel_classification_metrics(pred, n_labels):
 
     labels = pred.label_ids
     logits = pred.predictions
-    print('[Debug] logits:', logits.shape, logits )
     probs = sigmoid(logits)
-    print('[Debug] probs:', probs.shape, logits )
 
     best_threshold_mapping = _select_best_thresholds(labels, probs, n_labels)
     best_thresholds = [ v[0] for k,v in best_threshold_mapping.items() ]
@@ -71,6 +69,4 @@ def multilabel_classification_metrics(pred, n_labels):
         'precision_macro': precision_macro,
         'recall_macro': recall_macro,
         'nb_samples': len(labels),
-        'best_thresholds': best_thresholds,
-        'best_thresholds_mapping': best_threshold_mapping
     }
