@@ -46,7 +46,6 @@ class BertForMultiLabelSequenceClassification(BertPreTrainedModel):
 
         self.bert = BertModel(config)
         self.dropout = torch.nn.Dropout(config.hidden_dropout_prob)
-        self.sigmoid = torch.nn.Sigmoid()
         self.classifier = torch.nn.Linear(config.hidden_size, config.num_labels)
         self.init_weights()
 
@@ -87,20 +86,19 @@ class BertForMultiLabelSequenceClassification(BertPreTrainedModel):
 
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
-        probs = self.sigmoid(logits)
 
         loss = None
         if labels is not None:
             loss_fct = torch.nn.BCEWithLogitsLoss()
-            loss = loss_fct(probs, labels)
+            loss = loss_fct(logits, labels)
 
         if not return_dict:
-            output = (probs,) + outputs[2:]
+            output = (logits,) + outputs[2:]
             return ((loss,) + output) if loss is not None else output
 
         return SequenceClassifierOutput(
             loss=loss,
-            logits=probs,
+            logits=logits,
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
@@ -114,7 +112,6 @@ class RobertaForMultiLabelSequenceClassification(RobertaPreTrainedModel):
         self.num_labels = config.num_labels
 
         self.roberta = RobertaModel(config, add_pooling_layer=False)
-        self.sigmoid = torch.nn.Sigmoid()
         self.classifier = RobertaClassificationHead(config)
         self.init_weights()  
 
@@ -152,21 +149,20 @@ class RobertaForMultiLabelSequenceClassification(RobertaPreTrainedModel):
         )
         sequence_output = outputs[0]
         logits = self.classifier(sequence_output)
-        probs = self.sigmoid(logits)
 
         loss = None
         if labels is not None:
             if self.num_labels > 1:
                 loss_fct = torch.nn.BCEWithLogitsLoss()
-                loss = loss_fct(probs, labels)
+                loss = loss_fct(logits, labels)
 
         if not return_dict:
-            output = (probs,) + outputs[2:]
-            return ((probs,) + output) if loss is not None else output
+            output = (logits,) + outputs[2:]
+            return ((logits,) + output) if loss is not None else output
 
         return SequenceClassifierOutput(
             loss=loss,
-            logits=probs,
+            logits=logits,
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
