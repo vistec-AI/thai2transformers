@@ -206,12 +206,15 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, da
                         prediction_loss_only=False,
                         run_name=args.wandb_run_name
                     )
-    
+    if task == Task.MULTICLASS_CLS:
+        compute_metrics_fn = METRICS[task]
+    elif task == Task.MULTILABEL_CLS:
+        compute_metrics_fn = partial(METRICS[task],n_labels=DATASET_METADATA[args.dataset_name]['num_labels'])
+
     trainer = Trainer(
         model=model,
         args=training_args,
-        compute_metrics=partial(METRICS[task],
-                                n_labels=DATASET_METADATA[args.dataset_name]['num_labels']),
+        compute_metrics=compute_metrics_fn,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         data_collator=data_collator
