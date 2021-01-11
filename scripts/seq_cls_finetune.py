@@ -298,10 +298,10 @@ if __name__ == '__main__':
             sefr_cut.load_model('best')
             sefr_tokenize = lambda x: sefr_cut.tokenize(x)
             
-            text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
-
+            text_input_col_name = '.'.join(DATASET_METADATA[args.dataset_name]['text_input_col_name'])
             def tokenize_fn(batch):
-                return '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch, text_input_col_name).split())]) 
+                return '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch,
+                            DATASET_METADATA[args.dataset_name]['text_input_col_name']).split())]) 
 
             for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
 
@@ -342,7 +342,7 @@ if __name__ == '__main__':
                         task,
                         tokenizer,
                         dataset[split_name],
-                        DATASET_METADATA[args.dataset_name]['text_input_col_name'],
+                        text_input_col_name,
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
                         max_length=max_length,
                         space_token=args.space_token,
