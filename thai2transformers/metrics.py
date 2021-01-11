@@ -60,8 +60,11 @@ def multilabel_classification_metrics(pred, n_labels):
     precision_macro, recall_macro, f1_macro, _ = precision_recall_fscore_support(labels, preds, average='macro')
     precision_micro, recall_micro, f1_micro, _ = precision_recall_fscore_support(labels, preds, average='micro')
     acc = accuracy_score(labels, preds)
+    accuracy_micro = (labels == preds).mean()
+
     return {
         'accuracy': acc,
+        'accuracy_micro': accuracy_micro,
         'f1_micro': f1_micro,
         'precision_micro': precision_micro,
         'recall_micro': recall_micro,
