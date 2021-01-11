@@ -27,7 +27,7 @@ def get_dict_val(root:Dict, keys:Union[str, Tuple[str, str]]):
     """
     if type(keys) == str:
         return root[keys]
-    elif type(keys) == tuple and len(keys) == 2:
+    elif type(keys) == tuple:
         return root[keys[0]][keys[1]]
     
     return None
