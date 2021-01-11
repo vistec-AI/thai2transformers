@@ -292,13 +292,19 @@ if __name__ == '__main__':
         else:
             label_encoder = None
 
+      
+        text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
         if args.tokenizer_type_or_public_model_name == 'sefr_cut':
             print(f'Apply `sefr_cut` tokenizer to the text inputs of {args.dataset_name} dataset')
             import sefr_cut
             sefr_cut.load_model('best')
             sefr_tokenize = lambda x: sefr_cut.tokenize(x)
-            
-            text_input_col_name = '.'.join(DATASET_METADATA[args.dataset_name]['text_input_col_name'])
+            if type(DATASET_METADATA[args.dataset_name]['text_input_col_name']) == list:
+                
+                text_input_col_name = '.'.join(DATASET_METADATA[args.dataset_name]['text_input_col_name'])
+            else:
+                text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
+
             def tokenize_fn(batch):
                 return '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch,
                             DATASET_METADATA[args.dataset_name]['text_input_col_name']).split())]) 
