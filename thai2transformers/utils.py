@@ -1,9 +1,9 @@
 import operator
 from functools import reduce
-from typing import Tuple, Dict, Union
+from typing import Tuple, Dict, Union, List
 
 
-def get_dict_val(root:Dict, keys:Union[str, Tuple[str, str]]):
+def get_dict_val(root:Dict, keys:Union[str, List[str, str]]):
     """
     Access a nested object in root by item sequence.
 
