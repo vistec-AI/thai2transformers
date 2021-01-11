@@ -179,6 +179,31 @@ def main():
     )
 
     # test
+    #databunch
+    data_lm = load_data(args.output_dir, f"{args.dataset_name_or_path}_lm.pkl")
+    data_lm.sanity_check()
+
+    #classification data
+    tt = Tokenizer(tok_func=ThaiTokenizer, lang="th", pre_rules=pre_rules_th, post_rules=post_rules_th)
+    processor = [TokenizeProcessor(tokenizer=tt, chunksize=10000, mark_fields=False),
+                NumericalizeProcessor(vocab=data_lm.vocab, max_vocab=60000, min_freq=3)]
+
+    data_cls = (ItemLists(args.output_dir, 
+                train=TextList.from_df(train_df, args.output_dir, cols=["texts"], processor=processor),
+                valid=TextList.from_df(test_df, args.output_dir, cols=["texts"], processor=processor),)
+        .label_from_df("labels")
+        .databunch(bs=args.batch_size)
+        )
+
+    data_cls.sanity_check()
+    print(len(data_cls.vocab.itos))
+
+    #model
+    config = dict(emb_sz=400, n_hid=1550, n_layers=4, pad_token=1, qrnn=False,
+                 output_p=0.4, hidden_p=0.2, input_p=0.6, embed_p=0.1, weight_p=0.5)
+    trn_args = dict(bptt=70, drop_mult=0.7, alpha=2, beta=1, max_len=500)
+
+    learn = text_classifier_learner(data_cls, AWD_LSTM, config=config, pretrained=False, **trn_args)
     learn.load("bestmodel")
 
     # get predictions
