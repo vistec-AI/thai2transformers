@@ -3,7 +3,7 @@ from functools import reduce
 from typing import Tuple, Dict, Union, List
 
 
-def get_dict_val(root:Dict, keys:Union[str, List[str, str]]):
+def get_dict_val(root:Dict, keys:Union[str, List[str]]):
     """
     Access a nested object in root by item sequence.
 
