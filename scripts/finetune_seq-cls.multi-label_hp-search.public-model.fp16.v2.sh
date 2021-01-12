@@ -53,6 +53,7 @@ do
 					--wandb_run_name $WANDB_NAME \
 					--logging_steps 50 \
 					--fp16 \
+					--metric_for_best_model f1_macro \
 					${OPTIONAL_ARGS} |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
 					echo ""
