@@ -1,4 +1,6 @@
-thainer pos_pags best 1.0 0.0
+## thainer pos_pags best 1.0 0.0
+
+```
               precision    recall  f1-score   support
 
          ADJ     0.9027    0.7351    0.8104       404
@@ -19,8 +21,11 @@ thainer pos_pags best 1.0 0.0
     accuracy                         0.9450     24761
    macro avg     0.9496    0.8962    0.9206     24761
 weighted avg     0.9452    0.9450    0.9442     24761
+```
 
-thainer ner_tags best 1.0 0.0
+##thainer ner_tags best 1.0 0.0
+
+```
               precision    recall  f1-score   support
 
         DATE     0.8941    0.8216    0.8563       185
@@ -40,8 +45,11 @@ ORGANIZATION     0.8714    0.7287    0.7937       586
    micro avg     0.8529    0.7301    0.7867      1771
    macro avg     0.9026    0.7437    0.8104      1771
 weighted avg     0.8524    0.7301    0.7861      1771
+```
 
-lst20 pos_tags best 1.0 0.0
+## lst20 pos_tags best 1.0 0.0
+
+```
               precision    recall  f1-score   support
 
           NN     0.9699    0.9780    0.9740     58568
@@ -64,8 +72,11 @@ lst20 pos_tags best 1.0 0.0
     accuracy                         0.9628    207278
    macro avg     0.8160    0.8104    0.8128    207278
 weighted avg     0.9624    0.9628    0.9624    207278
+```
 
-lst20 ner_tags best 0.5 0.0
+##lst20 ner_tags best 0.5 0.0
+
+```
               precision    recall  f1-score   support
 
         _BRN     0.4286    0.1915    0.2647        47
@@ -82,3 +93,4 @@ lst20 ner_tags best 0.5 0.0
    micro avg     0.7873    0.7335    0.7594     18352
    macro avg     0.7654    0.6898    0.7213     18352
 weighted avg     0.7856    0.7335    0.7579     18352
+```
