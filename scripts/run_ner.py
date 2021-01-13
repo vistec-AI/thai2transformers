@@ -265,29 +265,6 @@ else:
 metric = load_metric("seqeval")
 
 
-def compute_metrics(p):
-    predictions, labels = p
-    predictions = np.argmax(predictions, axis=2)
-
-    # Remove ignored index (special tokens)
-    true_predictions = [
-        [label_maps[p] for (p, l) in zip(prediction, label) if l != -100]
-        for prediction, label in zip(predictions, labels)
-    ]
-    true_labels = [
-        [label_maps[l] for (p, l) in zip(prediction, label) if l != -100]
-        for prediction, label in zip(predictions, labels)
-    ]
-
-    results = metric.compute(predictions=true_predictions, references=true_labels)
-    return {
-        "precision": results["overall_precision"],
-        "recall": results["overall_recall"],
-        "f1": results["overall_f1"],
-        "accuracy": results["overall_accuracy"],
-    }
-
-
 def get_batch(obj, batch_size):
     i = 0
     r = obj[i * batch_size: i * batch_size + batch_size]
@@ -383,6 +360,41 @@ def t2t_chunk_metrics(agg_chunk_labels, agg_chunk_preds):
     return t2f_metrics.seqeval_classification_metrics(LabelsPreds)
 
 
+def t2t_sk_classification_metrics(agg_chunk_labels, agg_chunk_preds):
+    class LabelsPreds:
+        label_ids = agg_chunk_labels
+        predictions = agg_chunk_preds
+    return t2f_metrics.sk_classification_metrics(LabelsPreds, pred_labs=True)
+
+
+def compute_metrics(p):
+    predictions, labels = p
+    predictions = np.argmax(predictions, axis=2)
+
+    # Remove ignored index (special tokens)
+    true_predictions = [
+        [label_maps[p] for (p, l) in zip(prediction, label) if l != -100]
+        for prediction, label in zip(predictions, labels)
+    ]
+    true_labels = [
+        [label_maps[l] for (p, l) in zip(prediction, label) if l != -100]
+        for prediction, label in zip(predictions, labels)
+    ]
+    if 'ner' in data_args.label_name:
+        results = metric.compute(predictions=true_predictions, references=true_labels)
+        return {
+            "precision": results["overall_precision"],
+            "recall": results["overall_recall"],
+            "f1": results["overall_f1"],
+            "accuracy": results["overall_accuracy"],
+        }
+    else:
+        result = t2t_sk_classification_metrics(sum(true_labels, []),
+                                               sum(true_predictions, []))
+        result = {k: v for k, v in result.items() if k != 'classification_report'}
+        return result
+
+
 trainer = Trainer(
     model=model,
     args=training_args,
@@ -430,16 +442,26 @@ else:
 
 if not custom_args.no_train_report:
     agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, train_dataset)
-    result = t2t_chunk_metrics([[label_maps[e] for e in a] for a in agg_chunk_labels],
-                               [[label_maps[e] for e in a] for a in agg_chunk_preds])
+    agg_chunk_labels = [[label_maps[e] for e in a] for a in agg_chunk_labels]
+    agg_chunk_preds = [[label_maps[e] for e in a] for a in agg_chunk_preds]
+    if 'ner' in data_args.label_name:
+        result = t2t_chunk_metrics(agg_chunk_labels, agg_chunk_preds)
+    else:
+        result = t2t_sk_classification_metrics(sum(agg_chunk_labels, []),
+                                               sum(agg_chunk_preds, []))
     print('[ Train Result ]')
     pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
     print(result['classification_report'])
 
 if not custom_args.no_eval_report:
     agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, val_dataset)
-    result = t2t_chunk_metrics([[label_maps[e] for e in a] for a in agg_chunk_labels],
-                               [[label_maps[e] for e in a] for a in agg_chunk_preds])
+    agg_chunk_labels = [[label_maps[e] for e in a] for a in agg_chunk_labels]
+    agg_chunk_preds = [[label_maps[e] for e in a] for a in agg_chunk_preds]
+    if 'ner' in data_args.label_name:
+        result = t2t_chunk_metrics(agg_chunk_labels, agg_chunk_preds)
+    else:
+        result = t2t_sk_classification_metrics(sum(agg_chunk_labels, []),
+                                               sum(agg_chunk_preds, []))
     print('[ Val Result ]')
     pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
     print(result['classification_report'])
@@ -447,9 +469,13 @@ if not custom_args.no_eval_report:
 
 if not custom_args.no_test_report:
     agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, test_dataset)
-    result = t2t_chunk_metrics([[label_maps[e] for e in a] for a in agg_chunk_labels],
-                               [[label_maps[e] for e in a] for a in agg_chunk_preds])
+    agg_chunk_labels = [[label_maps[e] for e in a] for a in agg_chunk_labels]
+    agg_chunk_preds = [[label_maps[e] for e in a] for a in agg_chunk_preds]
+    if 'ner' in data_args.label_name:
+        result = t2t_chunk_metrics(agg_chunk_labels, agg_chunk_preds)
+    else:
+        result = t2t_sk_classification_metrics(sum(agg_chunk_labels, []),
+                                               sum(agg_chunk_preds, []))
     print('[ Test Result ]')
     pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
     print(result['classification_report'])
-
