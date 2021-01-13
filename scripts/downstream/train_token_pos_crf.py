@@ -1,5 +1,5 @@
 # call example
-# python train_token_classification_crf.py --dataset_name_or_path thainer --feature_col tokens\
+# python train_token_pos_crf.py --dataset_name_or_path thainer --feature_col tokens\
 #     --label_col ner_tags --metric_for_best_model f1_macro --c1 1.0 --c2 0.0
 
 import argparse

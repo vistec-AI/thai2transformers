@@ -1,5 +1,5 @@
 # call example
-# python train_token_classification_crf.py --dataset_name_or_path thainer --feature_col tokens\
+# python train_token_ner_crf.py --dataset_name_or_path thainer --feature_col tokens\
 #     --label_col ner_tags --metric_for_best_model f1_macro --c1 1.0 --c2 0.0
 
 import argparse
@@ -9,8 +9,7 @@ import numpy as np
 import pandas as pd
 import pycrfsuite
 from datasets import load_dataset
-from sklearn.metrics import classification_report, f1_score
-from thai2transformers.metrics import classification_metrics
+from thai2transformers.metrics import seqeval_classification_metrics
 from tqdm.auto import tqdm
 
 
@@ -73,7 +72,7 @@ class Pred:
         self.predictions = predictions
 
 
-def evaluate_crf(model_path, features, labels, tag_labels):
+def evaluate_crf(model_path, features, labels, tag_labels, args):
     tagger = pycrfsuite.Tagger()
     tagger.open(model_path)
     y_pred = []
@@ -192,12 +191,12 @@ def main():
     train_crf(f"{args.dataset_name_or_path}_{args.label_col}_best", c1, c2, x_train, y_train)
     if args.dataset_name_or_path == "lst20" and args.label_col == "ner_tags":
         res = evaluate_crf(
-            f"{args.dataset_name_or_path}_{args.label_col}_best_{c1}_{c2}.model", x_test, y_test, tag_labels[:-1]
+            f"{args.dataset_name_or_path}_{args.label_col}_best_{c1}_{c2}.model", x_test, y_test, tag_labels[:-1], args
         )  # test set of lst20 does not have E_TTL
         print(res["classification_report"])
     else:
         res = evaluate_crf(
-            f"{args.dataset_name_or_path}_{args.label_col}_best_{c1}_{c2}.model", x_test, y_test, tag_labels
+            f"{args.dataset_name_or_path}_{args.label_col}_best_{c1}_{c2}.model", x_test, y_test, tag_labels, args
         )
         print(res["classification_report"])
 
