@@ -6,6 +6,7 @@ Created on Wed Jan  6 13:12:12 2021
 @author: z
 """
 
+import pprint
 import numpy as np
 import torch
 import logging
@@ -23,14 +24,17 @@ from sklearn.metrics import f1_score, precision_recall_fscore_support, accuracy_
 try:
     from thai2transformers.tokenizers import (
         ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
-        ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer)
+        ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer,
+        SPACE_TOKEN,)
+    from thai2transformers import metrics as t2f_metrics
 except ModuleNotFoundError:
     import sys
     sys.path.append('..')  # path hacking
+    from thai2transformers import metrics as t2f_metrics
     from thai2transformers.tokenizers import (
         ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
         ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer,
-        SPACE_TOKEN)
+        SPACE_TOKEN,)
 
 from transformers import (AutoConfig, RobertaForTokenClassification,
                           Trainer, TrainingArguments,
@@ -81,9 +85,26 @@ class DataTrainingArguments:
     )
 
 
-parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
+@dataclass
+class CustomArguments:
+    no_train_report: bool = field(
+        default=False,
+        metadata={'help': 'do not report training set metrics'}
+    )
+    no_eval_report: bool = field(
+        default=False,
+        metadata={'help': 'do not report evaluation set metrics'}
+    )
+    no_test_report: bool = field(
+        default=False,
+        metadata={'help': 'do not report test set metrics'}
+    )
 
-model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+
+parser = HfArgumentParser((ModelArguments, DataTrainingArguments,
+                           TrainingArguments, CustomArguments))
+
+model_args, data_args, training_args, custom_args = parser.parse_args_into_dataclasses()
 
 # Setup logging
 logging.basicConfig(
@@ -105,34 +126,26 @@ logger.info("Training/evaluation parameters %s", training_args)
 logger.info("Data parameters %s", data_args)
 logger.info("Model parameters %s", model_args)
 
+
+def pre_tokenize(token):
+    token = token.replace(' ', SPACE_TOKEN)
+    return token
+
+
 cached_tokenize = None
 
 if model_args.tokenizer_type == 'AutoTokenizer':
     # bert-base-multilingual-cased
     tokenizer = AutoTokenizer.from_pretrained(model_args.tokenizer_name_or_path)
+    tokenizer.add_tokens(SPACE_TOKEN)
 
-    if data_args.dataset_name == 'thainer':
-        # in thainer there's a space as a legit token but why?
-        tokenizer.add_tokens(SPACE_TOKEN)
+    @lru_cache(maxsize=None)
+    def temp_cached_tokenize(token):
+        token = pre_tokenize(token)
+        ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
+        return ids
+    cached_tokenize = temp_cached_tokenize
 
-        @lru_cache(maxsize=None)
-        def cached_subword_tokenize(token):
-            token = token.replace(' ', SPACE_TOKEN)
-            tokens = tokenizer.tokenize(token)
-            if not tokens:
-                # default to space token, for somehow untokenizable text, weird unicode?
-                token = SPACE_TOKEN
-                return tokenizer.tokenize(token)
-            # subword tokenizer will add '##' to subword so we revert it
-            return [tokens[0]] + [e.replace('##', '') for e in tokens[1:]]
-        cached_tokenize = cached_subword_tokenize
-    else:
-        # other dataset might be cleaner but if you want to be sure check it
-        @lru_cache(maxsize=None)
-        def cached_subword_tokenize(token):
-            tokens = tokenizer.tokenize(token)
-            return [tokens[0]] + [e.replace('##', '') for e in tokens[1:]]
-        cached_tokenize = cached_subword_tokenize
 
 elif model_args.tokenizer_type == 'ThaiRobertaTokenizer':
     tokenizer = ThaiRobertaTokenizer.from_pretrained(
@@ -170,8 +183,9 @@ else:
 
 if cached_tokenize is None:
     def cached_tokenize(token):
-        token = token.replace(' ', SPACE_TOKEN)
-        return tokenizer.tokenize(token)
+        token = pre_tokenize(token)
+        ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
+        return ids
 
 
 def preprocess(examples):
@@ -194,9 +208,10 @@ def preprocess(examples):
         tokens.append(new_example_tokens)
         labels.append(new_example_labels)
         old_positions.append(old_position)
-    tokenized_inputs = tokenizer(tokens, is_split_into_words=True,
-                                 truncation=True, add_special_tokens=True,
-                                 max_length=data_args.max_length)
+    tokenized_inputs = tokenizer._batch_prepare_for_model(
+        [(e, None) for e in tokens],
+        truncation_strategy=transformers.tokenization_utils_base.TruncationStrategy.LONGEST_FIRST,
+        add_special_tokens=True, max_length=data_args.max_length)
     # in case of needed truncation we need to chop off some of the labels manually
     max_length = max(len(e) for e in tokenized_inputs['input_ids'])
     # add -100 to first and last token which is special tokens for <s> and </s>
@@ -361,6 +376,13 @@ def compute_chunk_metrics(agg_chunk_labels, agg_chunk_preds):
     return results, report
 
 
+def t2t_chunk_metrics(agg_chunk_labels, agg_chunk_preds):
+    class LabelsPreds:
+        label_ids = agg_chunk_labels
+        predictions = agg_chunk_preds
+    return t2f_metrics.seqeval_classification_metrics(LabelsPreds)
+
+
 trainer = Trainer(
     model=model,
     args=training_args,
@@ -406,38 +428,28 @@ else:
     raise NotImplementedError
 
 
-agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, train_dataset)
-token_results, token_report = compute_token_metrics(agg_chunk_labels, agg_chunk_preds)
-chunk_results, chunk_report = compute_chunk_metrics(agg_chunk_labels, agg_chunk_preds)
+if not custom_args.no_train_report:
+    agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, train_dataset)
+    result = t2t_chunk_metrics([[label_maps[e] for e in a] for a in agg_chunk_labels],
+                               [[label_maps[e] for e in a] for a in agg_chunk_preds])
+    print('[ Train Result ]')
+    pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
+    print(result['classification_report'])
 
-print('====== Train ======')
-print('Token:')
-print(token_results)
-print(token_report)
-print('Chunk:')
-print(chunk_results)
-print(chunk_report)
+if not custom_args.no_eval_report:
+    agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, val_dataset)
+    result = t2t_chunk_metrics([[label_maps[e] for e in a] for a in agg_chunk_labels],
+                               [[label_maps[e] for e in a] for a in agg_chunk_preds])
+    print('[ Val Result ]')
+    pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
+    print(result['classification_report'])
 
-agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, val_dataset)
-token_results, token_report = compute_token_metrics(agg_chunk_labels, agg_chunk_preds)
-chunk_results, chunk_report = compute_chunk_metrics(agg_chunk_labels, agg_chunk_preds)
 
-print('====== Validation ======')
-print('Token:')
-print(token_results)
-print(token_report)
-print('Chunk:')
-print(chunk_results)
-print(chunk_report)
+if not custom_args.no_test_report:
+    agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, test_dataset)
+    result = t2t_chunk_metrics([[label_maps[e] for e in a] for a in agg_chunk_labels],
+                               [[label_maps[e] for e in a] for a in agg_chunk_preds])
+    print('[ Test Result ]')
+    pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
+    print(result['classification_report'])
 
-agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, test_dataset)
-token_results, token_report = compute_token_metrics(agg_chunk_labels, agg_chunk_preds)
-chunk_results, chunk_report = compute_chunk_metrics(agg_chunk_labels, agg_chunk_preds)
-
-print('====== Test ======')
-print('Token:')
-print(token_results)
-print(token_report)
-print('Chunk:')
-print(chunk_results)
-print(chunk_report)

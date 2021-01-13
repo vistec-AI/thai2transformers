@@ -20,6 +20,30 @@ def classification_metrics(pred, pred_labs=False):
         'nb_samples': len(labels)
     }
 
+
+def seqeval_classification_metrics(pred):
+    from seqeval.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+    labels = pred.label_ids
+    preds = pred.predictions
+    precision_macro = precision_score(labels, preds, average='macro')
+    recall_macro = recall_score(labels, preds, average='macro')
+    f1_macro = f1_score(labels, preds, average='macro')
+    precision_micro = precision_score(labels, preds, average='micro')
+    recall_micro = recall_score(labels, preds, average='micro')
+    f1_micro = f1_score(labels, preds, average='micro')
+    acc = accuracy_score(labels, preds)
+    return {
+        'accuracy': acc,
+        'f1_micro': f1_micro,
+        'precision_micro': precision_micro,
+        'recall_micro': recall_micro,
+        'f1_macro': f1_macro,
+        'precision_macro': precision_macro,
+        'recall_macro': recall_macro,
+        'nb_samples': len(labels),
+        'classification_report': classification_report(labels, preds, digits=4)
+    }
+
 def _compute_best_threshold(targets, probs):
     f1s = []
     for threshold in range(1,100):
