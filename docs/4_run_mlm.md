@@ -4,7 +4,7 @@ This step train a mask language model using trained tokenizer and datasets. The 
 
 ## Instruction
 
-The following command can be use to train a mask language model (Append `--help` after the `run_mlm.py` to get more information).
+The following command can be used to train a mask language model (Append `--help` after the `run_mlm.py` to get more information).
 
 ```bash
 python run_mlm.py \

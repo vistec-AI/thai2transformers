@@ -113,7 +113,7 @@ def rm_useless_spaces(text: str) -> str:
     """
     return re.sub(" {2,}", " ", text)
 
-def replace_spaces(text: str) -> str:
+def replace_spaces(text: str, space_token: str = SPACE_SPECIAL_TOKEN) -> str:
     """
         Replace spaces with _
         :param str text: text to replace spaces
@@ -123,7 +123,7 @@ def replace_spaces(text: str) -> str:
             >>> replace_spaces("oh no")
             oh_no
     """
-    return re.sub(" ", SPACE_SPECIAL_TOKEN, text)
+    return re.sub(" ", space_token, text)
 
 
 def replace_rep_after(text: str) -> str:
@@ -227,7 +227,7 @@ def process_transformers(
     ],
     tok_func: Callable = word_tokenize,
     post_rules: Collection[Callable] = [ungroup_emoji, replace_wrep_post],
-):
+) -> str:
     text = text.lower()
     for rule in pre_rules:
         text = rule(text)

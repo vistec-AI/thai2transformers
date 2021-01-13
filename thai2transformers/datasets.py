@@ -13,8 +13,9 @@ from filelock import FileLock
 import logging, time
 from typing import Optional
 import joblib
+from .utils import get_dict_val
+from .conf import Task
 nb_cores = multiprocessing.cpu_count()
-
 
 @contextmanager
 def disable_gc():
@@ -279,31 +280,131 @@ class SequenceClassificationDataset(Dataset):
         self,
         tokenizer,
         data_dir,
+        task=Task.MULTICLASS_CLS,
         max_length=128,
         ext=".csv",
         bs=10000,
         preprocessor=None,
+        input_ids=[],
+        attention_masks=[],
+        labels=[],
+        label_encoder=None
     ):
         self.fnames = glob.glob(f"{data_dir}/*{ext}")
         self.max_length = max_length
         self.tokenizer = tokenizer
         self.bs = bs
         self.preprocessor = preprocessor
-        self.input_ids = []
-        self.attention_masks = []
-        self.labels = []
-
+        self.input_ids = input_ids
+        self.attention_masks = attention_masks
+        self.labels = labels
+        self.task = task
+        self.label_encoder = label_encoder
         self._build()
 
     def __len__(self):
         return len(self.labels)
 
     def __getitem__(self, i):
-        return {
-            "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
-            "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
-            "label": torch.tensor(self.labels[i], dtype=torch.long),
-        }
+        if self.task == Task.MULTICLASS_CLS:
+            return {
+                "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
+                "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
+                "label": torch.tensor(self.labels[i], dtype=torch.long),
+            }
+        elif self.task == Task.MULTILABEL_CLS:
+            return {
+                "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
+                "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
+                "label_ids": torch.tensor(self.labels[i], dtype=torch.float),
+            }
+        else:
+            raise NotImplementedError
+
+    @classmethod
+    def from_dataset(cls,
+                     task,
+                     tokenizer,
+                     dataset,
+                     text_column_name,
+                     label_column_name,
+                     prepare_for_tokenization,
+                     max_length=128,
+                     bs=1000,
+                     space_token='<_>',
+                     preprocessor=None,
+                     label_encoder=None):
+        
+        input_ids, attention_masks, labels = SequenceClassificationDataset._build_from_dataset(
+                     task,
+                     tokenizer,
+                     dataset,
+                     text_column_name,
+                     label_column_name,
+                     max_length=max_length,
+                     bs=bs,
+                     prepare_for_tokenization=prepare_for_tokenization,
+                     space_token=space_token,
+                     preprocessor=preprocessor,
+                     label_encoder=label_encoder)
+
+        return cls(
+            tokenizer=tokenizer,
+            data_dir=None,
+            max_length=max_length,
+            bs=bs,
+            input_ids=input_ids,
+            attention_masks=attention_masks,
+            labels=labels,
+            task=task,
+            preprocessor=preprocessor,
+            label_encoder=label_encoder
+        )
+    
+    @staticmethod
+    def _build_from_dataset(task, tokenizer, dataset,
+                            text_column_name, label_column_name,
+                            space_token, max_length, bs,
+                            prepare_for_tokenization,
+                            label_encoder,
+                            preprocessor=None):
+        texts = get_dict_val(dataset, text_column_name)
+        if task == Task.MULTICLASS_CLS:
+            labels = get_dict_val(dataset, label_column_name)
+
+            if label_encoder != None:
+                labels = label_encoder.transform(labels)
+
+        elif task == Task.MULTILABEL_CLS:
+            _labels = []
+            for i, name in enumerate(label_column_name):
+                # print(name)
+                _labels.append(get_dict_val(dataset, name))
+            labels = list(zip(*_labels))
+        else:
+            raise NotImplementedError
+        
+        input_ids = []
+        attention_masks = []
+
+        if preprocessor != None:
+            print('[INFO] Apply preprocessor to texts.')
+            texts = list(map(preprocessor, texts))
+
+        for i in tqdm(range(math.ceil(len(texts) / bs))):
+
+            batched_texts = texts[i * bs: (i+1) * bs]
+
+            tokenized_inputs = tokenizer(
+                batched_texts,
+                max_length=max_length,
+                truncation=True,
+                # padding='max_length'            
+            )
+            # add to list
+            input_ids += tokenized_inputs["input_ids"]
+            attention_masks += tokenized_inputs["attention_mask"]
+        return input_ids, attention_masks, labels
 
     def _build(self):
         for fname in tqdm(self.fnames):
@@ -323,7 +424,7 @@ class SequenceClassificationDataset(Dataset):
                     texts,
                     max_length=self.max_length,
                     truncation=True,
-                    pad_to_max_length=True,
+                    # padding='max_length'
                 )
 
                 # add to list
