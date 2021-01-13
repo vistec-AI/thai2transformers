@@ -12,4 +12,6 @@ tensorboard==2.3.0
 pydantic==1.7.3
 jsonlines==1.2.0
 nltk==3.4.5
+tensorflow>=2.0.0
 sefr_cut==0.2
+git+git://github.com/huggingface/datasets.git@686717b3cc56dcf830106f0e231bb22406b86156

@@ -9,10 +9,10 @@
 
 1) PyTorch
 
-    In this repository, we use PyTorch as a framework to train langauage model. The version of PyTorch that we used is 1.5.0.
+    In this repository, we use PyTorch as a framework to train langauage model. The version of PyTorch that we used is 1.5.0 with CUDA 10.2.
 
     ```
-    pip install torch===1.5.0
+    pip install torch==1.5.0
     ```
 
 2) SentencePiece
@@ -20,8 +20,7 @@
     In order to manually build SentencePiece model from raw text files, it is required to install SentencePiece from source. (ref: https://github.com/google/sentencepiece#c-from-source)
 
     ```
-    apt-get update
-    apt-get install cmake build-essential pkg-config libgoogle-perftools-dev
+    sudo apt-get install cmake build-essential pkg-config libgoogle-perftools-dev
 
     git clone https://github.com/google/sentencepiece.git
     cd sentencepiece
@@ -29,8 +28,8 @@
     cd build
     cmake ..
     make -j $(nproc)
-    make install
-    ldconfig -v
+    sudo make install
+    sudo ldconfig -v
     ```
     On OSX/macOS, replace the last command with sudo update_dyld_shared_cache
 
