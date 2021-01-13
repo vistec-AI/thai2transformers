@@ -99,6 +99,10 @@ class CustomArguments:
         default=False,
         metadata={'help': 'do not report test set metrics'}
     )
+    lst20_data_dir: Optional[str] = field(
+        default=None,
+        metadata={'help': 'path to lst20 dataset'}
+    )
 
 
 parser = HfArgumentParser((ModelArguments, DataTrainingArguments,
@@ -126,27 +130,10 @@ logger.info("Training/evaluation parameters %s", training_args)
 logger.info("Data parameters %s", data_args)
 logger.info("Model parameters %s", model_args)
 
-
-def pre_tokenize(token):
-    token = token.replace(' ', SPACE_TOKEN)
-    return token
-
-
-cached_tokenize = None
-
 if model_args.tokenizer_type == 'AutoTokenizer':
     # bert-base-multilingual-cased
     tokenizer = AutoTokenizer.from_pretrained(model_args.tokenizer_name_or_path)
     tokenizer.add_tokens(SPACE_TOKEN)
-
-    @lru_cache(maxsize=None)
-    def temp_cached_tokenize(token):
-        token = pre_tokenize(token)
-        ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
-        return ids
-    cached_tokenize = temp_cached_tokenize
-
-
 elif model_args.tokenizer_type == 'ThaiRobertaTokenizer':
     tokenizer = ThaiRobertaTokenizer.from_pretrained(
         model_args.tokenizer_name_or_path)
@@ -175,17 +162,30 @@ if data_args.dataset_name == 'thainer':
     # you will also need to merge *ไม่ยืนยัน tags into "O"
     # by removing it from _NER_TAGS
     dataset = load_dataset("thainer")
-    label_maps = {i: name for i, name in enumerate(dataset['train'].features[label_col].feature.names)}
+    label_maps = {i: name for i, name in
+                  enumerate(dataset['train'].features[label_col].feature.names)}
+    label_names = dataset['train'].features[label_col].feature.names
+    num_labels = dataset['train'].features[label_col].feature.num_classes
+elif data_args.dataset_name == 'lst20':
+    dataset = load_dataset('lst20', data_dir=custom_args.lst20_data_dir)
+    label_maps = {i: name for i, name in
+                  enumerate(dataset['train'].features[label_col].feature.names)}
     label_names = dataset['train'].features[label_col].feature.names
     num_labels = dataset['train'].features[label_col].feature.num_classes
 else:
     raise NotImplementedError
 
-if cached_tokenize is None:
-    def cached_tokenize(token):
-        token = pre_tokenize(token)
-        ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
-        return ids
+
+def pre_tokenize(token):
+    token = token.replace(' ', SPACE_TOKEN)
+    return token
+
+
+@lru_cache(maxsize=None)
+def cached_tokenize(token):
+    token = pre_tokenize(token)
+    ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
+    return ids
 
 
 def preprocess(examples):
@@ -247,6 +247,23 @@ if data_args.dataset_name == 'thainer':
     # val set need padding to fix problem with trainer
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
+elif data_args.dataset_name == 'lst20':
+    # exclude last example, lst20 dataset generator adding blank into the last example.
+    split = dataset['train'].train_test_split(test_size=1, shuffle=False)
+    train_dataset = split['train']
+
+    split = dataset['validation'].train_test_split(test_size=1, shuffle=False)
+    val_dataset = split['train']
+
+    split = dataset['test'].train_test_split(test_size=1, shuffle=False)
+    test_dataset = split['train']
+
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset))
+    # val set need padding to fix problem with trainer
+    val_dataset = Dataset.from_dict(data_collator(val_dataset))
+    test_dataset = Dataset.from_dict(data_collator(test_dataset))
 else:
     raise NotImplementedError
 
@@ -256,6 +273,8 @@ model = AutoModelForTokenClassification.from_pretrained(
 if model.config.vocab_size == len(tokenizer) - len(tokenizer.get_added_vocab()):
     # resize to accomodate added token
     model.resize_token_embeddings(len(tokenizer))
+elif model.config.vocab_size == len(tokenizer) and len(tokenizer.get_added_vocab()) > 0:
+    logger.warning('model might already accomodate added token')
 else:
     logger.warning(f'model vocab size ({model.config.vocab_size}) is not equal to'
                    f'tokenizer ({len(tokenizer)}), '
@@ -429,6 +448,24 @@ if data_args.dataset_name == 'thainer':
     val_dataset = split['train']
     test_dataset = split['test']
     # preprocess
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset))
+    # val set need padding to fix problem with trainer
+    train_dataset = Dataset.from_dict(data_collator(train_dataset))
+    val_dataset = Dataset.from_dict(data_collator(val_dataset))
+    test_dataset = Dataset.from_dict(data_collator(test_dataset))
+elif data_args.dataset_name == 'lst20':
+    # exclude last example, lst20 dataset generator adding blank into the last example.
+    split = dataset['train'].train_test_split(test_size=1, shuffle=False)
+    train_dataset = split['train']
+
+    split = dataset['validation'].train_test_split(test_size=1, shuffle=False)
+    val_dataset = split['train']
+
+    split = dataset['test'].train_test_split(test_size=1, shuffle=False)
+    test_dataset = split['train']
+
     train_dataset = Dataset.from_dict(preprocess(train_dataset))
     val_dataset = Dataset.from_dict(preprocess(val_dataset))
     test_dataset = Dataset.from_dict(preprocess(test_dataset))
