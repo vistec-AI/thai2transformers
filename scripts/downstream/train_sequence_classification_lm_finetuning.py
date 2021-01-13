@@ -413,7 +413,6 @@ if __name__ == '__main__':
     _, label_ids, result = trainer.predict(
                 test_dataset=dataset_split['test'])
 
-    print(f'[DEBUG] label_ids = {label_ids}')
     print(f'Evaluation on test set (dataset: {args.dataset_name})')    
     
     for key, value in result.items():
