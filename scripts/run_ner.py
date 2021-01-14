@@ -11,6 +11,7 @@ import numpy as np
 import torch
 import logging
 import transformers
+import datasets
 from dataclasses import dataclass, field
 from typing import Optional
 from custom_data_collator import DataCollatorForTokenClassification
@@ -143,6 +144,8 @@ elif model_args.tokenizer_type == 'ThaiWordsNewmmTokenizer':
 elif model_args.tokenizer_type == 'ThaiWordsSyllableTokenizer':
     tokenizer = ThaiWordsSyllableTokenizer.from_pretrained(
         model_args.tokenizer_name_or_path)
+elif model_args.tokenizer_type == 'skip':
+    logging.info('Skip tokenizer')
 else:
     raise NotImplementedError(f'tokenizer_type {model_args.tokenizer_type} is not implemeted.')
 
@@ -172,6 +175,35 @@ elif data_args.dataset_name == 'lst20':
                   enumerate(dataset['train'].features[label_col].feature.names)}
     label_names = dataset['train'].features[label_col].feature.names
     num_labels = dataset['train'].features[label_col].feature.num_classes
+elif data_args.dataset_name == 'dummytest':
+    def generat_dummy_dataset(size, max_length, max_token_length, label_names, label_sizes):
+        d = {'tokens': []}
+        c = {}
+        chars = [chr(i) for i in range(97, 123, 1)]
+        for label_name, label_size in zip(label_names, label_sizes):
+            d[label_name] = []
+            c[label_name] = list(range(label_size))
+        for i in range(size):
+            length = np.random.randint(1, max_length)
+            d['tokens'].append([''.join(np.random.choice(chars, size=max_token_length))
+                                for _ in range(length)])
+            for label_name in label_names:
+                dummy_labels = np.random.choice(c[label_name],
+                                                size=length)
+                d[label_name].append(dummy_labels)
+        return Dataset.from_dict(d)
+    dataset = datasets.DatasetDict(
+        {'train': generat_dummy_dataset(50, 50, 8, ['ner_tags', 'pos_tags'], [10, 20]),
+         'validation': generat_dummy_dataset(10, 50, 8, ['ner_tags', 'pos_tags'], [10, 20]),
+         'test': generat_dummy_dataset(10, 50, 8, ['ner_tags', 'pos_tags'], [10, 20])
+         })
+    label_maps = {i: str(name) for i, name in
+                  enumerate(range(20))}
+    if 'ner' in label_col.lower():
+        label_names = ['O'] + ['B-' + str(name) for i, name in enumerate(range(1, 20))]
+    else:
+        label_names = [str(name) for i, name in enumerate(range(20))]
+    num_labels = 20
 else:
     raise NotImplementedError
 
@@ -262,6 +294,16 @@ elif data_args.dataset_name == 'lst20':
     val_dataset = Dataset.from_dict(preprocess(val_dataset))
     test_dataset = Dataset.from_dict(preprocess(test_dataset))
     # val set need padding to fix problem with trainer
+    val_dataset = Dataset.from_dict(data_collator(val_dataset))
+    test_dataset = Dataset.from_dict(data_collator(test_dataset))
+elif data_args.dataset_name == 'dummytest':
+    train_dataset = dataset['train']
+    val_dataset = dataset['validation']
+    test_dataset = dataset['test']
+
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
 else:
@@ -473,6 +515,13 @@ elif data_args.dataset_name == 'lst20':
     train_dataset = Dataset.from_dict(data_collator(train_dataset))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
+elif data_args.dataset_name == 'dummytest':
+    train_dataset = dataset['train']
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    train_dataset = Dataset.from_dict(data_collator(train_dataset))
+    val_dataset = dataset['validation']
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    val_dataset = Dataset.from_dict(data_collator(val_dataset))
 else:
     raise NotImplementedError
 
