@@ -4,10 +4,9 @@ declare -A tokenizer_type
 declare -A model_name_or_path
 declare -A dataset_size
 
-tokenizer_type["spm_camembert"]="Camembert"
+tokenizer_type["spm_camembert"]="CamembertTokenizer"
 
 tokenizer_name_or_path["spm_camembert"]="/workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/tokenizer_folder"
-
 model_name_or_path["som_camembert"]="/workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/model/checkpoint-320000"
 
 
