@@ -293,9 +293,9 @@ if data_args.dataset_name == 'thainer':
     val_dataset = split['train']
     test_dataset = split['test']
     # preprocess
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
     # val set need padding to fix problem with trainer
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
@@ -310,9 +310,9 @@ elif data_args.dataset_name == 'lst20':
     split = dataset['test'].train_test_split(test_size=1, shuffle=False)
     test_dataset = split['train']
 
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
     # val set need padding to fix problem with trainer
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
@@ -321,9 +321,9 @@ elif data_args.dataset_name == 'dummytest':
     val_dataset = dataset['validation']
     test_dataset = dataset['test']
 
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
 else:
@@ -510,9 +510,9 @@ if data_args.dataset_name == 'thainer':
     val_dataset = split['train']
     test_dataset = split['test']
     # preprocess
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
     # val set need padding to fix problem with trainer
     train_dataset = Dataset.from_dict(data_collator(train_dataset))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
@@ -528,19 +528,19 @@ elif data_args.dataset_name == 'lst20':
     split = dataset['test'].train_test_split(test_size=1, shuffle=False)
     test_dataset = split['train']
 
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
     # val set need padding to fix problem with trainer
     train_dataset = Dataset.from_dict(data_collator(train_dataset))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
 elif data_args.dataset_name == 'dummytest':
     train_dataset = dataset['train']
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
     train_dataset = Dataset.from_dict(data_collator(train_dataset))
     val_dataset = dataset['validation']
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
 else:
     raise NotImplementedError
