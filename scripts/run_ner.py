@@ -106,6 +106,10 @@ class CustomArguments:
         default='<_>',
         metadata={'help': 'specify custom space token'}
     )
+    lowercase:str = field(
+        default=False,
+        metadata={'help': 'Apply lowercase to input texts'}
+    )
 
 
 parser = HfArgumentParser((ModelArguments, DataTrainingArguments,
@@ -132,6 +136,7 @@ logger.info("Training/evaluation parameters %s", training_args)
 
 logger.info("Data parameters %s", data_args)
 logger.info("Model parameters %s", model_args)
+logger.info("Custom args %s", custom_args)
 
 if model_args.tokenizer_type == 'AutoTokenizer':
     # bert-base-multilingual-cased
@@ -227,7 +232,7 @@ def pre_tokenize(token, space_token):
 
 
 @lru_cache(maxsize=None)
-def cached_tokenize(token, space_token, lowercase=True):
+def cached_tokenize(token, space_token, lowercase):
     if lowercase:
         token = token.lower()
     token = pre_tokenize(token, space_token)
@@ -235,7 +240,7 @@ def cached_tokenize(token, space_token, lowercase=True):
     return ids
 
 
-def preprocess(examples, space_token):
+def preprocess(examples, space_token, lowercase):
     tokens = []
     labels = []
     old_positions = []
@@ -245,7 +250,7 @@ def preprocess(examples, space_token):
         old_position = []
         for i, (token, label) in enumerate(zip(example_tokens, example_labels)):
             # tokenize each already pretokenized tokens with our own tokenizer.
-            toks = cached_tokenize(token, space_token)
+            toks = cached_tokenize(token, space_token, lowercase=custom_args.lowercase)
             n_toks = len(toks)
             new_example_tokens.extend(toks)
             # expand label to cover all tokens that get split in a pretokenized token
