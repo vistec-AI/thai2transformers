@@ -7,7 +7,7 @@ declare -A dataset_size
 tokenizer_type["spm_camembert"]="CamembertTokenizer"
 
 tokenizer_name_or_path["spm_camembert"]="/workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/tokenizer_folder"
-model_name_or_path["som_camembert"]="/workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/model/checkpoint-320000"
+model_name_or_path["spm_camembert"]="/workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/model/checkpoint-320000"
 
 
 dataset_size["thainer"]="5078"
@@ -65,7 +65,7 @@ do
                 --eval_steps $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size"))) \
                 --max_steps $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 3)) \
                 --evaluation_strategy steps \
-                --output_dir /workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/finetuning/$EXP_NAME \
+                --output_dir /workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/finetuned/$EXP_NAME \
                 --do_train \
                 --do_eval \
                 --max_length 512 \
