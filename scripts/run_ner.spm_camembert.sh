@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+VERSION=$1
+
 declare -A tokenizer_name_or_path
 declare -A tokenizer_type
 declare -A model_name_or_path
@@ -14,8 +16,8 @@ dataset_size["thainer"]="5078"
 dataset_size["lst20"]="67104"
 dataset_size["dummytest"]="50"
 
-output_base_dir=/workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/finetuning/
-log_folder=/workspace/logs/roberta_th/95gb-text-corpora/spm_camembert/finetuning/
+output_base_dir=/workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/finetuned/
+log_folder=/workspace/logs/roberta_th/95gb-text-corpora/spm_camembert/finetuned/
 
 declare -a base_models=("spm_camembert")
 declare -a dataset_names=("thainer" "lst20")
@@ -30,7 +32,7 @@ do
     do
         for model in "${base_models[@]}"
         do
-            EXP_NAME="${dataset_name}-${label_name}"
+            EXP_NAME="${dataset_name}-${label_name}.${VERSION}"
             log_path="${log_folder}/${dataset_name}/${EXP_NAME}.log"
             if [ -e "$log_path" ]; then
                 echo "$log_path exist."
