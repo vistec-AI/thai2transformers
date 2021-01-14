@@ -36,6 +36,7 @@ do
                 echo "$log_path exist."
                 continue
             fi
+            mkdir -p ${log_folder}
             touch "$log_path"
             echo "==================== Running Exp ===================="
             echo "${EXP_NAME}"
