@@ -26,7 +26,7 @@ dataset_size["thainer"]="5078"
 dataset_size["lst20"]="67104"
 dataset_size["dummytest"]="50"
 
-output_base_dir=/ist/ist-share/scads/zo/thai2transformers/exp_finetune_new
+output_base_dir=/ist/ist-share/scads/zo/thai2transformers/exp_finetune
 log_folder=logging_new
 
 declare -a base_models=("xlm" "mbert" "syllable" "newmm" "spm")
@@ -77,7 +77,7 @@ do
                 --eval_steps $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size"))) \
                 --max_steps $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 3)) \
                 --evaluation_strategy steps \
-                --output_dir /ist/ist-share/scads/zo/thai2transformers/exp_finetune/$EXP_NAME \
+                --output_dir $output_base_dir/$EXP_NAME \
                 --do_train \
                 --do_eval \
                 --max_length 512 \
