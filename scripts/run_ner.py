@@ -41,7 +41,7 @@ from transformers import (AutoConfig, RobertaForTokenClassification,
                           Trainer, TrainingArguments,
                           AutoModelForTokenClassification, AutoTokenizer,
                           BertForTokenClassification,
-                          HfArgumentParser)
+                          HfArgumentParser, CamembertTokenizer)
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +104,10 @@ class CustomArguments:
         default=None,
         metadata={'help': 'path to lst20 dataset'}
     )
+    space_token:str = field(
+        default='<_>',
+        metadata={'help': 'specify custom space token'}
+    )
 
 
 parser = HfArgumentParser((ModelArguments, DataTrainingArguments,
@@ -144,6 +148,13 @@ elif model_args.tokenizer_type == 'ThaiWordsNewmmTokenizer':
 elif model_args.tokenizer_type == 'ThaiWordsSyllableTokenizer':
     tokenizer = ThaiWordsSyllableTokenizer.from_pretrained(
         model_args.tokenizer_name_or_path)
+elif model_args.tokenizer_type == 'CamembertTokenizer':
+    tokenizer = CamembertTokenizer.from_pretrained(
+        model_args.tokenizer_name_or_path)
+    tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', custom_args.space_token]
+    # Override "SPACE_TOKEN" variable with user supplied space token
+    SPACE_TOKEN = custom_args.space_token
+    logger.info("[INFO] SPACE_TOKEN = `%s`", SPACE_TOKEN)
 elif model_args.tokenizer_type == 'skip':
     logging.info('Skip tokenizer')
 else:
