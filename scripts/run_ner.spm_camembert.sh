@@ -68,7 +68,7 @@ do
                 --output_dir /workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/finetuned/$EXP_NAME \
                 --do_train \
                 --do_eval \
-                --max_length 512 \
+                --max_length 416 \
                 --fp16 \
                 --load_best_model_at_end
                 "
