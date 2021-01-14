@@ -31,12 +31,12 @@ do
         for model in "${base_models[@]}"
         do
             EXP_NAME="${dataset_name}-${label_name}"
-            log_path="${log_folder}/${EXP_NAME}.log"
+            log_path="${log_folder}/${dataset_name}/${EXP_NAME}.log"
             if [ -e "$log_path" ]; then
                 echo "$log_path exist."
                 continue
             fi
-            mkdir -p ${log_folder}
+            mkdir -p "${log_folder}/${dataset_name}"
             touch "$log_path"
             echo "==================== Running Exp ===================="
             echo "${EXP_NAME}"
@@ -70,7 +70,8 @@ do
                 --do_eval \
                 --max_length 416 \
                 --fp16 \
-                --load_best_model_at_end
+                --load_best_model_at_end \
+                --run_name $EXP_NAME
                 "
                 script -q -c "bash -c ${command@Q}" /dev/null | tee "$log_path"
             sleep 0.5
