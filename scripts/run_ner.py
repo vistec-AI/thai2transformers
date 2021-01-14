@@ -174,7 +174,7 @@ if data_args.dataset_name == 'thainer':
     # you will also need to merge *ไม่ยืนยัน tags into "O"
     # by removing it from _NER_TAGS
     dataset = load_dataset("thainer")
-      # Remove tag: ไม่ยืนยัน
+    # Remove tag: ไม่ยืนยัน
     if label_col == 'ner_tags':
         dataset['train'] = dataset['train'].map(lambda examples: {'ner_tags': [i if i not in [13,26] else 27 for i in examples[label_col]]})
 
