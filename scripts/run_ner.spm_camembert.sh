@@ -49,7 +49,7 @@ do
             echo "Output Dir: ${output_base_dir}/${EXP_NAME}"
             command="
                 set -x
-                WANDB_PROJECT=\"thai2transformers_finetune\" python3 run_ner.py --tokenizer_type ${tokenizer_type["${model}"]} \
+                python3 run_ner.py --tokenizer_type ${tokenizer_type["${model}"]} \
                 --tokenizer_name_or_path ${tokenizer_name_or_path["${model}"]} \
                 --model_name_or_path ${model_name_or_path["${model}"]} \
                 --dataset_name ${dataset_name} \
