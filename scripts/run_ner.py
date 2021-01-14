@@ -223,7 +223,9 @@ def pre_tokenize(token, space_token):
 
 
 @lru_cache(maxsize=None)
-def cached_tokenize(token, space_token):
+def cached_tokenize(token, space_token, lowercase=True):
+    if lowercase:
+        token = token.lower()
     token = pre_tokenize(token, space_token)
     ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
     return ids
