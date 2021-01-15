@@ -111,11 +111,11 @@ class CustomArguments:
         default=None,
         metadata={'help': 'path to lst20 dataset'}
     )
-    space_token:str = field(
+    space_token: str = field(
         default='<_>',
         metadata={'help': 'specify custom space token'}
     )
-    lowercase:str = field(
+    lowercase: bool = field(
         default=False,
         metadata={'help': 'Apply lowercase to input texts'}
     )
