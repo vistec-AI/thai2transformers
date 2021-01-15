@@ -9,10 +9,10 @@
 
 1) PyTorch
 
-    In this repository, we use PyTorch as a framework to train langauage model. The version of PyTorch that we used is 1.5.0.
+    In this repository, we use PyTorch as a framework to train langauage model. The version of PyTorch that we used is 1.5.0 with CUDA 10.2.
 
     ```
-    pip install torch===1.5.0
+    pip install torch==1.5.0
     ```
 
 2) SentencePiece

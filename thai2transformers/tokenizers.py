@@ -573,7 +573,7 @@ class ThaiRobertaTokenizer(PreTrainedTokenizer):
 
         return (out_vocab_file,)
 
-    def prepare_for_tokenization(self, text, is_split_into_words=False, **kwargs):
+    def prepare_for_tokenization(self, text, space_token=SPACE_TOKEN, is_split_into_words=False, **kwargs):
         if "is_pretokenized" in kwargs:
             warnings.warn(
                 "`is_pretokenized` is deprecated and will be removed in a future version, use `is_split_into_words` instead.",
@@ -583,7 +583,7 @@ class ThaiRobertaTokenizer(PreTrainedTokenizer):
 
         # replace empty space with special space token
 
-        text = text.replace(' ', SPACE_TOKEN)
+        text = text.replace(' ', space_token)
 
         return (text, kwargs)
 
@@ -711,7 +711,7 @@ class BaseThaiWordsTokenizer(PreTrainedTokenizer):
 
         return (out_vocab_file,)
 
-    def prepare_for_tokenization(self, text, is_split_into_words=False, **kwargs):
+    def prepare_for_tokenization(self, text, space_token=SPACE_TOKEN, is_split_into_words=False, **kwargs):
         if "is_pretokenized" in kwargs:
             warnings.warn(
                 "`is_pretokenized` is deprecated and will be removed in a future version, use `is_split_into_words` instead.",
@@ -721,7 +721,7 @@ class BaseThaiWordsTokenizer(PreTrainedTokenizer):
 
         # replace empty space with special space token
 
-        text = text.replace(' ', SPACE_TOKEN)
+        text = text.replace(' ', space_token)
 
         return (text, kwargs)
 
