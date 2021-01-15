@@ -204,7 +204,7 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, da
                         no_cuda=args.no_cuda,
                         metric_for_best_model=args.metric_for_best_model,
                         prediction_loss_only=False,
-                        run_name=args.wandb_run_name
+                        run_name=args.run_name
                     )
     if task == Task.MULTICLASS_CLS:
         compute_metrics_fn = METRICS[task]
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     parser.add_argument('--tokenizer_dir', type=str)
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
     parser.add_argument('--space_token', type=str, default=' ', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
-    parser.add_argument('--max_seq_length', type=int, default=None)
+    parser.add_argument('--max_length', type=int, default=None)
 
     # Finetuning
     parser.add_argument('--num_train_epochs', type=int, default=5)
@@ -255,7 +255,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_grad_norm', type=float, default=1.0)
 
     # wandb
-    parser.add_argument('--wandb_run_name', type=str, default=None)
+    parser.add_argument('--run_name', type=str, default=None)
 
     args = parser.parse_args()
 
@@ -341,7 +341,7 @@ if __name__ == '__main__':
         tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', args.space_token]
 
     print('\n[INFO] Preprocess and tokenizing texts in datasets')
-    max_length = args.max_seq_length if args.max_seq_length else config.max_position_embeddings
+    max_length = args.max_length if args.max_length else config.max_position_embeddings
     print(f'[INFO] max_length = {max_length} \n')
     
     dataset_split = { split_name: SequenceClassificationDataset.from_dataset(
