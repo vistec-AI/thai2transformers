@@ -18,9 +18,9 @@ Developing. See this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06F
  
 <br>
 
-1. Install required libraries: [1_installation.md](./docs/1_installation.md)
+1. Install required libraries: [1_installation.md](./docs/1_installation.md)  
+2. Prepare `thwiki` dataset from Thai Wikipedia dump: [2_thwiki_data-preparation.md](./docs/2_thwiki_data-preparation.md)  
 
-2. Prepare `thwiki` dataset from Thai Wikipedia dump: [2_thwiki_data-preparation.md](./docs/2_thwiki_data-preparation.md)
 
 3. Tokenizer training and vocabulary building : 
     
@@ -29,3 +29,5 @@ Developing. See this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06F
     b) For word-level token from [Limkonchotiwat et al., 2020](https://github.com/mrpeerat/SEFR_CUT) (`sefr-cut`) : [3b_sefr-cut_pretokenize.md](./docs/2b_sefr-cut_pretokenize.md)  
 
 4. Pretrain a masked langauge model: [4_run_mlm.md](./docs/3_run_mlm.md)  
+
+

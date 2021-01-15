@@ -386,21 +386,10 @@ class SequenceClassificationDataset(Dataset):
         
         input_ids = []
         attention_masks = []
-        print(f'[DEBUG] labels {labels[:4]}\n')
-        if label_encoder != None:
-            print(f'[DEBUG] label_encoder.classes_ {label_encoder.classes_}')
-      
-        print(f'\n\n[DEBUG] (before: preprocessor) input_text {texts[:4]}\n')
-        if preprocessor != None:
-            print('[DEBUG] Apply preprocessor to texts.')
-            texts = list(map(preprocessor, texts))
-        print(f'\n\n[DEBUG] (after: preprocessor) input_text {texts[:4]}\n')
 
-        # print(f'[DEBUG] (before: prepare_for_tokenization) input_text {texts[:4]}\n')
-        # if prepare_for_tokenization:
-        #     texts = list(map(lambda text: tokenizer.prepare_for_tokenization(text, space_token=space_token)[0], texts))
-        # print(f'[DEBUG] (after: prepare_for_tokenization) input_text {texts[:4]}\n')
-        
+        if preprocessor != None:
+            print('[INFO] Apply preprocessor to texts.')
+            texts = list(map(preprocessor, texts))
 
         for i in tqdm(range(math.ceil(len(texts) / bs))):
 
