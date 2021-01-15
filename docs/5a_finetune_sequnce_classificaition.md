@@ -73,3 +73,32 @@ Optional arguments:
 - `--lowercase`     :  Append "--lowercase" to convert all input texts to lowercase as some model may 
 support only uncased texts (default: `False`)
 - `--run_name`     :  Specify the **run_name** for logging experiment to wandb.com (default: `False`)
+
+
+### Example 
+
+<br>
+
+1. Finetuning `roberthai-thwiki-spm` on multiclass classification task of `wisesight_sentiment` dataset.
+
+    The following script will finetune the `roberthai-thwiki-spm` pretrained model from checkpoint:7000. 
+     
+    The script will finetune model with FP16 mixed-precision training on GPU (ID: 0). The train and validation batch size is 16 with no gradient accumulation. The model checkpoint will be save every epoch and select the best model by validation f1_micro. During finetuning, the learning rate will be warmed up linearly until `3e-05` for 100 steps, then linearly decay to zero. The maximum sequence length that the model will be passed (from the resuling number of tokens according to the tokenizer specified). Otherwise, it will truncate the sequence to `max_length`. 
+
+    ```
+    cd scripts
+    CUDA_VISIBLE_DEVICES=0 	python ./train_sequence_classification_lm_finetuning.py \
+    spm \
+    wisesight_sentiment \
+    /checkpoints/roberthai-thwiki-spm/finetuned/wisesight_sentiment/ \
+    /logs/roberthai-thwiki-spm/finetuned/wisesight_sentiment/ \
+    --tokenizer_dir /checkpoints/roberthai-thwiki-spm/tokenizer_folder \
+    --model_dir /checkpoints/roberthai-thwiki-spm/model/checkpoint-7000 \
+    --num_train_epochs 3 \
+    --metric_for_best_model f1_micro \
+    --learning_rate 3e-05 \
+    --warmup_ratio 0.1 \
+    --max_length 512 \
+    --space_token "<_>" \
+    --fp16 \
+    ```
