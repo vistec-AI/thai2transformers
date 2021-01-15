@@ -15,4 +15,4 @@ nltk==3.4.5
 sefr_cut==0.2
 tensorflow>=2.0.0
 sefr_cut==0.2
-datasets
+datasets==1.2.0
