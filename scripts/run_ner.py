@@ -18,15 +18,14 @@ from custom_data_collator import DataCollatorForTokenClassification
 from datasets import load_dataset, load_metric, Dataset
 from functools import lru_cache
 from seqeval.metrics import classification_report
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report as sk_classification_report
-from sklearn.metrics import f1_score, precision_recall_fscore_support, accuracy_score
+from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 # thai2transformers
 try:
     from thai2transformers.tokenizers import (
         ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
         ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer,
-        SPACE_TOKEN,)
+        SPACE_TOKEN, SEFR_SPLIT_TOKEN)
     from thai2transformers import metrics as t2f_metrics
 except ModuleNotFoundError:
     import sys
@@ -35,12 +34,10 @@ except ModuleNotFoundError:
     from thai2transformers.tokenizers import (
         ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
         ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer,
-        SPACE_TOKEN,)
+        SPACE_TOKEN, SEFR_SPLIT_TOKEN)
 
-from transformers import (AutoConfig, RobertaForTokenClassification,
-                          Trainer, TrainingArguments,
+from transformers import (Trainer, TrainingArguments,
                           AutoModelForTokenClassification, AutoTokenizer,
-                          BertForTokenClassification,
                           HfArgumentParser)
 
 logger = logging.getLogger(__name__)
@@ -144,6 +141,9 @@ elif model_args.tokenizer_type == 'ThaiWordsNewmmTokenizer':
 elif model_args.tokenizer_type == 'ThaiWordsSyllableTokenizer':
     tokenizer = ThaiWordsSyllableTokenizer.from_pretrained(
         model_args.tokenizer_name_or_path)
+elif model_args.tokenizer_type == 'FakeSefrCutTokenizer':
+    tokenizer = FakeSefrCutTokenizer.from_pretrained(
+        model_args.tokenizer_name_or_path)
 elif model_args.tokenizer_type == 'skip':
     logging.info('Skip tokenizer')
 else:
@@ -213,11 +213,26 @@ def pre_tokenize(token):
     return token
 
 
-@lru_cache(maxsize=None)
-def cached_tokenize(token):
-    token = pre_tokenize(token)
-    ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
-    return ids
+if model_args.tokenizer_type == 'FakeSefrCutTokenizer':
+    from sefr_cache import SefrCacheTokenizer
+    sefr_cache_tokenizer = SefrCacheTokenizer()
+    sefr_cache_tokenizer.load('sefr_cache_tokenizer_dict.pkl')
+
+    @lru_cache(maxsize=None)
+    def sefr_cached_tokenize(token):
+        token = pre_tokenize(token)
+        tokens = sefr_cache_tokenizer.tokenize(token)
+        text = SEFR_SPLIT_TOKEN.join(tokens)
+        ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
+        return ids
+
+    cached_tokenize = sefr_cached_tokenize
+else:
+    @lru_cache(maxsize=None)
+    def cached_tokenize(token):
+        token = pre_tokenize(token)
+        ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
+        return ids
 
 
 def preprocess(examples):
