@@ -34,7 +34,7 @@ Required arguments:
 
     The directory to store finetuned model
 
-- **output_dir** : 
+- **logging_dir** : 
 
     The directory to logging output including Tensorboard log, and `wandb` log (optional)
 
@@ -57,9 +57,6 @@ Optional arguments:
 - `--weight_decay` : The value of weight decay (default: `0.01`)
 - `--warmup_ratio`: The ratio of steps / max_steps to warmup learning rate (default: `0.1`; in other word, warm up the learning until the peak valye for the first 10% of the total steps)
 - `--batch_size`: The batch size (default: `16`)
-- `--batch_size`: The batch size (default: `16`)
-- `--batch_size`: The batch size (default: `16`)
-
 - `--no_cuda`: Append "--no_cuda" to use only CPUs during finetuning (default: `False`)
 - `--fp16`: Append "--fp16" to use FP16 mixed-precision trianing (default: `False`)
 - `--metric_for_best_model`: The metric to select the best model based on validation set (default: `f1_micro`)
@@ -72,7 +69,7 @@ Optional arguments:
 - `--max_grad_norm` : Value of gradient norm (default: `1.0`)
 - `--lowercase`     :  Append "--lowercase" to convert all input texts to lowercase as some model may 
 support only uncased texts (default: `False`)
-- `--run_name`     :  Specify the **run_name** for logging experiment to wandb.com (default: `False`)
+- `--run_name`     :  Specify the **run_name** for logging experiment to wandb.com (default: `None`)
 
 
 ### Example 
@@ -90,10 +87,10 @@ support only uncased texts (default: `False`)
     CUDA_VISIBLE_DEVICES=0 	python ./train_sequence_classification_lm_finetuning.py \
     spm \
     wisesight_sentiment \
-    /checkpoints/roberthai-thwiki-spm/finetuned/wisesight_sentiment/ \
-    /logs/roberthai-thwiki-spm/finetuned/wisesight_sentiment/ \
-    --tokenizer_dir /checkpoints/roberthai-thwiki-spm/tokenizer_folder \
-    --model_dir /checkpoints/roberthai-thwiki-spm/model/checkpoint-7000 \
+    /workspace/thai2transformers/checkpoints/roberthai-thwiki-spm/finetuned/wisesight_sentiment/ \
+    /workspace/thai2transformers/logs/roberthai-thwiki-spm/finetuned/wisesight_sentiment/ \
+    --tokenizer_dir /workspace/thai2transformers/checkpoints/roberthai-thwiki-spm/tokenizer_folder \
+    --model_dir /workspace/thai2transformers/checkpoints/roberthai-thwiki-spm/model/checkpoint-7000 \
     --num_train_epochs 3 \
     --metric_for_best_model f1_micro \
     --learning_rate 3e-05 \
@@ -102,3 +99,12 @@ support only uncased texts (default: `False`)
     --space_token "<_>" \
     --fp16 \
     ```
+
+    <details>
+    <summary>
+    Log output:
+    </summary>
+    
+    ```
+    ```
+    </details>
