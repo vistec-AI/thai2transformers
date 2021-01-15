@@ -36,7 +36,7 @@ Required arguments:
 
 - **output_dir** : 
 
-    The directory to logging output including Huggingface's Trainer log, Tensorboard log, and `wandb` log (optional)
+    The directory to logging output including Tensorboard log, and `wandb` log (optional)
 
 <br>
 
