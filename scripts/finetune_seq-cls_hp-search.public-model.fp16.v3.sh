@@ -4,7 +4,7 @@ EXP_NAME=$3
 MAX_SEQ_LENGTH=$4
 OPTIONAL_ARGS=$5
 
-for DATASET in wisesight_sentiment wongnai_reviews generated_reviews_enth-review_star
+for DATASET in generated_reviews_enth-review_star
 do
 	for N_EPOCHS in 3
 	do
