@@ -28,7 +28,7 @@ def _compute_best_threshold(targets, probs):
             threshold/100,
             f1_score(targets,
                      preds,
-                     average='binary')
+                     average='macro')
         ))
 
     f1s_df = pd.DataFrame(f1s).sort_values(1,ascending=False).reset_index(drop=True)
