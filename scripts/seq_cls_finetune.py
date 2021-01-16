@@ -330,7 +330,7 @@ if __name__ == '__main__':
                 text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
 
             def tokenize_fn(batch, text_input_col_name):
-                return '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(batch[text_input_col_name]).split())]) 
+                return '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(batch[text_input_col_name]).split() ]) 
 
             for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
