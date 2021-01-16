@@ -13,7 +13,7 @@ do
 	do
 		for BATCH_SIZE in 16
 		do
-			for LR in 2e-5
+			for LR in 3e-5
 			do 
 				for WARMUP_RATIO in 0.1
 				do
