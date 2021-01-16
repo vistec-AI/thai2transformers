@@ -335,7 +335,7 @@ if __name__ == '__main__':
             for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
                                         text_input_col_name: get_dict_val(batch,
-                                            DATASET_METADATA[args.dataset_name]['text_input_col_name'])
+                                            DATASET_METADATA[args.dataset_name]['text_input_col_name'])[0]
                                     }, batched=True, batch_size=1)
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
                                         text_input_col_name: tokenize_fn(batch, text_input_col_name)  
