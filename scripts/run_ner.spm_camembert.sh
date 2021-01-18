@@ -74,7 +74,7 @@ do
                 --max_length ${MAX_LENGTH} \
                 --fp16 \
                 --lowercase \
-                --space_token <th_roberta_space_token> \
+                --space_token '<th_roberta_space_token>' \
                 --load_best_model_at_end \
                 --run_name $EXP_NAME
                 "
