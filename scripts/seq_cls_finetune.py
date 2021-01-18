@@ -8,6 +8,7 @@ sys.path.append('..')
 from functools import partial
 import urllib.request
 from tqdm import tqdm
+from typing import Collection, Callable
 from pathlib import Path
 from sklearn import preprocessing
 import pandas as pd
@@ -221,6 +222,28 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, da
     )
     return trainer, training_args
 
+def _process_transformers(
+    text: str,
+    pre_rules: Collection[Callable] = [
+        preprocess.fix_html,
+        preprocess.rm_brackets,
+        preprocess.replace_newlines,
+        preprocess.rm_useless_spaces,
+        preprocess.replace_spaces,
+        preprocess.replace_rep_after,
+    ],
+    tok_func: Callable = preprocess.word_tokenize,
+    post_rules: Collection[Callable] = [preprocess.ungroup_emoji, preprocess.replace_wrep_post],
+    lowercase: bool = False
+) -> str:
+    if lowercase:
+        text = text.lower()
+    for rule in pre_rules:
+        text = rule(text)
+    toks = tok_func(text)
+    for rule in post_rules:
+        toks = rule(toks)
+    return "".join(toks)
 
 if __name__ == '__main__':
 
@@ -236,6 +259,7 @@ if __name__ == '__main__':
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
     parser.add_argument('--space_token', type=str, default=' ', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
     parser.add_argument('--max_seq_length', type=int, default=None)
+    parser.add_argument('--lowercase', action='store_true', default=False)
 
     # Finetuning
     parser.add_argument('--num_train_epochs', type=int, default=5)
@@ -305,15 +329,14 @@ if __name__ == '__main__':
             else:
                 text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
 
-            def tokenize_fn(batch):
-                return '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch,
-                            DATASET_METADATA[args.dataset_name]['text_input_col_name']).split())]) 
+            def tokenize_fn(batch, text_input_col_name):
+                return ['<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch, text_input_col_name)[0].split()) ])] 
 
             for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
-
+               
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
-                                        text_input_col_name: tokenize_fn(batch)  
-                                    }, batched=False, batch_size=1)
+                                        text_input_col_name: tokenize_fn(batch, DATASET_METADATA[args.dataset_name]['text_input_col_name'])  
+                                    }, batched=True, batch_size=1)
     except Exception as e:
         raise e
 
@@ -353,14 +376,15 @@ if __name__ == '__main__':
                         max_length=max_length,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
-                        preprocessor=partial(preprocess.process_transformers, 
+                        preprocessor=partial(_process_transformers, 
                             pre_rules = [
                             preprocess.fix_html,
                             preprocess.rm_brackets,
                             preprocess.replace_newlines,
                             preprocess.rm_useless_spaces,
                             partial(preprocess.replace_spaces, space_token=args.space_token) if args.space_token != ' ' else lambda x: x,
-                            preprocess.replace_rep_after]
+                            preprocess.replace_rep_after],
+                            lowercase=args.lowercase
                         ),
                         label_encoder=label_encoder) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
                     }
