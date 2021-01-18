@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 VERSION=$1
+MAX_LENGTH=$2
 
 declare -A tokenizer_name_or_path
 declare -A tokenizer_type
@@ -70,8 +71,10 @@ do
                 --output_dir /workspace/checkpoints/roberta_th/95gb-text-corpora/spm_camembert/finetuned/$EXP_NAME \
                 --do_train \
                 --do_eval \
-                --max_length 416 \
+                --max_length ${MAX_LENGTH} \
                 --fp16 \
+                --lowercase \
+                --space_token <th_roberta_space_token> \
                 --load_best_model_at_end \
                 --run_name $EXP_NAME
                 "
