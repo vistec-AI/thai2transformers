@@ -106,7 +106,7 @@ class CustomArguments:
         default='<_>',
         metadata={'help': 'specify custom space token'}
     )
-    lowercase:str = field(
+    lowercase:bool = field(
         default=False,
         metadata={'help': 'Apply lowercase to input texts'}
     )
