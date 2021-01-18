@@ -110,6 +110,10 @@ class CustomArguments:
         default=False,
         metadata={'help': 'Apply lowercase to input texts'}
     )
+    filter_thainer_with_mbert_tokenizer_threshold: Optional[int] = field(
+        default=None,
+        metadata={'help': 'fiter thainer test set with mbert.'}
+    )
 
 
 parser = HfArgumentParser((ModelArguments, DataTrainingArguments,
@@ -292,6 +296,19 @@ if data_args.dataset_name == 'thainer':
         train_size=0.5, test_size=0.5, seed=2020)
     val_dataset = split['train']
     test_dataset = split['test']
+
+    if custom_args.filter_thainer_with_mbert_tokenizer_threshold is not None:
+        mbert_tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
+
+        def is_not_too_long(example,
+                            max_length=custom_args.filter_thainer_with_mbert_tokenizer_threshold):
+            tokens = sum([mbert_tokenizer.tokenize(
+                pre_tokenize(token, space_token=custom_args.space_token))
+                          for token in example[text_col]], [])
+            return len(tokens) < max_length
+
+        test_dataset = test_dataset.filter(is_not_too_long)
+
     # preprocess
     train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
     val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
@@ -509,6 +526,19 @@ if data_args.dataset_name == 'thainer':
         train_size=0.5, test_size=0.5, seed=2020)
     val_dataset = split['train']
     test_dataset = split['test']
+
+    if custom_args.filter_thainer_with_mbert_tokenizer_threshold is not None:
+        mbert_tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
+
+        def is_not_too_long(example,
+                            max_length=custom_args.filter_thainer_with_mbert_tokenizer_threshold):
+            tokens = sum([mbert_tokenizer.tokenize(
+                pre_tokenize(token, space_token=custom_args.space_token))
+                          for token in example[text_col]], [])
+            return len(tokens) < max_length
+
+        test_dataset = test_dataset.filter(is_not_too_long)
+
     # preprocess
     train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
     val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
