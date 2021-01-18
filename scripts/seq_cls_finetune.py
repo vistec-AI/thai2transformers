@@ -103,7 +103,7 @@ DATASET_METADATA = {
     'generated_reviews_enth-correct_translation': { 
         'huggingface_dataset_name': 'generated_reviews_enth',
         'task': Task.MULTICLASS_CLS,
-        'text_input_col_name': ('translation', 'th'),
+        'text_input_col_name': ['translation', 'th'],
         'label_col_name': 'correct',
         'num_labels': 2,
         'split_names': ['train', 'validation', 'test']
@@ -111,7 +111,7 @@ DATASET_METADATA = {
     'generated_reviews_enth-review_star': { 
         'huggingface_dataset_name': 'generated_reviews_enth',
         'task': Task.MULTICLASS_CLS,
-        'text_input_col_name': ('translation', 'th'),
+        'text_input_col_name': ['translation', 'th'],
         'label_col_name': 'review_star',
         'num_labels': 5,
         'split_names': ['train', 'validation', 'test']
@@ -292,18 +292,27 @@ if __name__ == '__main__':
         else:
             label_encoder = None
 
+      
+        text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
         if args.tokenizer_type_or_public_model_name == 'sefr_cut':
             print(f'Apply `sefr_cut` tokenizer to the text inputs of {args.dataset_name} dataset')
             import sefr_cut
             sefr_cut.load_model('best')
             sefr_tokenize = lambda x: sefr_cut.tokenize(x)
-            
-            text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
+            if type(DATASET_METADATA[args.dataset_name]['text_input_col_name']) == list:
+                
+                text_input_col_name = '.'.join(DATASET_METADATA[args.dataset_name]['text_input_col_name'])
+            else:
+                text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
+
+            def tokenize_fn(batch):
+                return '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch,
+                            DATASET_METADATA[args.dataset_name]['text_input_col_name']).split())]) 
 
             for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
 
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
-                                        text_input_col_name: '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch, text_input_col_name).split()) ]) 
+                                        text_input_col_name: tokenize_fn(batch)  
                                     }, batched=False, batch_size=1)
     except Exception as e:
         raise e
@@ -339,7 +348,7 @@ if __name__ == '__main__':
                         task,
                         tokenizer,
                         dataset[split_name],
-                        DATASET_METADATA[args.dataset_name]['text_input_col_name'],
+                        text_input_col_name,
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
                         max_length=max_length,
                         space_token=args.space_token,
