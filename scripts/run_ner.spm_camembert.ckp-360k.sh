@@ -24,7 +24,7 @@ declare -a dataset_names=("thainer" "lst20")
 declare -a label_names=("ner_tags" "pos_tags")
 
 effective_batch_size=32
-device_batch_size=16
+device_batch_size=32
 
 for dataset_name in "${dataset_names[@]}"
 do
