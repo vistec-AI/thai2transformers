@@ -142,6 +142,21 @@ def main():
         tag_labels = dataset["train"].features[args.label_col].feature.names
     else:
         tag_labels = dataset["train"].features[args.label_col].feature.names
+        
+        
+    if args.dataset_name_or_path == 'thainer':
+        from transformers import AutoTokenizer
+        mbert_tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
+        def pre_tokenize(token, space_token):
+            token = token.replace(' ', space_token)
+            return token
+        def is_not_too_long(example,
+                            max_length=510):
+            tokens = sum([mbert_tokenizer.tokenize(
+                pre_tokenize(token, space_token='<_>'))
+                          for token in example[args.feature_col]], [])
+            return len(tokens) < max_length
+        dataset['test'] = dataset['test'].filter(is_not_too_long)
     print("Dataset loaded")
 
     # extract features
