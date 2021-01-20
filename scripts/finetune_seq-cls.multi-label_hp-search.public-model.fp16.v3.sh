@@ -46,6 +46,7 @@ do
 					${DATASET} \
 					${OUTPUT_DIR} \
 					${TF_LOG_DIR} \
+					--batch_size ${BATCH_SIZE} \
 					--num_train_epochs ${N_EPOCHS} \
 					--learning_rate ${LR} \
 					--warmup_ratio ${WARMUP_RATIO} \

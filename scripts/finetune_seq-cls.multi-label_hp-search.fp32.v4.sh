@@ -1,14 +1,17 @@
 TOKENIZER_TYPE=$1
-MODEL_NAME=$2
-EXP_NAME=$3
-MAX_SEQ_LENGTH=$4
-OPTIONAL_ARGS=$5
+MODEL_DIR=$2
+TOKENIZER_DIR=$3
+MODEL_NAME=$4
+EXP_NAME=$5
+MAX_SEQ_LENGTH=$6
+SPACE_TOKEN=$7
+OPTIONAL_ARGS=$8
 
 for DATASET in prachathai67k
 do
 	for N_EPOCHS in 3
 	do
-		for BATCH_SIZE in 32
+		for BATCH_SIZE in 16
 		do
 			for LR in 3e-5
 			do 
@@ -30,6 +33,8 @@ do
 
 					echo "Pretrained model name: ${MODEL_NAME}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "Type of token: ${TOKENIZER_TYPE}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+					echo "Model directory: ${MODEL_DIR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+					echo "Tokenizer directory: ${TOKENIZER_DIR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "Dataset: ${DATASET}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "WANDB_NAME: ${WANDB_NAME}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
@@ -39,6 +44,7 @@ do
 					echo "Batch size: ${BATCH_SIZE}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "Learning rate: ${LR}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "Warmup ratio: ${WARMUP_RATIO}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
+					echo "Space token: ${SPACE_TOKEN}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 					echo "Max sequence length: ${MAX_SEQ_LENGTH}" |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
 					python ./seq_cls_finetune.py \
@@ -46,13 +52,16 @@ do
 					${DATASET} \
 					${OUTPUT_DIR} \
 					${TF_LOG_DIR} \
+					--tokenizer_dir ${TOKENIZER_DIR} \
+					--model_dir ${MODEL_DIR} \
+					--batch_size ${BATCH_SIZE} \
 					--num_train_epochs ${N_EPOCHS} \
 					--learning_rate ${LR} \
 					--warmup_ratio ${WARMUP_RATIO} \
 					--max_seq_length ${MAX_SEQ_LENGTH} \
+					--space_token ${SPACE_TOKEN} \
 					--wandb_run_name $WANDB_NAME \
 					--logging_steps 50 \
-					--fp16 \
 					--metric_for_best_model f1_macro \
 					${OPTIONAL_ARGS} |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 

@@ -8,7 +8,7 @@ for DATASET in prachathai67k
 do
 	for N_EPOCHS in 3
 	do
-		for BATCH_SIZE in 32
+		for BATCH_SIZE in 16
 		do
 			for LR in 3e-5
 			do 
@@ -46,14 +46,15 @@ do
 					${DATASET} \
 					${OUTPUT_DIR} \
 					${TF_LOG_DIR} \
+					--batch_size ${BATCH_SIZE} \
 					--num_train_epochs ${N_EPOCHS} \
 					--learning_rate ${LR} \
 					--warmup_ratio ${WARMUP_RATIO} \
 					--max_seq_length ${MAX_SEQ_LENGTH} \
 					--wandb_run_name $WANDB_NAME \
 					--logging_steps 50 \
-					--fp16 \
 					--metric_for_best_model f1_macro \
+					--fp16 \
 					${OPTIONAL_ARGS} |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
 					echo ""

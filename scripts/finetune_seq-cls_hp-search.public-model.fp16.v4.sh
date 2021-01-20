@@ -4,11 +4,11 @@ EXP_NAME=$3
 MAX_SEQ_LENGTH=$4
 OPTIONAL_ARGS=$5
 
-for DATASET in prachathai67k
+for DATASET in wisesight_sentiment wongnai_reviews generated_reviews_enth-review_star
 do
 	for N_EPOCHS in 3
 	do
-		for BATCH_SIZE in 32
+		for BATCH_SIZE in 16
 		do
 			for LR in 3e-5
 			do 
@@ -46,6 +46,7 @@ do
 					${DATASET} \
 					${OUTPUT_DIR} \
 					${TF_LOG_DIR} \
+					--batch_size ${BATCH_SIZE} \
 					--num_train_epochs ${N_EPOCHS} \
 					--learning_rate ${LR} \
 					--warmup_ratio ${WARMUP_RATIO} \
@@ -53,7 +54,6 @@ do
 					--wandb_run_name $WANDB_NAME \
 					--logging_steps 50 \
 					--fp16 \
-					--metric_for_best_model f1_macro \
 					${OPTIONAL_ARGS} |& tee -a ${TRAINER_OUTPUT_LOG_PATH}
 
 					echo ""

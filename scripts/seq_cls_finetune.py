@@ -8,6 +8,7 @@ sys.path.append('..')
 from functools import partial
 import urllib.request
 from tqdm import tqdm
+from typing import Collection, Callable
 from pathlib import Path
 from sklearn import preprocessing
 import pandas as pd
@@ -103,7 +104,7 @@ DATASET_METADATA = {
     'generated_reviews_enth-correct_translation': { 
         'huggingface_dataset_name': 'generated_reviews_enth',
         'task': Task.MULTICLASS_CLS,
-        'text_input_col_name': ('translation', 'th'),
+        'text_input_col_name': ['translation', 'th'],
         'label_col_name': 'correct',
         'num_labels': 2,
         'split_names': ['train', 'validation', 'test']
@@ -111,7 +112,7 @@ DATASET_METADATA = {
     'generated_reviews_enth-review_star': { 
         'huggingface_dataset_name': 'generated_reviews_enth',
         'task': Task.MULTICLASS_CLS,
-        'text_input_col_name': ('translation', 'th'),
+        'text_input_col_name': ['translation', 'th'],
         'label_col_name': 'review_star',
         'num_labels': 5,
         'split_names': ['train', 'validation', 'test']
@@ -221,6 +222,28 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, da
     )
     return trainer, training_args
 
+def _process_transformers(
+    text: str,
+    pre_rules: Collection[Callable] = [
+        preprocess.fix_html,
+        preprocess.rm_brackets,
+        preprocess.replace_newlines,
+        preprocess.rm_useless_spaces,
+        preprocess.replace_spaces,
+        preprocess.replace_rep_after,
+    ],
+    tok_func: Callable = preprocess.word_tokenize,
+    post_rules: Collection[Callable] = [preprocess.ungroup_emoji, preprocess.replace_wrep_post],
+    lowercase: bool = False
+) -> str:
+    if lowercase:
+        text = text.lower()
+    for rule in pre_rules:
+        text = rule(text)
+    toks = tok_func(text)
+    for rule in post_rules:
+        toks = rule(toks)
+    return "".join(toks)
 
 if __name__ == '__main__':
 
@@ -236,6 +259,7 @@ if __name__ == '__main__':
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
     parser.add_argument('--space_token', type=str, default=' ', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
     parser.add_argument('--max_seq_length', type=int, default=None)
+    parser.add_argument('--lowercase', action='store_true', default=False)
 
     # Finetuning
     parser.add_argument('--num_train_epochs', type=int, default=5)
@@ -292,19 +316,27 @@ if __name__ == '__main__':
         else:
             label_encoder = None
 
+      
+        text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
         if args.tokenizer_type_or_public_model_name == 'sefr_cut':
             print(f'Apply `sefr_cut` tokenizer to the text inputs of {args.dataset_name} dataset')
             import sefr_cut
             sefr_cut.load_model('best')
             sefr_tokenize = lambda x: sefr_cut.tokenize(x)
-            
-            text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
+            if type(DATASET_METADATA[args.dataset_name]['text_input_col_name']) == list:
+                
+                text_input_col_name = '.'.join(DATASET_METADATA[args.dataset_name]['text_input_col_name'])
+            else:
+                text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
+
+            def tokenize_fn(batch, text_input_col_name):
+                return ['<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch, text_input_col_name)[0].split()) ])] 
 
             for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
-
+               
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
-                                        text_input_col_name: '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch, text_input_col_name).split()) ]) 
-                                    }, batched=False, batch_size=1)
+                                        text_input_col_name: tokenize_fn(batch, DATASET_METADATA[args.dataset_name]['text_input_col_name'])  
+                                    }, batched=True, batch_size=1)
     except Exception as e:
         raise e
 
@@ -339,19 +371,20 @@ if __name__ == '__main__':
                         task,
                         tokenizer,
                         dataset[split_name],
-                        DATASET_METADATA[args.dataset_name]['text_input_col_name'],
+                        text_input_col_name,
                         DATASET_METADATA[args.dataset_name]['label_col_name'],
                         max_length=max_length,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
-                        preprocessor=partial(preprocess.process_transformers, 
+                        preprocessor=partial(_process_transformers, 
                             pre_rules = [
                             preprocess.fix_html,
                             preprocess.rm_brackets,
                             preprocess.replace_newlines,
                             preprocess.rm_useless_spaces,
                             partial(preprocess.replace_spaces, space_token=args.space_token) if args.space_token != ' ' else lambda x: x,
-                            preprocess.replace_rep_after]
+                            preprocess.replace_rep_after],
+                            lowercase=args.lowercase
                         ),
                         label_encoder=label_encoder) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
                     }

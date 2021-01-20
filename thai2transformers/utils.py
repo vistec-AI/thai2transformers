@@ -1,9 +1,9 @@
 import operator
 from functools import reduce
-from typing import Tuple, Dict, Union
+from typing import Tuple, Dict, Union, List
 
 
-def get_dict_val(root:Dict, keys:Union[str, Tuple[str, str]]):
+def get_dict_val(root:Dict, keys:Union[str, List[str]]):
     """
     Access a nested object in root by item sequence.
 
@@ -27,7 +27,10 @@ def get_dict_val(root:Dict, keys:Union[str, Tuple[str, str]]):
     """
     if type(keys) == str:
         return root[keys]
-    elif type(keys) == tuple:
-        return list(map(lambda x: x[keys[1]], root[keys[0]]))
+    elif type(keys) == list:
+        _results = []
+        for item in root[keys[0]]:
+            _results.append(item[keys[1]])
+        return _results
     
     return None
