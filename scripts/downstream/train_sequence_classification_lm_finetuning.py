@@ -259,6 +259,7 @@ if __name__ == '__main__':
     parser.add_argument('--prepare_for_tokenization', action='store_true', default=False, help='To replace space with a special token e.g. `<_>`. This may require for some pretrained models.')
     parser.add_argument('--space_token', type=str, default=' ', help='The special token for space, specify if argumet: prepare_for_tokenization is applied')
     parser.add_argument('--max_length', type=int, default=None)
+    parser.add_argument('--lowercase', action='store_true', default=False)
 
     # Finetuning
     parser.add_argument('--num_train_epochs', type=int, default=5)
@@ -384,6 +385,7 @@ if __name__ == '__main__':
                             preprocess.rm_useless_spaces,
                             partial(preprocess.replace_spaces, space_token=args.space_token) if args.space_token != ' ' else lambda x: x,
                             preprocess.replace_rep_after]
+                            lowercase=args.lowercase
                         ),
                         label_encoder=label_encoder) for split_name in DATASET_METADATA[args.dataset_name]['split_names']
                     }
