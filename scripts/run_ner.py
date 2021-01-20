@@ -319,7 +319,7 @@ if data_args.dataset_name == 'thainer':
         def is_not_too_long(example,
                             max_length=custom_args.filter_thainer_with_mbert_tokenizer_threshold):
             tokens = sum([mbert_tokenizer.tokenize(
-                pre_tokenize(token))
+                pre_tokenize(token, '<_>'))
                           for token in example[text_col]], [])
             return len(tokens) < max_length
 
@@ -546,7 +546,7 @@ if data_args.dataset_name == 'thainer':
         def is_not_too_long(example,
                             max_length=custom_args.filter_thainer_with_mbert_tokenizer_threshold):
             tokens = sum([mbert_tokenizer.tokenize(
-                pre_tokenize(token))
+                pre_tokenize(token, '<_>'))
                           for token in example[text_col]], [])
             return len(tokens) < max_length
 
