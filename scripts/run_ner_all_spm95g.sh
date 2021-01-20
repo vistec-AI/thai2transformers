@@ -4,26 +4,10 @@ declare -A tokenizer_type
 declare -A model_name_or_path
 declare -A dataset_size
 
-tokenizer_type["xlm"]="AutoTokenizer"
-tokenizer_type["mbert"]="AutoTokenizer"
-tokenizer_type["syllable"]="ThaiWordsSyllableTokenizer"
-tokenizer_type["newmm"]="ThaiWordsNewmmTokenizer"
-tokenizer_type["spm"]="ThaiRobertaTokenizer"
-tokenizer_type["sefr"]="FakeSefrCutTokenizer"
 
-tokenizer_name_or_path["xlm"]="xlm-roberta-base"
-tokenizer_name_or_path["mbert"]="bert-base-multilingual-cased"
-tokenizer_name_or_path["syllable"]="/ist/ist-share/scads/zo/thai2transformers/exp/syllable/tokenizer_folder"
-tokenizer_name_or_path["newmm"]="/ist/ist-share/scads/zo/thai2transformers/exp/newmm/tokenizer_folder"
-tokenizer_name_or_path["spm"]="/ist/ist-share/scads/zo/thai2transformers//exp_rerun/spm_lr_7e_4/tokenizer_folder"
-tokenizer_name_or_path["sefr"]="/ist/ist-share/scads/zo/thai2transformers/exp/sefr_cut/tokenizer_folder"
-
-model_name_or_path["xlm"]="xlm-roberta-base"
-model_name_or_path["mbert"]="bert-base-multilingual-cased"
-model_name_or_path["syllable"]="/ist/ist-share/scads/zo/thai2transformers/exp/syllable/output_folder/model/checkpoint-8000"
-model_name_or_path["newmm"]="/ist/ist-share/scads/zo/thai2transformers/exp/newmm/output_folder/model/checkpoint-5000"
-model_name_or_path["spm"]="/ist/ist-share/scads/zo/thai2transformers/exp_rerun/spm_lr_7e_4/output_folder/model/checkpoint-7000"
-model_name_or_path["sefr"]="/ist/ist-share/scads/zo/thai2transformers/exp/sefr_cut/output_folder/model/checkpoint-4500"
+tokenizer_type["spm95g"]="CamembertTokenizer"
+model_name_or_path["spm95g"]="/ist/ist-share/scads/aires/roberthai-95g-spm/model/checkpoint-360000"
+tokenizer_name_or_path["spm95g"]="/ist/ist-share/scads/zo/thai2transformers/rsync_ist_dgx03/roberta_th/95gb-text-corpora/spm_camembert/tokenizer_folder"
 
 dataset_size["thainer"]="5078"
 dataset_size["lst20"]="67104"
@@ -66,7 +50,7 @@ else
     mkdir -p "$log_folder"
 fi
 
-declare -a base_models=("sefr")
+declare -a base_models=("spm95g")
 declare -a dataset_names=("thainer" "lst20")
 declare -a label_names=("ner_tags" "pos_tags")
 
@@ -116,9 +100,11 @@ do
                 --output_dir $output_base_dir/$EXP_NAME \
                 --do_train \
                 --do_eval \
-                --max_length 512 \
+                --max_length 416 \
                 --fp16 \
                 --load_best_model_at_end \
+                --space_token '<th_roberta_space_token>' \
+                --lowercase \
                 --filter_thainer_with_mbert_tokenizer_threshold 510
                 "
                 # script -q -c "long_running_command" /dev/null | print_progress
