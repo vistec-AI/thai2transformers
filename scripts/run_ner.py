@@ -125,6 +125,7 @@ parser = HfArgumentParser((ModelArguments, DataTrainingArguments,
 
 model_args, data_args, training_args, custom_args = parser.parse_args_into_dataclasses()
 
+# Set seed
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 torch.manual_seed(training_args.seed)
