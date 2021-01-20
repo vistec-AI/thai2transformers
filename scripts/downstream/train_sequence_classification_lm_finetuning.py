@@ -8,6 +8,7 @@ sys.path.append('..')
 from functools import partial
 import urllib.request
 from tqdm import tqdm
+from typing import Collection, Callable
 from pathlib import Path
 from sklearn import preprocessing
 import pandas as pd
@@ -221,6 +222,28 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, da
     )
     return trainer, training_args
 
+def _process_transformers(
+    text: str,
+    pre_rules: Collection[Callable] = [
+        preprocess.fix_html,
+        preprocess.rm_brackets,
+        preprocess.replace_newlines,
+        preprocess.rm_useless_spaces,
+        preprocess.replace_spaces,
+        preprocess.replace_rep_after,
+    ],
+    tok_func: Callable = preprocess.word_tokenize,
+    post_rules: Collection[Callable] = [preprocess.ungroup_emoji, preprocess.replace_wrep_post],
+    lowercase: bool = False
+) -> str:
+    if lowercase:
+        text = text.lower()
+    for rule in pre_rules:
+        text = rule(text)
+    toks = tok_func(text)
+    for rule in post_rules:
+        toks = rule(toks)
+    return "".join(toks)
 
 if __name__ == '__main__':
 
