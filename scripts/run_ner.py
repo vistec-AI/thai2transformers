@@ -38,7 +38,6 @@ except ModuleNotFoundError:
 
 from transformers import (Trainer, TrainingArguments,
                           AutoModelForTokenClassification, AutoTokenizer,
-                          BertForTokenClassification,
                           HfArgumentParser, CamembertTokenizer)
 
 logger = logging.getLogger(__name__)
@@ -51,7 +50,8 @@ def is_main_process(rank):
 @dataclass
 class ModelArguments:
     """
-    Arguments pertaining to which model/config/tokenizer we are going to fine-tune, or train from scratch.
+    Arguments pertaining to which model/config/tokenizer we are going to fine-tune,
+    or train from scratch.
     """
 
     model_name_or_path: str = field(
@@ -106,11 +106,11 @@ class CustomArguments:
         default=False,
         metadata={'help': 'skip eval loop'}
     )
-    space_token:str = field(
-        default='<_>',
+    space_token: str = field(
+        default=SPACE_TOKEN,
         metadata={'help': 'specify custom space token'}
     )
-    lowercase:bool = field(
+    lowercase: bool = field(
         default=False,
         metadata={'help': 'Apply lowercase to input texts'}
     )
@@ -131,11 +131,11 @@ logging.basicConfig(
     datefmt="%m/%d/%Y %H:%M:%S",
     level=logging.INFO if is_main_process(training_args.local_rank) else logging.WARN,
 )
-
 # Log on each process the small summary:
 logger.warning(
-    f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
-    + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
+    f"Process rank: {training_args.local_rank}, device: {training_args.device},"
+    f"n_gpu: {training_args.n_gpu}, distributed training: {bool(training_args.local_rank != -1)},"
+    f"16-bits training: {training_args.fp16}"
 )
 # Set the verbosity to info of the Transformers logger (on main process only):
 if is_main_process(training_args.local_rank):
@@ -178,22 +178,13 @@ text_col = 'tokens'
 label_col = data_args.label_name
 
 if data_args.dataset_name == 'thainer':
-    # we cannot use this in its current form since there is a bug
-    # which cause ner_tags to appear as 27 for all examples
-    # the current hacking solution is to run this first once
-    # this should generate cache folder (depend on arguments given)
-    # like this .cache/huggingface/modules/datasets_modules/datasets/thainer/.../thainer.py
-    # add this line
-    # >>> splits[2] = splits[2].rstrip()
-    # ner_tag = splits[2] if splits[2] in self._NER_TAGS else "O"
-    # this will strip the newline out of last spilted text first
-    # you will also need to merge *ไม่ยืนยัน tags into "O"
-    # by removing it from _NER_TAGS
     dataset = load_dataset("thainer")
     # Remove tag: ไม่ยืนยัน
     if label_col == 'ner_tags':
-        dataset['train'] = dataset['train'].map(lambda examples: {'ner_tags': [i if i not in [13,26] else 27 for i in examples[label_col]]})
-
+        dataset['train'] = dataset['train'].map(
+            lambda examples: {'ner_tags': [i if i not in [13, 26] else 27
+                                           for i in examples[label_col]]}
+            )
     label_maps = {i: name for i, name in
                   enumerate(dataset['train'].features[label_col].feature.names)}
     label_names = dataset['train'].features[label_col].feature.names
@@ -237,7 +228,7 @@ else:
     raise NotImplementedError
 
 
-def pre_tokenize(token, space_token):
+def pre_tokenize(token, space_token=custom_args.space_token):
     token = token.replace(' ', space_token)
     return token
 
@@ -248,8 +239,11 @@ if model_args.tokenizer_type == 'FakeSefrCutTokenizer':
     sefr_cache_tokenizer.load('sefr_cache_tokenizer_dict.pkl')
 
     @lru_cache(maxsize=None)
-    def sefr_cached_tokenize(token):
-        token = pre_tokenize(token)
+    def sefr_cached_tokenize(token, space_token=custom_args.space_token,
+                             lowercase=custom_args.lowercase):
+        if lowercase:
+            token = token.lower()
+        token = pre_tokenize(token, space_token)
         tokens = sefr_cache_tokenizer.tokenize(token)
         text = SEFR_SPLIT_TOKEN.join(tokens)
         ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
@@ -258,22 +252,16 @@ if model_args.tokenizer_type == 'FakeSefrCutTokenizer':
     cached_tokenize = sefr_cached_tokenize
 else:
     @lru_cache(maxsize=None)
-    def cached_tokenize(token):
-        token = pre_tokenize(token)
+    def cached_tokenize(token, space_token=custom_args.space_token,
+                        lowercase=custom_args.lowercase):
+        if lowercase:
+            token = token.lower()
+        token = pre_tokenize(token, space_token)
         ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
         return ids
 
 
-@lru_cache(maxsize=None)
-def cached_tokenize(token, space_token, lowercase):
-    if lowercase:
-        token = token.lower()
-    token = pre_tokenize(token, space_token)
-    ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
-    return ids
-
-
-def preprocess(examples, space_token, lowercase):
+def preprocess(examples, space_token=custom_args.space_token, lowercase=custom_args.lowercase):
     tokens = []
     labels = []
     old_positions = []
@@ -312,9 +300,7 @@ def preprocess(examples, space_token, lowercase):
 data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
 
 if data_args.dataset_name == 'thainer':
-    # exclude last example, thainer dataset generator adding blank into the last example.
-    split = dataset['train'].train_test_split(test_size=1, shuffle=False)
-    train_dataset = split['train']
+    train_dataset = dataset['train']
 
     split = train_dataset.train_test_split(
         train_size=0.8, test_size=0.2, seed=2020)
@@ -328,37 +314,32 @@ if data_args.dataset_name == 'thainer':
 
     if custom_args.filter_thainer_with_mbert_tokenizer_threshold is not None:
         mbert_tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
+        # mbert_tokenizer.add_special_tokens(custom_args.space_token)
 
         def is_not_too_long(example,
                             max_length=custom_args.filter_thainer_with_mbert_tokenizer_threshold):
             tokens = sum([mbert_tokenizer.tokenize(
-                pre_tokenize(token, space_token=custom_args.space_token))
+                pre_tokenize(token))
                           for token in example[text_col]], [])
             return len(tokens) < max_length
 
         test_dataset = test_dataset.filter(is_not_too_long)
 
     # preprocess
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset))
     # val set need padding to fix problem with trainer
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
 elif data_args.dataset_name == 'lst20':
-    # exclude last example, lst20 dataset generator adding blank into the last example.
-    split = dataset['train'].train_test_split(test_size=1, shuffle=False)
-    train_dataset = split['train']
+    train_dataset = dataset['train']
+    val_dataset = dataset['validation']
+    test_dataset = dataset['test']
 
-    split = dataset['validation'].train_test_split(test_size=1, shuffle=False)
-    val_dataset = split['train']
-
-    split = dataset['test'].train_test_split(test_size=1, shuffle=False)
-    test_dataset = split['train']
-
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset))
     # val set need padding to fix problem with trainer
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
@@ -367,9 +348,9 @@ elif data_args.dataset_name == 'dummytest':
     val_dataset = dataset['validation']
     test_dataset = dataset['test']
 
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
 else:
@@ -540,11 +521,13 @@ if training_args.do_eval and not custom_args.skip_do_eval:
     trainer.evaluate()
 
 
-# Preprocess dataset again sometimes something funky occure causing error in report.
+# Preprocess dataset again sometimes something funky occur causing error in report.
+# This is possibly because huggingface transformers lib decide to drop some variable
+# that are irrelevant to training such as 'old_positions', we also padding training
+# dataset in this step. This is done so that predicition loop can ran without having
+# padding step inside it.
 if data_args.dataset_name == 'thainer':
-    # exclude last example, thainer dataset generator adding blank into the last example.
-    split = dataset['train'].train_test_split(test_size=1, shuffle=False)
-    train_dataset = split['train']
+    train_dataset = dataset['train']
 
     split = train_dataset.train_test_split(
         train_size=0.8, test_size=0.2, seed=2020)
@@ -558,49 +541,46 @@ if data_args.dataset_name == 'thainer':
 
     if custom_args.filter_thainer_with_mbert_tokenizer_threshold is not None:
         mbert_tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
+        # mbert_tokenizer.add_special_tokens(custom_args.space_token)
 
         def is_not_too_long(example,
                             max_length=custom_args.filter_thainer_with_mbert_tokenizer_threshold):
             tokens = sum([mbert_tokenizer.tokenize(
-                pre_tokenize(token, space_token=custom_args.space_token))
+                pre_tokenize(token))
                           for token in example[text_col]], [])
             return len(tokens) < max_length
 
         test_dataset = test_dataset.filter(is_not_too_long)
 
     # preprocess
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset))
     # val set need padding to fix problem with trainer
     train_dataset = Dataset.from_dict(data_collator(train_dataset))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
 elif data_args.dataset_name == 'lst20':
-    # exclude last example, lst20 dataset generator adding blank into the last example.
-    split = dataset['train'].train_test_split(test_size=1, shuffle=False)
-    train_dataset = split['train']
+    train_dataset = dataset['train']
+    val_dataset = dataset['validation']
+    test_dataset = dataset['test']
 
-    split = dataset['validation'].train_test_split(test_size=1, shuffle=False)
-    val_dataset = split['train']
-
-    split = dataset['test'].train_test_split(test_size=1, shuffle=False)
-    test_dataset = split['train']
-
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    test_dataset = Dataset.from_dict(preprocess(test_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset))
     # val set need padding to fix problem with trainer
     train_dataset = Dataset.from_dict(data_collator(train_dataset))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
     test_dataset = Dataset.from_dict(data_collator(test_dataset))
 elif data_args.dataset_name == 'dummytest':
     train_dataset = dataset['train']
-    train_dataset = Dataset.from_dict(preprocess(train_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
-    train_dataset = Dataset.from_dict(data_collator(train_dataset))
     val_dataset = dataset['validation']
-    val_dataset = Dataset.from_dict(preprocess(val_dataset, space_token=custom_args.space_token, lowercase=custom_args.lowercase))
+    test_dataset = dataset['test']
+    train_dataset = Dataset.from_dict(preprocess(train_dataset))
+    val_dataset = Dataset.from_dict(preprocess(val_dataset))
+    test_dataset = Dataset.from_dict(preprocess(test_dataset))
     val_dataset = Dataset.from_dict(data_collator(val_dataset))
+    test_dataset = Dataset.from_dict(data_collator(test_dataset))
 else:
     raise NotImplementedError
 
