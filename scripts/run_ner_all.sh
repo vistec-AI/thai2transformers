@@ -29,8 +29,8 @@ dataset_size["thainer"]="5078"
 dataset_size["lst20"]="67104"
 dataset_size["dummytest"]="50"
 
-output_base_dir=/ist/ist-share/scads/zo/thai2transformers/exp_finetune_fix_data_and_filtered
-log_folder=/ist/ist-share/scads/zo/thai2transformers/log_exp_finetune_fix_data_and_filtered
+output_base_dir=/ist/ist-share/scads/zo/thai2transformers/exp_finetune_fix_data_and_filtered_6
+log_folder=/ist/ist-share/scads/zo/thai2transformers/log_exp_finetune_fix_data_and_filtered_6
 
 if [ -e "$output_base_dir" ]; then
     echo "output_base_dir: $output_base_dir exist."
@@ -66,7 +66,7 @@ else
     mkdir -p "$log_folder"
 fi
 
-declare -a base_models=("sefr")
+declare -a base_models=("sefr" "xlm" "mbert")
 declare -a dataset_names=("thainer" "lst20")
 declare -a label_names=("ner_tags" "pos_tags")
 
@@ -92,8 +92,8 @@ do
             echo "Tokenizer Name or path: ${tokenizer_name_or_path["${model}"]}"
             echo "Model name or path: ${model_name_or_path["${model}"]}"
             echo "Training size: ${dataset_size["${dataset_name}"]}"
-            echo "Warmup: $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 3 / 10))"
-            echo "Maxstep: $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 3))"
+            echo "Warmup: $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 6 / 10))"
+            echo "Maxstep: $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 6))"
             echo "Evalstep: $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size")))"
             echo "Output Dir: ${output_base_dir}/${EXP_NAME}"
             command="
@@ -107,11 +107,11 @@ do
                 --per_device_train_batch_size ${device_batch_size} \
                 --per_device_eval_batch_size ${device_batch_size} \
                 --gradient_accumulation_steps 1 \
-                --learning_rate 5e-5 \
-                --warmup_steps $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 3 / 10))  \
+                --learning_rate 3e-5 \
+                --warmup_steps $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 6 / 10))  \
                 --logging_steps 10 \
                 --eval_steps $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size"))) \
-                --max_steps $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 3)) \
+                --max_steps $((("${dataset_size["${dataset_name}"]}" / "$effective_batch_size") * 6)) \
                 --evaluation_strategy steps \
                 --output_dir $output_base_dir/$EXP_NAME \
                 --do_train \
@@ -119,6 +119,7 @@ do
                 --max_length 512 \
                 --fp16 \
                 --load_best_model_at_end \
+                --seed 2020 \
                 --filter_thainer_with_mbert_tokenizer_threshold 510
                 "
                 # script -q -c "long_running_command" /dev/null | print_progress
