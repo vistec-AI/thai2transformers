@@ -377,7 +377,7 @@ if __name__ == '__main__':
                         max_length=max_length,
                         space_token=args.space_token,
                         prepare_for_tokenization=args.prepare_for_tokenization,
-                        preprocessor=partial(preprocess.process_transformers, 
+                        preprocessor=partial(_process_transformers, 
                             pre_rules = [
                             preprocess.fix_html,
                             preprocess.rm_brackets,
