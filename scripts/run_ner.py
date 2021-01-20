@@ -125,6 +125,11 @@ parser = HfArgumentParser((ModelArguments, DataTrainingArguments,
 
 model_args, data_args, training_args, custom_args = parser.parse_args_into_dataclasses()
 
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+torch.manual_seed(training_args.seed)
+np.random.seed(training_args.seed)
+
 # Setup logging
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
