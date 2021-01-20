@@ -329,15 +329,14 @@ if __name__ == '__main__':
             else:
                 text_input_col_name = DATASET_METADATA[args.dataset_name]['text_input_col_name']
 
-            def tokenize_fn(batch):
-                return '<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch,
-                            DATASET_METADATA[args.dataset_name]['text_input_col_name']).split())]) 
+            def tokenize_fn(batch, text_input_col_name):
+                return ['<|>'.join([ '<|>'.join(tok_text + ['<_>']) for tok_text in sefr_tokenize(get_dict_val(batch, text_input_col_name)[0].split()) ])] 
 
             for split_name in DATASET_METADATA[args.dataset_name]['split_names']:
-
+               
                 dataset[split_name] = dataset[split_name].map(lambda batch: { 
-                                        text_input_col_name: tokenize_fn(batch)  
-                                    }, batched=False, batch_size=1)
+                                        text_input_col_name: tokenize_fn(batch, DATASET_METADATA[args.dataset_name]['text_input_col_name'])  
+                                    }, batched=True, batch_size=1)
     except Exception as e:
         raise e
 
