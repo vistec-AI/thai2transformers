@@ -1,10 +1,10 @@
-# Training mask language model
+# Masked Language Model (MLM) Pretraining
 
-This step train a mask language model using trained tokenizer and datasets. The tokenizer is implemented derived from a class `transformers.tokenization_utils.PreTrainedTokenizer`. There are a lot of arguments that can be pass in this step. The script is derived from huggingface transformers `examples/language_modeling/run_mlm.py` with decent amount of new arguments and modifications.
+This page describes the steps required to train Thai RoBERTa based on our custom Tokenizer class. The tokenizers we implemented are inherited from `transformers.tokenization_utils.PreTrainedTokenizer`. There are a lot of arguments that can be pass in this step. Our MLM training script is adapted from Huggingface's transformers respository (`examples/language_modeling/run_mlm.py`) and we add a number of new arguments.
 
 ## Instruction
 
-The following command can be used to train a mask language model (Append `--help` after the `run_mlm.py` to get more information).
+The following command can be used to train a masked language model (Append `--help` after the `run_mlm.py` to get more information).
 
 ```bash
 python run_mlm.py \
