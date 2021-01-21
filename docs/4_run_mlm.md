@@ -51,7 +51,7 @@ cd scripts
 
 CUDA_VISIBLE_DEVIDES="3" python run_mlm.py \
  --architecture roberta-base \
- --tokenizer_name_or_path /workspace/thai2transformers/data/tokenizers/thwiki-20200820/newmm/min-freq-4/newmm.json  \
+ --tokenizer_name_or_path /workspace/thai2transformers/data/tokenizers/thwiki-20200820/newmm/min-freq-4/newmm.json \
  --ext txt \
  --train_dir /workspace/thai2transformers/data/dataset/thwiki-20200820/5_split/train \
  --eval_dir /workspace/thai2transformers/data/dataset/thwiki-20200820/5_split/val \
