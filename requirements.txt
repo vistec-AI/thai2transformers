@@ -15,6 +15,5 @@ nltk==3.4.5
 tensorflow>=2.0.0
 git+git://github.com/huggingface/datasets.git@686717b3cc56dcf830106f0e231bb22406b86156
 sefr_cut==0.2
-datasets==1.2.0
 ssg==0.0.6
 tokenizers==0.9.4

@@ -117,5 +117,5 @@ def multilabel_classification_metrics(pred, n_labels):
         'f1_macro': f1_macro,
         'precision_macro': precision_macro,
         'recall_macro': recall_macro,
-        'nb_samples': len(labels),
+        'nb_samples': len(labels)
     }
