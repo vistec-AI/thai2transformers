@@ -40,7 +40,7 @@ python run_mlm.py \
 
 The command above will load tokenizer from `$PROJECT_TOKENIZER_PATH` with tokenizer type `$PROJECT_TOKENIZER_TYPE` (including __ThaiRobertaTokenizer__ (Subword-level, SentencePiece), __ThaiWordsNewmmTokenizer__ (Word-level, PyThaiNLP's newmm), __ThaiWordsSyllableTokenizer__ (syllable-level, CRF-based syllable segmentor), __FakeSefrCutTokenizer__ (Word-level, ML-based word tokenizer),). Then, create binarized dataset from `*.txt` file in `$PROJECT_TRAIN_DATASET_DIR` and validation dataset from `*.txt` file in `$PROJECT_EVAL_DATASET_DIR` with dataset type `MemmapConcatFullSentenceTextDataset`. The datasets created will be cached at `$PROJECT_CACHE_DIR`, right now there are now mechanism to detect if the cache is actually corresponding to the same datasets specified in `train_dir` or `eval_dir` (if the cache already exits it will skip reading from those text files).
 
-Due to the fact that most of the the datasets creation does not use gpus. So to only build datasets and cache it without training we can also use `--build_dataset_only` flags to trigger script to quit before training step.
+Due to the fact that most of the datasets creation does not use gpus. So to only build datasets and cache it without training we can also use `--build_dataset_only` flags to trigger script to quit before training step.
 
 <br>
 
