@@ -25,7 +25,7 @@ try:
     from thai2transformers.tokenizers import (
         ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
         ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer,
-        SPACE_TOKEN, SEFR_SPLIT_TOKEN)
+        SPACE_TOKEN as DEFAULT_SPACE_TOKEN, SEFR_SPLIT_TOKEN)
     from thai2transformers import metrics as t2f_metrics
 except ModuleNotFoundError:
     import sys
@@ -34,7 +34,7 @@ except ModuleNotFoundError:
     from thai2transformers.tokenizers import (
         ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
         ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer,
-        SPACE_TOKEN, SEFR_SPLIT_TOKEN)
+        SPACE_TOKEN as DEFAULT_SPACE_TOKEN, SEFR_SPLIT_TOKEN)
 
 from transformers import (Trainer, TrainingArguments,
                           AutoModelForTokenClassification, AutoTokenizer,
@@ -107,7 +107,7 @@ class CustomArguments:
         metadata={'help': 'skip eval loop'}
     )
     space_token: str = field(
-        default=SPACE_TOKEN,
+        default=DEFAULT_SPACE_TOKEN,
         metadata={'help': 'specify custom space token'}
     )
     lowercase: bool = field(
