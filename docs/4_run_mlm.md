@@ -44,7 +44,7 @@ Due to the fact that most of the datasets creation does not use gpus. So to only
 
 <br>
 
-For instance, the following command will train `roberta-base` model on 1 GPU (GPU ID: 3) with FP16 mixed-precision training on the `thwiki-20200820` dataset. The maximum sequence length is set to 64. The batch size is 1 with gradient accumulation of 16 step. The maximum trianing step is set to 100 steps with 10 warmup steps in which the learning rate is increased linearly to the peak value of `5e-4` and linearly decayed to zero.
+For instance, the following command will train `roberta-base` model on 1 GPU (GPU ID: 3) with FP16 mixed-precision training on the `thwiki-20200820` dataset. Maximum sequence length is set to 64. The batch size is 1 with gradient accumulation of 16 steps.  Maximum trianing step is set to 100 steps with 10 warmup steps in which the learning rate is increased linearly to the peak value of `5e-4` and linearly decayed to zero.
 
 ```
 cd scripts
