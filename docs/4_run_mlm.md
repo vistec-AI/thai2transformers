@@ -174,6 +174,3 @@ loss_scale             : dynamic
 ```
 
 </details>
-
-
-
