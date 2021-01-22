@@ -7,20 +7,20 @@ The word level tokenizer that we use has pre_tokenize hook that will pre tokeniz
 1) Install required library
 
     As `sefr_cut` relies on `deepcut`, an ML-based word tokenization model, it requires to install Tensorflow. Tensorflow can be installed via the following commands:	
-    
+
     ```bash
     pip install tensorflow
     
-    # For machine with GPUs	--overwrite
+    # For machine with GPUs
     
     pip install tensorflow-gpu	
     ```	
 
-    Then, install `sefr_cut`.	
+    Then, install `sefr_cut`.
 
-    ```bash	
+    ```bash
     pip install sefr_cut==0.2	
-    ```	
+    ```
 
 
 2) Perform word tokenization
@@ -28,7 +28,8 @@ The word level tokenizer that we use has pre_tokenize hook that will pre tokeniz
     The following command will read text files line by line from `input_folder` and output it to `output_folder` where `chunk_size` (number of lines to be read for each process) is number of process multiply by 200.
 
     ```bash
-    python3 ./scripts/sefr_cut_pre_tokenizer.py \ 
+    cd scripts
+    python ./sefr_cut_pre_tokenizer.py \ 
     --input_folder ../data/dataset/thwiki-202008_concat/5_split/train \
     --output_folder ../data/tokenizers/thwiki-202008_concat/seft_cut/ \
     --chunk_size $(($(nproc) * 200)) \
