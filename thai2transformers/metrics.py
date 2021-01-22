@@ -1,11 +1,18 @@
 import pandas as pd
 import numpy as np
+from sklearn.metrics import f1_score, accuracy_score, precision_recall_fscore_support, classification_report
 from seqeval.metrics import (accuracy_score as seqeval_accuracy_score, 
                              classification_report as seqeval_classification_report, 
                              f1_score as seqeval_f1_score,
                              precision_score as seqeval_precision_score, 
                              recall_score as seqeval_recall_score)
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+
+def sk_classification_metrics(pred, pred_labs=False):
+    result = classification_metrics(pred)
+    labels = pred.label_ids
+    preds = pred.predictions if pred_labs else pred.predictions.argmax(-1) 
+    result['classification_report'] = classification_report(labels, preds, digits=4)
+    return result
 
 
 def classification_metrics(pred, pred_labs=False):
@@ -23,6 +30,30 @@ def classification_metrics(pred, pred_labs=False):
         'precision_macro': precision_macro,
         'recall_macro': recall_macro,
         'nb_samples': len(labels)
+    }
+
+
+def seqeval_classification_metrics(pred):
+    from seqeval.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+    labels = pred.label_ids
+    preds = pred.predictions
+    precision_macro = precision_score(labels, preds, average='macro')
+    recall_macro = recall_score(labels, preds, average='macro')
+    f1_macro = f1_score(labels, preds, average='macro')
+    precision_micro = precision_score(labels, preds, average='micro')
+    recall_micro = recall_score(labels, preds, average='micro')
+    f1_micro = f1_score(labels, preds, average='micro')
+    acc = accuracy_score(labels, preds)
+    return {
+        'accuracy': acc,
+        'f1_micro': f1_micro,
+        'precision_micro': precision_micro,
+        'recall_micro': recall_micro,
+        'f1_macro': f1_macro,
+        'precision_macro': precision_macro,
+        'recall_macro': recall_macro,
+        'nb_samples': len(labels),
+        'classification_report': classification_report(labels, preds, digits=4)
     }
 
 def _compute_best_threshold(targets, probs):
@@ -76,28 +107,5 @@ def multilabel_classification_metrics(pred, n_labels):
         'f1_macro': f1_macro,
         'precision_macro': precision_macro,
         'recall_macro': recall_macro,
-        'nb_samples': len(labels),
-    }
-
-
-def seqeval_classification_metrics(pred):
-    labels = pred.label_ids
-    preds = pred.predictions
-    precision_macro = seqeval_precision_score(labels, preds, average="macro")
-    recall_macro = seqeval_recall_score(labels, preds, average="macro")
-    f1_macro = seqeval_f1_score(labels, preds, average="macro")
-    precision_micro = seqeval_precision_score(labels, preds, average="micro")
-    recall_micro = seqeval_recall_score(labels, preds, average="micro")
-    f1_micro = seqeval_f1_score(labels, preds, average="micro")
-    acc = seqeval_accuracy_score(labels, preds)
-    return {
-        "accuracy": acc,
-        "f1_micro": f1_micro,
-        "precision_micro": precision_micro,
-        "recall_micro": recall_micro,
-        "f1_macro": f1_macro,
-        "precision_macro": precision_macro,
-        "recall_macro": recall_macro,
-        "nb_samples": len(labels),
-        "classification_report": seqeval_classification_report(labels, preds, digits=4),
+        'nb_samples': len(labels)
     }

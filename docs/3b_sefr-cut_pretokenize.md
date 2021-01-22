@@ -31,7 +31,7 @@ The word level tokenizer that we use has pre_tokenize hook that will pre tokeniz
     cd scripts
     python ./sefr_cut_pre_tokenizer.py \
     --input_folder ../data/dataset/thwiki-20200820/5_split/train \
-    --output_folder ../data/tokenizers/thwiki-thwiki/seft_cut/ \
+    --output_folder ../data/tokenizers/thwiki-20200820/seft_cut/ \
     --chunk_size $(($(nproc) * 200)) \
     --overwrite
     ```
