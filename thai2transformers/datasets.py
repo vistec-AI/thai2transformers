@@ -368,8 +368,6 @@ class SequenceClassificationDataset(Dataset):
                             prepare_for_tokenization,
                             label_encoder,
                             preprocessor=None):
-        print(f'Debug text_column_name: {text_column_name}')
-        print(f'Debug dataset: {dataset}')
         texts = get_dict_val(dataset, text_column_name)
         if task == Task.MULTICLASS_CLS:
             labels = get_dict_val(dataset, label_column_name)
