@@ -1,10 +1,10 @@
-# Training mask language model
+# Masked Language Model (MLM) Pretraining
 
-This step train a mask language model using trained tokenizer and datasets. The tokenizer is implemented derived from a class `transformers.tokenization_utils.PreTrainedTokenizer`. There are a lot of arguments that can be pass in this step. The script is derived from huggingface transformers `examples/language_modeling/run_mlm.py` with decent amount of new arguments and modifications.
+This page describes the steps required to train Thai RoBERTa based on our custom Tokenizer class. The tokenizers we implemented are inherited from `transformers.tokenization_utils.PreTrainedTokenizer`. There are a lot of arguments that can be pass in this step. Our MLM training script is adapted from Huggingface's transformers respository (`examples/language_modeling/run_mlm.py`) and we add a number of new arguments.
 
 ## Instruction
 
-The following command can be used to train a mask language model (Append `--help` after the `run_mlm.py` to get more information).
+The following command can be used to train a masked language model (Append `--help` after the `run_mlm.py` to get more information).
 
 ```bash
 python run_mlm.py \
@@ -40,18 +40,18 @@ python run_mlm.py \
 
 The command above will load tokenizer from `$PROJECT_TOKENIZER_PATH` with tokenizer type `$PROJECT_TOKENIZER_TYPE` (including __ThaiRobertaTokenizer__ (Subword-level, SentencePiece), __ThaiWordsNewmmTokenizer__ (Word-level, PyThaiNLP's newmm), __ThaiWordsSyllableTokenizer__ (syllable-level, CRF-based syllable segmentor), __FakeSefrCutTokenizer__ (Word-level, ML-based word tokenizer),). Then, create binarized dataset from `*.txt` file in `$PROJECT_TRAIN_DATASET_DIR` and validation dataset from `*.txt` file in `$PROJECT_EVAL_DATASET_DIR` with dataset type `MemmapConcatFullSentenceTextDataset`. The datasets created will be cached at `$PROJECT_CACHE_DIR`, right now there are now mechanism to detect if the cache is actually corresponding to the same datasets specified in `train_dir` or `eval_dir` (if the cache already exits it will skip reading from those text files).
 
-Due to the fact that most of the the datasets creation does not use gpus. So to only build datasets and cache it without training we can also use `--build_dataset_only` flags to trigger script to quit before training step.
+Due to the fact that most of the dataset creation does not use GPUs. So to only build datasets and cache it without training we can also use `--build_dataset_only` flags to trigger script to quit before training step.
 
 <br>
 
-For instance, the following command will train `roberta-base` model on 1 GPU (GPU ID: 3) with FP16 mixed-precision training on the `thwiki-20200820` dataset. The maximum sequence length is set to 64. The batch size is 1 with gradient accumulation of 16 step. The maximum trianing step is set to 100 steps with 10 warmup steps in which the learning rate is increased linearly to the peak value of `5e-4` and linearly decayed to zero.
+For instance, the following command will train `roberta-base` model on 1 GPU (GPU ID: 3) with FP16 mixed-precision training on the `thwiki-20200820` dataset. Maximum sequence length is set to 64. The batch size is 1 with gradient accumulation of 16 steps.  Maximum trianing step is set to 100 steps with 10 warmup steps in which the learning rate is increased linearly to the peak value of `5e-4` and linearly decayed to zero.
 
 ```
 cd scripts
 
 CUDA_VISIBLE_DEVIDES="3" python run_mlm.py \
  --architecture roberta-base \
- --tokenizer_name_or_path /workspace/thai2transformers/data/tokenizers/thwiki-20200820/newmm/min-freq-4/newmm.json  \
+ --tokenizer_name_or_path /workspace/thai2transformers/data/tokenizers/thwiki-20200820/newmm/min-freq-4/newmm.json \
  --ext txt \
  --train_dir /workspace/thai2transformers/data/dataset/thwiki-20200820/5_split/train \
  --eval_dir /workspace/thai2transformers/data/dataset/thwiki-20200820/5_split/val \
@@ -174,6 +174,3 @@ loss_scale             : dynamic
 ```
 
 </details>
-
-
-

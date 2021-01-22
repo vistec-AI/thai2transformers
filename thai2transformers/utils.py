@@ -28,6 +28,9 @@ def get_dict_val(root:Dict, keys:Union[str, List[str]]):
     if type(keys) == str:
         return root[keys]
     elif type(keys) == list:
-        return root[keys[0]][keys[1]]
+        _results = []
+        for item in root[keys[0]]:
+            _results.append(item[keys[1]])
+        return _results
     
     return None

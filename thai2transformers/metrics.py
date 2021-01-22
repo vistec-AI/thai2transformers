@@ -8,15 +8,12 @@ from seqeval.metrics import (accuracy_score as seqeval_accuracy_score,
                              recall_score as seqeval_recall_score)
 
 def sk_classification_metrics(pred, pred_labs=False):
-    
     result = classification_metrics(pred)
-
     labels = pred.label_ids
     preds = pred.predictions if pred_labs else pred.predictions.argmax(-1) 
-   
-    result['classification_report'] =  classification_report(labels, preds, digits=4)
-
+    result['classification_report'] = classification_report(labels, preds, digits=4)
     return result
+
 
 def classification_metrics(pred, pred_labs=False):
     labels = pred.label_ids
@@ -110,5 +107,5 @@ def multilabel_classification_metrics(pred, n_labels):
         'f1_macro': f1_macro,
         'precision_macro': precision_macro,
         'recall_macro': recall_macro,
-        'nb_samples': len(labels),
+        'nb_samples': len(labels)
     }
