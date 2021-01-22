@@ -6,15 +6,15 @@ The word level tokenizer that we use has pre_tokenize hook that will pre tokeniz
 
 1) Install required library
 
-    As `sefr_cut` relies on `deepcut`, an ML-based word tokenization model, it requires to install Tensorflow. Tensorflow can be installed via the following commands:	
+    As `sefr_cut` relies on `deepcut`, an ML-based word tokenization model, it requires to install Tensorflow. Tensorflow can be installed via the following commands:
 
     ```bash
     pip install tensorflow
 
     # For machine with GPUs
 
-    pip install tensorflow-gpu	
-    ```	
+    pip install tensorflow-gpu
+    ```
 
     Then, install `sefr_cut`.
 
