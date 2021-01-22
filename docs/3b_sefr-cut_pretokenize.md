@@ -10,16 +10,16 @@ The word level tokenizer that we use has pre_tokenize hook that will pre tokeniz
 
     ```bash
     pip install tensorflow
-    
+
     # For machine with GPUs
-    
+
     pip install tensorflow-gpu	
     ```	
 
     Then, install `sefr_cut`.
 
     ```bash
-    pip install sefr_cut==0.2	
+    pip install sefr_cut==0.2
     ```
 
 
@@ -29,9 +29,9 @@ The word level tokenizer that we use has pre_tokenize hook that will pre tokeniz
 
     ```bash
     cd scripts
-    python ./sefr_cut_pre_tokenizer.py \ 
-    --input_folder ../data/dataset/thwiki-202008_concat/5_split/train \
-    --output_folder ../data/tokenizers/thwiki-202008_concat/seft_cut/ \
+    python ./sefr_cut_pre_tokenizer.py \
+    --input_folder ../data/dataset/thwiki-20200820/5_split/train \
+    --output_folder ../data/tokenizers/thwiki-20200820/seft_cut/ \
     --chunk_size $(($(nproc) * 200)) \
     --overwrite
     ```
