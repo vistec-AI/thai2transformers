@@ -12,7 +12,7 @@ from pythainlp.tokenize import word_tokenize
 
 _TK_UNK, _TK_REP, _TK_WREP, _TK_URL, _TK_END = "<unk> <rep> <wrep> <url> </s>".split()
 
-SPACE_SPECIAL_TOKEN = "<th_roberta_space_token>"
+SPACE_SPECIAL_TOKEN = "<_>"
 
 # str->str rules
 def fix_html(text: str) -> str:
