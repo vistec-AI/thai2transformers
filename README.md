@@ -39,8 +39,6 @@ Also, you can download current version of cleaned datasets from [here](https://d
  
 In this example, we demonstrate how pretrain RoBERTa base model on Thai Wikipedia dump from scracth
 
-<br>
-
 1. Install required libraries: [1_installation.md](./docs/1_installation.md)  
 2. Prepare `thwiki` dataset from Thai Wikipedia dump: [2_thwiki_data-preparation.md](./docs/2_thwiki_data-preparation.md)  
 
@@ -61,15 +59,11 @@ In this example, we demonstrate how pretrain RoBERTa base model on Thai Wikipedi
 In this example, we demonstrate how to finetune WanchanBERTa, a RoBERTa base model pretrained on Thai Wikipedia dump and Thai assorted texts. 
 
 
-<br>
-
 - Finetune model for sequence classification task from exisitng datasets including `wisesight_sentiment`, `wongnai_reviews`, `generated_reviews_enth` (review star prediction), and `prachathai67k`:
 [5a_finetune_sequence_classificaition.md](./docs/5a_finetune_sequence_classificaition.md)  
 
 - Finetune model for token classification task (NER and POS tagging) from exisitng datasets including `thainer` and `lst20`:
 [5b_finetune_token_classificaition.md](./docs/5b_finetune_token_classificaition.md)  
-
-<br>
 
 <br>
 
