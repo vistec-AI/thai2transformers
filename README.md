@@ -1,21 +1,44 @@
-## `thai2transformers`
+
+# thai2transformers
+
+**Pretraining transformer-based Thai language models**
+
 
 <br>
 
-Pretraining transformers in Thai and English
+thai2transformers provides customtized scripts to pretrain transformer-based masked language model on Thai texts with various types of token as follows:
+
+- __spm__ : a subword-level token from [SentencePiece](https://github.com/google/sentencepiece) library.
+- __newmm__  : a dictionary-based Thai word tokenizer based on maximal matching from [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp).
+- __ssg__ : a CRF-based Thai syllable tokenizer [[Chormai et al., 2020]](https://www.aclweb.org/anthology/2020.emnlp-main.315.pdf),
+- __sefr__: a ML-based Thai word toknizer based on Stacked Ensemble Filter and Refine (SEFR) [[Limkonchotiwat et al., 2020]](https://www.aclweb.org/anthology/2020.emnlp-main.315/) based on probablities from CNN-based [deepcut](https://github.com/rkcosmos/deepcut) and SEFR tokenizer is loaded with `engine="best"`.
+
 
 <br>
 
-### Pretraining Datasets
+<br>
+
+### Thai texts for language model pretraining
 
 <br>
 
-Developing. See this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06FT2RvBE8twKzvXeSe4w5CHnU29f8ZWMUcJdmRks/edit?usp=sharing). Download current version of cleaned datasets [here](https://drive.google.com/file/d/1oF7_COZJqGdIaDGMNI1rKdDCOEzVoZHq/view?usp=sharing).
+We curate a list of sources that can be used to pretrain language model.
+The statistics for each data source are listed in this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06FT2RvBE8twKzvXeSe4w5CHnU29f8ZWMUcJdmRks/edit?usp=sharing). 
+
+Also, you can download current version of cleaned datasets from [here](https://drive.google.com/file/d/1oF7_COZJqGdIaDGMNI1rKdDCOEzVoZHq/view?usp=sharing).
 
 <br>
 
-### Instruction:
+<br>
+
+### Model pretraining and finetuning instructions:
+
+<br>
+
+**a) Instruction for RoBERTa BASE model pretraining on Thai Wikipedia dump:**
  
+In this example, we demonstrate how pretrain RoBERTa base model on Thai Wikipedia dump from scracth
+
 <br>
 
 1. Install required libraries: [1_installation.md](./docs/1_installation.md)  
@@ -30,4 +53,39 @@ Developing. See this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06F
 
 4. Pretrain a masked langauge model: [4_run_mlm.md](./docs/3_run_mlm.md)  
 
+<br>
 
+**b) Instruction for RoBERTa model finetuning on existing Thai text classification, and NER/POS tagging datasets.**
+
+
+In this example, we demonstrate how to finetune WanchanBERTa, a RoBERTa base model pretrained on Thai Wikipedia dump and Thai assorted texts. 
+
+
+<br>
+
+- Finetune model for sequence classification task from exisitng datasets including `wisesight_sentiment`, `wongnai_reviews`, `generated_reviews_enth` (review star prediction), and `prachathai67k`:
+[5a_finetune_sequence_classificaition.md](./docs/5a_finetune_sequence_classificaition.md)  
+
+- Finetune model for token classification task (NER and POS tagging) from exisitng datasets including `thainer` and `lst20`:
+[5b_finetune_token_classificaition.md](./docs/5b_finetune_token_classificaition.md)  
+
+<br>
+
+<br>
+
+<br>
+
+
+###  BibTeX entry and citation info
+
+
+```
+@misc{lowphansirikul2021wangchanberta,
+      title={WangchanBERTa: Pretraining transformer-based Thai Language Models}, 
+      author={Lalita Lowphansirikul and Charin Polpanumas and Nawat Jantrakulchai and Sarana Nutanong},
+      year={2021},
+      eprint={2101.09635},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
