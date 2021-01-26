@@ -8,12 +8,18 @@ from tqdm.auto import tqdm
 import numpy as np
 import pandas as pd
 import logging
+import sentencepiece as spm
+from functools import partial
+
 logging.basicConfig(level=logging.INFO)
 
 # argparse
 import argparse
 
 # python3 preprocess_pantip_large.py --input_dir raw_data/pantip-large --output_dir cleaned_data/pantip-large-cleaned
+
+_TOKENIZER = word_tokenize
+_TOKENIZER_NAME = 'newmm'
 
 def process_one_pantip(text_list, min_seq_length=5, max_seq_length=300, sep_func=sent_tokenize):
     word_counts = []
@@ -74,9 +80,18 @@ def main():
     )
     parser.add_argument("--min_seq_length", type=int, default=5)
     parser.add_argument("--max_seq_length", type=int, default=300)
+    parser.add_argument("--tokenizer", type=str, default='newmm', help='Tokenizer for sentence length filtering, specify either "newmm" or "spm"')
+    parser.add_argument("--spm_model_path", type=str, help='Specify path of SentencePiece model when arg:tokenizer is "spm"')
     parser.add_argument("--ext", type=str, default="")
 
     args = parser.parse_args()
+
+    if args.tokenizer.lower() == "spm":
+        sp = spm.SentencePieceProcessor(model_file=args.spm_model_path)
+        repr_space_token_fn = lambda x: x.replace(' ', '<th_roberta_space_token>')
+        _TOKENIZER =lambda x: sp.encode(repr_space_token_fn(x), out_tyoe=str)
+        _TOKENIZER_NAME = 'spm'
+    
     print(f"{args.input_dir}/*{args.ext}")
     fnames = [str(x) for x in glob.glob(f"{args.input_dir}/*{args.ext}")]
 
@@ -84,7 +99,9 @@ def main():
         results = pool.map(process_fname_pantip, fnames)
 
     result_df = pd.concat(results).drop_duplicates().reset_index(drop=True)
-    pd.Series(result_df.text.unique()).to_csv(f'{args.output_dir}/pantip-large.txt',index=False,header=None)
+    pd.Series(result_df.text.unique()).to_csv(f'{args.output_dir}/pantip-large.tok-{_TOKENIZER_NAME}_min-{args.min_seq_length}_max-{args.max_seq_length}.txt',
+                                                index=False,
+                                                header=None)
 
 if __name__ == "__main__":
     main()
