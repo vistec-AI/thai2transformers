@@ -6,12 +6,12 @@
 
 <br>
 
-thai2transformers provides customtized scripts to pretrain transformer-based masked language model on Thai texts with various types of token as follows:
+thai2transformers provides customized scripts to pretrain transformer-based masked language model on Thai texts with various types of tokens as follows:
 
-- __spm__ : a subword-level token from [SentencePiece](https://github.com/google/sentencepiece) library.
-- __newmm__  : a dictionary-based Thai word tokenizer based on maximal matching from [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp).
-- __ssg__ : a CRF-based Thai syllable tokenizer [[Chormai et al., 2020]](https://www.aclweb.org/anthology/2020.emnlp-main.315.pdf),
-- __sefr__: a ML-based Thai word toknizer based on Stacked Ensemble Filter and Refine (SEFR) [[Limkonchotiwat et al., 2020]](https://www.aclweb.org/anthology/2020.emnlp-main.315/) based on probablities from CNN-based [deepcut](https://github.com/rkcosmos/deepcut) and SEFR tokenizer is loaded with `engine="best"`.
+- __spm__: a subword-level token from [SentencePiece](https://github.com/google/sentencepiece) library.
+- __newmm__ : a dictionary-based Thai word tokenizer based on maximal matching from [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp).
+- __ssg__: a CRF-based Thai syllable tokenizer [[Chormai et al., 2020]](https://www.aclweb.org/anthology/2020.emnlp-main.315.pdf),
+- __sefr__: a ML-based Thai word tokenizer based on Stacked Ensemble Filter and Refine (SEFR) [[Limkonchotiwat et al., 2020]](https://www.aclweb.org/anthology/2020.emnlp-main.315/) based on probabilities from CNN-based [deepcut](https://github.com/rkcosmos/deepcut) and SEFR tokenizer is loaded with `engine="best"`.
 
 
 <br>
@@ -37,7 +37,7 @@ Also, you can download current version of cleaned datasets from [here](https://d
 
 **a) Instruction for RoBERTa BASE model pretraining on Thai Wikipedia dump:**
  
-In this example, we demonstrate how pretrain RoBERTa base model on Thai Wikipedia dump from scracth
+In this example, we demonstrate how pretrain RoBERTa base model on Thai Wikipedia dump from scratch
 
 1. Install required libraries: [1_installation.md](./docs/1_installation.md)  
 2. Prepare `thwiki` dataset from Thai Wikipedia dump: [2_thwiki_data-preparation.md](./docs/2_thwiki_data-preparation.md)  
