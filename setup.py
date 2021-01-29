@@ -9,7 +9,9 @@ requirements = [
     "pythainlp>=2.1.0",
     "emoji",
     "transformers==3.5.0",
-    "dataset>=1.2.1",
+    "datasets>=1.2.1",
+    "sefr_cut",
+    "seqeval",
 ]
 
 
