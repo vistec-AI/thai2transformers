@@ -2,7 +2,7 @@ import os
 import glob
 import argparse
 import shutil
-from helper import _readline_clean_and_strip, get_file_size
+from thai2transformers.helper import _readline_clean_and_strip, get_file_size
 
 
 try:
