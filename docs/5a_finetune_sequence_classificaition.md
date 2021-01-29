@@ -83,7 +83,7 @@ support only uncased texts (default: `False`)
     The script will finetune model with FP16 mixed-precision training on GPU (ID: 3). The train and validation batch size is 16 with no gradient accumulation. The model checkpoint will be save every epoch and select the best model by validation f1_micro. During finetuning, the learning rate will be warmed up linearly until `3e-05` for 100 steps, then linearly decay to zero. The maximum sequence length that the model will be passed (from the resuling number of tokens according to the tokenizer specified). Otherwise, it will truncate the sequence to `max_length`. 
 
     ```
-    cd scripts
+    cd ./scripts/downstream
     CUDA_VISIBLE_DEVICES=3 python ./train_sequence_classification_lm_finetuning.py \
     spm \
     wisesight_sentiment \
