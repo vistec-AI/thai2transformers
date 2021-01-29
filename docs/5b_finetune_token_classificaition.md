@@ -101,7 +101,7 @@ The arguements for the `train_sequence_classification_lm_finetuning.py` are as f
     The script will finetune model with FP16 mixed-precision training on 2 GPUs (ID: 1,2). The train and validation batch size is 16 with no gradient accumulation. The model checkpoint will be save every 250 steps and select the best model by validation loss. During finetuning, the learning rate will be warmed up linearly until `5e-05` for 100 steps, then linearly decay to zero. The maximum sequence length that the model will be passed (from the resuling number of tokens according to the tokenizer specified). Otherwise, it will truncate the sequence to `max_length`. Note that, `--lowercase` is appened to the arugment list as `roberthai-95g-spm` only support uncased text (all lowercase text). Space token is set to `"<th_roberta_space_token>"` as the model use this token for space token.
 
     ```
-    cd scripts
+    cd ./scripts/downstream
     CUDA_VISIBLE_DEVICES=1,2 python train_token_classification_lm_finetuning.py \
     --tokenizer_type CamembertTokenizer \
     --tokenizer_name_or_path /workspace/checkpoints/roberthai-95g-spm/tokenizer_folder \

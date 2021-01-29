@@ -1,10 +1,6 @@
 import argparse
 import math
 import os
-import sys
-
-sys.path.append('..')
-
 from functools import partial
 import urllib.request
 from tqdm import tqdm

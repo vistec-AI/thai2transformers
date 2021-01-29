@@ -20,21 +20,13 @@ from functools import lru_cache
 from seqeval.metrics import classification_report
 from sklearn.metrics import classification_report as sk_classification_report
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
+
 # thai2transformers
-try:
-    from thai2transformers.tokenizers import (
-        ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
-        ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer,
-        SPACE_TOKEN as DEFAULT_SPACE_TOKEN, SEFR_SPLIT_TOKEN)
-    from thai2transformers import metrics as t2f_metrics
-except ModuleNotFoundError:
-    import sys
-    sys.path.append('..')  # path hacking
-    from thai2transformers import metrics as t2f_metrics
-    from thai2transformers.tokenizers import (
-        ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
-        ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer,
-        SPACE_TOKEN as DEFAULT_SPACE_TOKEN, SEFR_SPLIT_TOKEN)
+from thai2transformers import metrics as t2f_metrics
+from thai2transformers.tokenizers import (
+    ThaiRobertaTokenizer, ThaiWordsNewmmTokenizer,
+    ThaiWordsSyllableTokenizer, FakeSefrCutTokenizer,
+    SPACE_TOKEN as DEFAULT_SPACE_TOKEN, SEFR_SPLIT_TOKEN)
 
 from transformers import (Trainer, TrainingArguments,
                           AutoModelForTokenClassification, AutoTokenizer,

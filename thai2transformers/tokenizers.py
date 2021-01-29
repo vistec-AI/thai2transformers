@@ -19,11 +19,11 @@ from functools import partial
 
 
 try:
-    from helper import get_file_size, multi_imap
+    from thai2transformers.helper import get_file_size, multi_imap
 except ModuleNotFoundError:
     import sys
     sys.path.append('../scripts')  # path hacking
-    from helper import get_file_size, multi_imap
+    from thai2transformers.helper import get_file_size, multi_imap
 
 logger = logging.getLogger()
 
