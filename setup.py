@@ -5,14 +5,21 @@ with open('README.md', 'r') as f:
   readme =  f.read()
 
 requirements = [
-    "torch>=1.0",
-    "pythainlp>=2.1.0",
-    "emoji",
+    "torch>=1.5.0",
     "transformers==3.5.0",
+    "sentencepiece==0.1.94",
+    "emoji",
+    "pythainlp>=2.2.4",
+    "tqdm",
     "datasets>=1.2.1",
     "sefr_cut",
     "seqeval",
     "pytorch-lightning",
+    "pydantic",
+    "jsonlines",
+    "ssg==0.0.6",
+    "tokenizers==0.9.4",
+    "pandas==1.1.4",
 ]
 
 
