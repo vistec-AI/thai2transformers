@@ -12,6 +12,7 @@ requirements = [
     "datasets>=1.2.1",
     "sefr_cut",
     "seqeval",
+    "pytorch-lightning",
 ]
 
 

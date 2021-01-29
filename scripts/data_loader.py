@@ -19,7 +19,7 @@ import mmap
 import struct
 import bisect
 from contextlib import contextmanager
-from helper import get_file_size, _readline_clean_and_strip
+from thai2transformers.helper import get_file_size, _readline_clean_and_strip
 
 
 logger = logging.get_logger(__name__)
