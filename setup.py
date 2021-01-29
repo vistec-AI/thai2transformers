@@ -19,7 +19,7 @@ requirements = [
 setup(
     name="thai2transformers",
     version="0.0.1dev0",
-    description="Pretraining transformer based Thai language models ",
+    description="Pretraining transformer based Thai language models",
     long_description=readme,
     long_description_content_type="text/markdown",
     author="VISTEC-depa AI Research Institute of Thailand",
