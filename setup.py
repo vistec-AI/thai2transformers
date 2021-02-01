@@ -18,7 +18,7 @@ requirements = [
     "pydantic",
     "jsonlines",
     "ssg==0.0.6",
-    "tokenizers==0.10.0",
+    "tokenizers==0.9.4",
     "pandas==1.1.4",
     "future>=0.17.1",
 ]
