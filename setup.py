@@ -19,7 +19,7 @@ requirements = [
     "jsonlines",
     "ssg==0.0.6",
     "tokenizers==0.9.3",
-    "pandas==1.1.4",
+    "pandas",
 ]
 
 
