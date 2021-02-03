@@ -7,7 +7,7 @@ with open('README.md', 'r') as f:
 requirements = [
     "torch>=1.5.0",
     "transformers==3.5.0",
-    "sentencepiece==0.1.94",
+    "sentencepiece==0.1.91",
     "emoji",
     "pythainlp>=2.2.4",
     "tqdm",
@@ -18,14 +18,14 @@ requirements = [
     "pydantic",
     "jsonlines",
     "ssg==0.0.6",
-    "tokenizers==0.9.4",
-    "pandas==1.1.4",
+    "tokenizers==0.9.3",
+    "pandas",
 ]
 
 
 setup(
     name="thai2transformers",
-    version="0.1.0dev2",
+    version="0.1.1dev1",
     description="Pretraining transformer based Thai language models",
     long_description=readme,
     long_description_content_type="text/markdown",
