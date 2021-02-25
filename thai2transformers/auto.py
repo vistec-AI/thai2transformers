@@ -23,6 +23,11 @@ MODEL_FOR_MULTI_LABEL_SEQUENCE_CLASSIFICATION_MAPPING = OrderedDict(
     ]
 )
 
+# The following class `AutoModelForMultiLabelSequenceClassification` 
+# is modified from the class named`AutoModelForSequenceClassification` of Huggingface's transformers 
+# 
+# `transformers.model.auto.modeling_auto.AutoModelForSequenceClassification`
+# Ref: https://github.com/huggingface/transformers/blob/9a7e63729f3ff6ddf065fd0d443421e46b1a2ffb/src/transformers/models/auto/modeling_auto.py#L1288
 class AutoModelForMultiLabelSequenceClassification:
     
     def __init__(self):
