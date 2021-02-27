@@ -279,7 +279,7 @@ class SequenceClassificationDataset(Dataset):
     def __init__(
         self,
         tokenizer,
-        preprocessor,
+        preprocessor: Union[Callable[[str], str], List[Callable[str], str]]],
         data_dir,
         task=Task.MULTICLASS_CLS,
         max_length=128,
