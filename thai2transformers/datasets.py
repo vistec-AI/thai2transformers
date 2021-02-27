@@ -1,5 +1,6 @@
 import os
 import glob
+from typing import Union, List, Callable
 import pandas as pd
 import math
 from tqdm.auto import tqdm
