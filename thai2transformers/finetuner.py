@@ -126,8 +126,7 @@ class SequenceClassificationFinetuner:
                       train_dataset: SequenceClassificationDataset,
                       val_dataset: SequenceClassificationDataset = None):
         
-        self.training_args = TrainingArguments(training_args)
-        data_collator = DataCollatorWithPadding(tokenizer,
+        self.training_args = training_args
                                                 padding=True,
                                                 pad_to_multiple_of=8 if kwargs['fp16'] else None)
 
