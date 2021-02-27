@@ -6,6 +6,7 @@ from transformers import (
     AutoModelForSequenceClassification,
     TrainingArguments,
     Trainer,
+    DataCollatorWithPadding
 )
 from transformers.tokenization_utils import (
     PreTrainedTokenizer,
