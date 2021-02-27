@@ -146,7 +146,11 @@ class SequenceClassificationFinetuner:
                  val_dataset: SequenceClassificationDataset = None,
                  test_dataset: SequenceClassificationDataset = None):
 
-        self._init_trainer()
+        self._init_trainer(
+            training_args=training_args,
+            train_dataset=train_dataset,
+            val_dataset=val_dataset
+        )
         self.trainer.train()
         self.trainer.save_model(
             os.path.join(training_args.output_dir,
