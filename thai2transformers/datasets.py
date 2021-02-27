@@ -280,9 +280,9 @@ class SequenceClassificationDataset(Dataset):
     def __init__(
         self,
         tokenizer,
-        preprocessor: Union[Callable[[str], str], List[Callable[[str], str]]],
         data_dir,
         task=Task.MULTICLASS_CLS,
+        preprocessor: Union[Callable[[str], str], List[Callable[[str], str]]] = None,
         max_length=128,
         ext=".csv",
         bs=10000,
