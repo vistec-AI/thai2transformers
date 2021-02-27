@@ -159,9 +159,11 @@ class SequenceClassificationFinetuner:
 
         if test_dataset != None:
 
-        _, label_ids, result = trainer.predict(test_dataset=test_dataset)
+            _, label_ids, result = self.trainer.predict(test_dataset=test_dataset)
     
-        print(f'Evaluation on test set')    
-    
-        for key, value in result.items():
-            print(f'{key} : {value:.4f}')
+            print(f'Evaluation on test set')    
+        
+            for key, value in result.items():
+                print(f'{key} : {value:.4f}')
+
+            return result
