@@ -329,7 +329,6 @@ class SequenceClassificationDataset(Dataset):
                      dataset,
                      text_column_name,
                      label_column_name,
-                     prepare_for_tokenization,
                      max_length=128,
                      bs=1000,
                      space_token='<_>',
@@ -344,7 +343,6 @@ class SequenceClassificationDataset(Dataset):
                      label_column_name,
                      max_length=max_length,
                      bs=bs,
-                     prepare_for_tokenization=prepare_for_tokenization,
                      space_token=space_token,
                      preprocessor=preprocessor,
                      label_encoder=label_encoder)
@@ -366,7 +364,6 @@ class SequenceClassificationDataset(Dataset):
     def _build_from_dataset(task, tokenizer, dataset,
                             text_column_name, label_column_name,
                             space_token, max_length, bs,
-                            prepare_for_tokenization,
                             label_encoder,
                             preprocessor=None):
         texts = get_dict_val(dataset, text_column_name)
