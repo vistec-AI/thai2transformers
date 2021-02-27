@@ -43,6 +43,7 @@ FINETUNE_SEQ_CLS_MODEL_MAPPING = {
     Task.MULTILABEL_CLS.value: AutoModelForMultiLabelSequenceClassification
 }
 
+
 class BaseFinetuner:
 
     def load_pretrained_tokenizer(self):
@@ -54,14 +55,15 @@ class BaseFinetuner:
     def finetune(self):
         pass
 
+
 class SequenceClassificationFinetuner:
 
     def __init__(self,
-                tokenizer: PreTrainedTokenizer = None,
-                config = None,
-                task: Union[str, Task] = None,
-                num_labels: int = None,
-                metric: Union[str, Callable, Task] = None):
+                 tokenizer: PreTrainedTokenizer = None,
+                 config=None,
+                 task: Union[str, Task] = None,
+                 num_labels: int = None,
+                 metric: Union[str, Callable, Task] = None):
 
         self.tokenizer = tokenizer
         self.config = config
@@ -72,8 +74,8 @@ class SequenceClassificationFinetuner:
         self.trainer = None
 
     def load_pretrained_tokenizer(self,
-            tokenizer_cls: PreTrainedTokenizer,
-            name_or_path: Union[str, os.PathLike]):
+                                  tokenizer_cls: PreTrainedTokenizer,
+                                  name_or_path: Union[str, os.PathLike]):
         """
         Load a pretrained tokenizer to the finetuner instance
         """
@@ -83,14 +85,14 @@ class SequenceClassificationFinetuner:
         if tokenizer_cls.__name__ == 'CamembertTokenizer':
 
             if name_or_path in AIRESEARCH_MODEL_NAME.keys():
-            
+
                 self.tokenizer.additional_special_tokens = [
                     '<s>NOTUSED',
                     '</s>NOTUSED',
                     AIRESEARCH_MODEL_NAME[name_or_path]['space_token']
                 ]
 
-    def load_pretrained_model(self, 
+    def load_pretrained_model(self,
                               task: Union[str, Task],
                               name_or_path: Union[str, os.PathLike],
                               num_labels: int = None):
@@ -111,21 +113,22 @@ class SequenceClassificationFinetuner:
 
         if type(task) == Task:
             task = task.value
-        
+
         self.task = task
 
-        if  task not in FINETUNE_SEQ_CLS_MODEL_MAPPING.keys():
-            raise NotImplementedError(f"The task specified `{task}` is incorrect or not available for {self.__class__.__name__}")
+        if task not in FINETUNE_SEQ_CLS_MODEL_MAPPING.keys():
+            raise NotImplementedError(
+                f"The task specified `{task}` is incorrect or not available for {self.__class__.__name__}")
 
         self.model = FINETUNE_SEQ_CLS_MODEL_MAPPING[task].from_pretrained(name_or_path,
-                                                        config=self.config)
+                                                                          config=self.config)
         self.metric = FINETUNE_SEQ_CLS_METRIC_MAPPING[task]
 
     def _init_trainer(self,
                       training_args,
                       train_dataset: SequenceClassificationDataset,
                       val_dataset: SequenceClassificationDataset = None):
-        
+
         self.training_args = training_args
         data_collator = DataCollatorWithPadding(self.tokenizer,
                                                 padding=True,
@@ -154,15 +157,16 @@ class SequenceClassificationFinetuner:
         self.trainer.train()
         self.trainer.save_model(
             os.path.join(training_args.output_dir,
-            'checkpoint-final')
+                         'checkpoint-final')
         )
 
         if test_dataset != None:
 
-            _, label_ids, result = self.trainer.predict(test_dataset=test_dataset)
-    
-            print(f'Evaluation on test set')    
-        
+            _, label_ids, result = self.trainer.predict(
+                test_dataset=test_dataset)
+
+            print(f'Evaluation on test set')
+
             for key, value in result.items():
                 print(f'{key} : {value:.4f}')
 
