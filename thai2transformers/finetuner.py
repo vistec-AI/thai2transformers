@@ -129,7 +129,7 @@ class SequenceClassificationFinetuner:
         self.training_args = training_args
         data_collator = DataCollatorWithPadding(self.tokenizer,
                                                 padding=True,
-                                                pad_to_multiple_of=8 if kwargs['fp16'] else None)
+                                                pad_to_multiple_of=8 if training_args.fp16 else None)
 
         self.trainer = Trainer(
             model=self.model,
