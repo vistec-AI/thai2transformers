@@ -51,7 +51,7 @@ class BaseFinetuner:
     def load_pretrained_model(self):
         pass
 
-    def finetune(self, *kwargs):
+    def finetune(self):
         pass
 
 class SequenceClassificationFinetuner:
