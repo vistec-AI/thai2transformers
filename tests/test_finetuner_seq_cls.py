@@ -176,6 +176,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
 
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'RobertaForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
         
         # instantiate RobertaForSequenceClassification with `num_labels` specified
@@ -186,6 +187,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'RobertaForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
         # instantiate RobertaForSequenceClassification with `num_labels` specified and using Task enum variable
@@ -196,6 +198,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'RobertaForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
         # instantiate RobertaForMultiLabelSequenceClassification without `num_labels`
@@ -205,6 +208,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             name_or_path=pretrained_model_name
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'RobertaForMultiLabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
         
         # instantiate RobertaForMultiLabelSequenceClassification with `num_labels` specified
@@ -215,6 +219,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'RobertaForMultiLabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
 
@@ -226,4 +231,5 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'RobertaForMultiLabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
