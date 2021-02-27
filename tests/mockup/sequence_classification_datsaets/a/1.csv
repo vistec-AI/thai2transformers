@@ -1,0 +1,5 @@
+input,label
+'a1',positive
+'a-1',negative
+'a100',positive
+'a-0.23',negative
