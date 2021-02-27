@@ -282,7 +282,7 @@ class SequenceClassificationDataset(Dataset):
         tokenizer,
         data_dir,
         task=Task.MULTICLASS_CLS,
-        preprocessor: Union[Callable[[str], str], List[Callable[[str], str]]] = None,
+        preprocessor: Callable[[str], str] = None,
         max_length=128,
         ext=".csv",
         bs=10000,
