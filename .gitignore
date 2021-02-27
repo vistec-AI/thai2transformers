@@ -5,6 +5,7 @@
 raw_data
 
 #files
+tmp
 logs
 data
 data_prep
