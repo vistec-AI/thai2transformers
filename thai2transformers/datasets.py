@@ -279,12 +279,12 @@ class SequenceClassificationDataset(Dataset):
     def __init__(
         self,
         tokenizer,
+        preprocessor,
         data_dir,
         task=Task.MULTICLASS_CLS,
         max_length=128,
         ext=".csv",
         bs=10000,
-        preprocessor=None,
         input_ids=[],
         attention_masks=[],
         labels=[],
