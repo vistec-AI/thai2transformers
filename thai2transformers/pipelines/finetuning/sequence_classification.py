@@ -157,7 +157,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
             self.test_dataset = SequenceClassificationDataset.from_dataset(
                 task=self.task,
                 tokenizer=self.tokenizer,
-                dataset=self._dataset[val_dataset_name],
+                dataset=self._dataset[test_dataset_name],
                 text_column_name=self.text_column_name,
                 label_column_name=self.label_column_name,
                 max_length=max_length,
