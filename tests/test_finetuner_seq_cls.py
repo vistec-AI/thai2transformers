@@ -285,7 +285,9 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
 class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
 
     def setUp(self):
-        shutil.rmtree('./tmp/seq_cls_finetuned')
+        if os.path.exists('./tmp/seq_cls_finetuner'):
+            shutil.rmtree('./tmp/seq_cls_finetuner')
+
     @require_torch
     def test_finetune_wanchanbert_spm_camembert_on_wongnai(self):
 
@@ -325,7 +327,6 @@ class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
                         label_column_name='star_rating',
                         max_length=416,
                         space_token='<_>',
-                        prepare_for_tokenization=True,
                         preprocessor=partial(_process_transformers, 
                             pre_rules = [
                             preprocess.fix_html,
@@ -341,7 +342,7 @@ class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
 
 
         # define training args
-        output_dir = './tmp/seq_cls_finetuned/wangchanbert-base-att-spm-uncased/wongnai_reviews'
+        output_dir = './tmp/seq_cls_finetuner/wangchanbert-base-att-spm-uncased/wongnai_reviews'
         training_args = TrainingArguments(output_dir=output_dir)
 
         print('training_args', training_args)
