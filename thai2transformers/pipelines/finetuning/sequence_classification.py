@@ -99,33 +99,44 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                         num_labels=self.num_labels)
 
     def process_dataset(self,
-                           tokenizer=None,
-                           preprocessor: Callable[[str], str]=None,
-                           max_length=512,
-                           bs=1000,
-                           space_token='<_>',
-                           train_dataset_name='train',
-                           val_dataset_name='val',
-                           test_dataset_name='test'):   
+                        tokenizer=None,
+                        preprocessor: Callable[[str], str]=None,
+                        max_length=128,
+                        bs=1000,
+                        space_token='<_>',
+                        train_dataset_name='train',
+                        val_dataset_name='val',
+                        test_dataset_name='test',
+                        num_train_examples: int=None,
+                        num_val_examples: int=None,
+                        num_test_examples: int=None):
  
         if self.tokenizer == None and tokenizer != None:
             self.tokenizer = tokenizer
         elif self.tokenizer == None and tokenizer == None:
             raise AssertionError('A Tokenizer has never been specified')
 
+        if num_train_examples != None and train_dataset_name in self._dataset.keys():
+            self._dataset[train_dataset_name] = self._dataset[train_dataset_name][:num_train_examples]
+        if num_val_examples != None and val_dataset_name in self._dataset.keys():
+            self._dataset[val_dataset_name] = self._dataset[val_dataset_name][:num_val_examples]
+        if num_test_examples != None and test_dataset_name in self._dataset.keys():
+            self._dataset[test_dataset_name] = self._dataset[test_dataset_name][:num_test_examples]
 
-        self.train_dataset = SequenceClassificationDataset.from_dataset(
-            task=self.task,
-            tokenizer=self.tokenizer,
-            dataset=self._dataset[train_dataset_name],
-            text_column_name=self.text_column_name,
-            label_column_name=self.label_column_name,
-            max_length=max_length,
-            bs=bs,
-            space_token=space_token,
-            preprocessor=preprocessor,
-            label_encoder=self.label_encoder,
-        )
+
+        if train_dataset_name in self._dataset.keys():
+            self.train_dataset = SequenceClassificationDataset.from_dataset(
+                task=self.task,
+                tokenizer=self.tokenizer,
+                dataset=self._dataset[train_dataset_name],
+                text_column_name=self.text_column_name,
+                label_column_name=self.label_column_name,
+                max_length=max_length,
+                bs=bs,
+                space_token=space_token,
+                preprocessor=preprocessor,
+                label_encoder=self.label_encoder,
+            )
 
         if val_dataset_name in self._dataset.keys():
             self.val_dataset = SequenceClassificationDataset.from_dataset(
