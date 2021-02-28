@@ -79,7 +79,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
         if self.task == Task.MULTICLASS_CLS.value:
             self.num_labels = len(set(get_dict_val(self._dataset['train'], label_column_name)))
         if self.task == Task.MULTILABEL_CLS.value:
-            self.num_labels = len(set(reduce(lambda a,b: a + b, get_dict_val(self._dataset['train'], label_column_name))))
+            self.num_labels = len(label_column_name)
 
 
     def load_tokenizer(self, tokenizer_cls, name_or_path):
