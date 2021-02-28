@@ -16,12 +16,14 @@ seq_cls_finetune.load_dataset('wongnai_reviews')
 import os
 import sys
 from typing import List, Union, Dict, Callable, Optional
+from functools import reduce
 
 from datasets import load_dataset
 from sklearn.preprocessing import LabelEncoder
 from transformers import (
-    TrainingArguments
+    TrainingArguments,
 )
+from transformers.tokenization_utils import PreTrainedTokenizer
 
 from .base import BaseFinetuningPipeline
 from thai2transformers.conf import Task
