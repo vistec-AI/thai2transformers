@@ -87,6 +87,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
         self.finetuner.load_pretrained_tokenizer(
                         tokenizer_cls=tokenizer_cls,
                         name_or_path=name_or_path)
+        self.tokenizer = self.finetuner.tokenizer    
    
     def load_model(self, tokenizer_cls, name_or_path, num_labels:int = None):
 
