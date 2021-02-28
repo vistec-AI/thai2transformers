@@ -307,13 +307,13 @@ class SequenceClassificationDataset(Dataset):
         return len(self.labels)
 
     def __getitem__(self, i):
-        if self.task == Task.MULTICLASS_CLS:
+        if self.task == Task.MULTICLASS_CLS.value:
             return {
                 "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
                 "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
                 "label": torch.tensor(self.labels[i], dtype=torch.long),
             }
-        elif self.task == Task.MULTILABEL_CLS:
+        elif self.task == Task.MULTILABEL_CLS.value:
             return {
                 "input_ids": torch.tensor(self.input_ids[i], dtype=torch.long),
                 "attention_mask": torch.tensor(self.attention_masks[i], dtype=torch.long),
@@ -324,7 +324,7 @@ class SequenceClassificationDataset(Dataset):
 
     @classmethod
     def from_dataset(cls,
-                     task,
+                     task: Union[str, Task],
                      tokenizer,
                      dataset,
                      text_column_name,
@@ -335,6 +335,9 @@ class SequenceClassificationDataset(Dataset):
                      preprocessor=None,
                      label_encoder=None):
         
+        if isinstance(task, Task):
+            task = task.value
+
         input_ids, attention_masks, labels = SequenceClassificationDataset._build_from_dataset(
                      task,
                      tokenizer,
@@ -367,13 +370,13 @@ class SequenceClassificationDataset(Dataset):
                             label_encoder,
                             preprocessor=None):
         texts = get_dict_val(dataset, text_column_name)
-        if task == Task.MULTICLASS_CLS:
+        if task == Task.MULTICLASS_CLS.value:
             labels = get_dict_val(dataset, label_column_name)
 
             if label_encoder != None:
                 labels = label_encoder.transform(labels)
 
-        elif task == Task.MULTILABEL_CLS:
+        elif task == Task.MULTILABEL_CLS.value:
             _labels = []
             for i, name in enumerate(label_column_name):
                 # print(name)
