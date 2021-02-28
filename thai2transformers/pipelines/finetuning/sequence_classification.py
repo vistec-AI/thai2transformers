@@ -155,13 +155,21 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                 label_encoder=self.label_encoder,
             )
 
-    def finetune(self, output_dir:str, **kwargs):
+    def finetune(self, output_dir:str, eval_on_test_set:bool = False, **kwargs):
 
         training_args = TrainingArguments(output_dir=output_dir,
                                           **kwargs)
 
-                                          
-        self.finetuner.finetune(training_args,
+        if eval_on_test_set and self.test_dataset:
+            return self.finetuner.finetune(training_args,
                                 train_dataset=self.train_dataset,
                                 val_dataset=self.val_dataset,
                                 test_dataset=self.test_dataset)
+        elif eval_on_test_set and self.test_dataset == None:
+            raise AssertionError('test_dataset is not specified, while argument eval_on_test_set is True')
+        
+        if not eval_on_test_set:
+            self.finetuner.finetune(training_args,
+                                train_dataset=self.train_dataset,
+                                val_dataset=self.val_dataset,
+                                test_dataset=None)
