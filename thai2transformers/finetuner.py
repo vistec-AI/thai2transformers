@@ -1,6 +1,6 @@
 import os
 from typing import List, Dict, Union, Optional, Callable
-
+from functools import partial
 from transformers import (
     AutoConfig,
     AutoModelForSequenceClassification,
@@ -123,6 +123,8 @@ class SequenceClassificationFinetuner:
         self.model = FINETUNE_SEQ_CLS_MODEL_MAPPING[task].from_pretrained(name_or_path,
                                                                           config=self.config)
         self.metric = FINETUNE_SEQ_CLS_METRIC_MAPPING[task]
+        if task == Task.MULTILABEL_CLS.value:
+            self.metric = partial(self.metric, n_labels=num_labels)
 
     def _init_trainer(self,
                       training_args,
