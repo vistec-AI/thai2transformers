@@ -82,7 +82,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
             self.num_labels = len(label_column_name)
 
 
-    def load_tokenizer(self, tokenizer_cls, name_or_path):
+    def load_tokenizer(self, tokenizer_cls: Union[str, PreTrainedTokenizer], name_or_path):
 
         self.finetuner.load_pretrained_tokenizer(
                         tokenizer_cls=tokenizer_cls,
