@@ -102,7 +102,7 @@ class TestSequenceClassificationDataset(unittest.TestCase):
         self.assertEqual(type(ValueError()), type(context.exception))
 
 
-    def test_init_from_dataset(self):
+    def test_init_from_dataset_1(self):
 
         daataset = load_dataset('wongnai_reviews')
         daataset['train'] = daataset['train'][:100]
@@ -157,8 +157,8 @@ class TestSequenceClassificationDataset(unittest.TestCase):
 
     def test_init_from_dataset_with_error_1(self):
 
-        daataset = load_dataset('wongnai_reviews')
-        daataset['train'] = daataset['train'][:100]
+        dataset = load_dataset('wongnai_reviews')
+        dataset['train'] = dataset['train'][:100]
         text_column_name = 'review_body'
         label_column_name = 'star_rating'
         def preprocessor(x: str) -> List[str]:
@@ -169,7 +169,7 @@ class TestSequenceClassificationDataset(unittest.TestCase):
             seq_cls_dataset = SequenceClassificationDataset.from_dataset(
                 task=Task.MULTICLASS_CLS,
                 tokenizer=AutoTokenizer.from_pretrained('xlm-roberta-base'),
-                dataset=daataset['train'],
+                dataset=dataset['train'],
                 text_column_name=text_column_name,
                 label_column_name=label_column_name,
                 max_length=10,
