@@ -75,12 +75,14 @@ class SequenceClassificationFinetuner:
 
     def load_pretrained_tokenizer(self,
                                   tokenizer_cls: PreTrainedTokenizer,
-                                  name_or_path: Union[str, os.PathLike]):
+                                  name_or_path: Union[str, os.PathLike],
+                                  revision: str = None):
         """
         Load a pretrained tokenizer to the finetuner instance
         """
 
-        self.tokenizer = tokenizer_cls.from_pretrained(name_or_path)
+        self.tokenizer = tokenizer_cls.from_pretrained(name_or_path,
+                                                       revision=revision)
 
         if tokenizer_cls.__name__ == 'CamembertTokenizer':
 
@@ -95,6 +97,7 @@ class SequenceClassificationFinetuner:
     def load_pretrained_model(self,
                               task: Union[str, Task],
                               name_or_path: Union[str, os.PathLike],
+                              revision: str = None,
                               num_labels: int = None):
         """
         Load a pretrained model to the finetuner instance and modify classification head
@@ -121,7 +124,8 @@ class SequenceClassificationFinetuner:
                 f"The task specified `{task}` is incorrect or not available for {self.__class__.__name__}")
 
         self.model = FINETUNE_SEQ_CLS_MODEL_MAPPING[task].from_pretrained(name_or_path,
-                                                                          config=self.config)
+                                                                          config=self.config,
+                                                                          revision=revision)
         self.metric = FINETUNE_SEQ_CLS_METRIC_MAPPING[task]
         if task == Task.MULTILABEL_CLS.value:
             self.metric = partial(self.metric, n_labels=num_labels)
