@@ -45,8 +45,6 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
         elif isinstance(task, str):
             self.task = task
         self._dataset = None
-        self.tokeinzer = tokeinzer
-        self.model = model
         self.train_dataset = train_dataset
         self.val_dataset = val_dataset
         self.test_dataset = test_dataset
