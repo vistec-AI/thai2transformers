@@ -89,7 +89,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                         name_or_path=name_or_path)
         self.tokenizer = self.finetuner.tokenizer    
    
-    def load_model(self, tokenizer_cls, name_or_path, num_labels:int = None):
+    def load_model(self, name_or_path, num_labels:int = None):
 
         if self.num_labels == None and num_labels != None:
             self.num_labels = num_labels
