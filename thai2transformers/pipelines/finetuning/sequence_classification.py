@@ -55,7 +55,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
 
     def load_dataset(self,
                      dataset_name_or_path: Union[str, os.PathLike],
-                     text_column_name: Union[str, List[str]],
+                     text_column_name: Union[str],
                      label_column_name: Union[str, List[str]],
                      task: Union[str, Task]= None):
         if isinstance(task, Task):
