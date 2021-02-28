@@ -125,6 +125,36 @@ class TestSequenceClassificationDataset(unittest.TestCase):
         self.assertIsNotNone(seq_cls_dataset)
         self.assertEqual(len(seq_cls_dataset[0]['input_ids']), max_length)
 
+    # Init with LabelEncoder instance
+    def test_init_from_dataset_2(self):
+
+
+        dataset = load_dataset('wongnai_reviews')
+        dataset['train'] = dataset['train'][:100]
+        text_column_name = 'review_body'
+        label_column_name = 'star_rating'
+        max_length = 10
+
+        def preprocessor(x: str) -> str:
+            return x.replace(' ', '<_>')
+
+        label_encoder = preprocessing.LabelEncoder()
+        label_encoder.fit(dataset['train'][label_column_name])
+        print(label_encoder)
+
+        seq_cls_dataset = SequenceClassificationDataset.from_dataset(
+            task=Task.MULTICLASS_CLS,
+            tokenizer=AutoTokenizer.from_pretrained('xlm-roberta-base'),
+            dataset=dataset['train'],
+            text_column_name=text_column_name,
+            label_column_name=label_column_name,
+            max_length=max_length,
+            preprocessor=preprocessor,
+            label_encoder=label_encoder
+        )
+        self.assertIsNotNone(seq_cls_dataset)
+        self.assertEqual(len(seq_cls_dataset[0]['input_ids']), max_length)
+
     def test_init_from_dataset_with_error_1(self):
 
         daataset = load_dataset('wongnai_reviews')
