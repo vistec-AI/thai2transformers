@@ -50,6 +50,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
         self.test_dataset = test_dataset
         self.finetuner = finetuner
         self.label_encoder = None
+        self.tokenizer = None
 
         self.finetuner = SequenceClassificationFinetuner()
 
