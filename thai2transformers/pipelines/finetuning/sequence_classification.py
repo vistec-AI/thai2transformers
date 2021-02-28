@@ -70,6 +70,8 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
             if 'train' in self._dataset.keys():
                 self.label_encoder = LabelEncoder()
                 self.label_encoder.fit(self._dataset['train'][label_column_name])
+        elif self.task == Task.MULTILABEL_CLS.value:
+            self.label_encoder = None
         else:
             raise ValueError()
 
