@@ -40,6 +40,8 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                  finetuner: BaseFinetuner = None):
         if isinstance(task, Task):
             self.task = task.value
+        elif isinstance(task, str):
+            self.task = task
         self._dataset = None
         self.tokeinzer = tokeinzer
         self.model = model
