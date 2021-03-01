@@ -121,7 +121,7 @@ class SequenceClassificationFinetuner(BaseFinetuner):
                 num_labels=num_labels
             )
 
-        if isinstance(task) == Task:
+        if isinstance(task, Task):
             task = task.value
 
         self.task = task
