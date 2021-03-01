@@ -456,7 +456,7 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
         training_args.warmup_steps = 2
         training_args.evaluation_strategy = 'steps'
         training_args.eval_steps = 10
-        training_args.logging_steps = 
+        training_args.logging_steps = 1
         training_args.no_cuda = not torch.cuda.is_available()
         training_args.run_name = None # Set wandb run name to None
         
@@ -548,11 +548,11 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
         training_args = TrainingArguments(output_dir=output_dir)
 
         print('training_args', training_args)
-        training_args.max_steps = 10
-        training_args.warmup_steps = 2
+        training_args.max_steps = 50
+        training_args.warmup_steps = 8
         training_args.evaluation_strategy = 'steps'
-        training_args.eval_steps = 10
-        training_args.logging_steps = 
+        training_args.eval_steps = 25
+        training_args.logging_steps = 1
         training_args.no_cuda = not torch.cuda.is_available()
         training_args.run_name = None # Set wandb run name to None
         
