@@ -127,8 +127,6 @@ class SequenceClassificationFinetuner:
                                                                           config=self.config,
                                                                           revision=revision)
         self.metric = FINETUNE_SEQ_CLS_METRIC_MAPPING[task]
-        if task == Task.MULTILABEL_CLS.value:
-            self.metric = partial(self.metric, n_labels=num_labels)
 
     def _init_trainer(self,
                       training_args,
@@ -139,11 +137,15 @@ class SequenceClassificationFinetuner:
         data_collator = DataCollatorWithPadding(self.tokenizer,
                                                 padding=True,
                                                 pad_to_multiple_of=8 if training_args.fp16 else None)
+        if self.task == Task.MULTILABEL_CLS.value:
+            metric = partial(self.metric, n_labels=self.num_labels)
+        else:
+            metric = self.metric
 
         self.trainer = Trainer(
             model=self.model,
             args=self.training_args,
-            compute_metrics=self.metric,
+            compute_metrics=metric,
             train_dataset=train_dataset,
             eval_dataset=val_dataset,
             data_collator=data_collator
