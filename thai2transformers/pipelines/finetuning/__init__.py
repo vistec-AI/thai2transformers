@@ -1,3 +1,7 @@
 from .sequence_classification import (
-    SequenceClassificationFinetuningPipeline
+    SequenceClassificationFinetuningPipeline,
+)
+
+from .token_classification import (
+    TokenClassificationFinetuningPipeline,
 )
