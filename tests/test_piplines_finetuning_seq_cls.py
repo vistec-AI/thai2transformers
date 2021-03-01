@@ -222,23 +222,23 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
         self.assertEqual(seq_cls_finetuner.finetuner.num_labels, prachathai_num_labels)
         self.assertEqual(seq_cls_finetuner.finetuner.model.num_labels, prachathai_num_labels)
 
-        # training_args = {
-        #     'max_steps': 10,
-        #     'warmup_steps': 1,
-        #     'no_cuda': not torch.cuda.is_available(),
-        # }
+        training_args = {
+            'max_steps': 10,
+            'warmup_steps': 1,
+            'no_cuda': not torch.cuda.is_available(),
+        }
         
-        # output_dir = './tmp/seq_cls_finetuning_pipeline/wangchanbert-base-att-spm-uncased/prachathai67k'
+        output_dir = './tmp/seq_cls_finetuning_pipeline/wangchanbert-base-att-spm-uncased/prachathai67k'
 
-        # eval_result = seq_cls_finetuner.finetune(
-        #     output_dir=output_dir,
-        #     eval_on_test_set=True,
-        #     **training_args
-        # )
+        eval_result = seq_cls_finetuner.finetune(
+            output_dir=output_dir,
+            eval_on_test_set=True,
+            **training_args
+        )
 
-        # self.assertIsNotNone(eval_result)
-        # print(eval_result)
+        self.assertIsNotNone(eval_result)
+        print(eval_result)
 
-        # self.assertTrue(os.path.exists(
-        #     os.path.join(output_dir, 'checkpoint-final', 'pytorch_model.bin')
-        # ))
+        self.assertTrue(os.path.exists(
+            os.path.join(output_dir, 'checkpoint-final', 'pytorch_model.bin')
+        ))
