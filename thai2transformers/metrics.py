@@ -14,7 +14,7 @@ from .conf import Task
 
 
 def sk_classification_metrics(pred, pred_labs=False):
-    result = classification_metrics(pred)
+    result = classification_metrics(pred, pred_labs=pred_labs)
     labels = pred.label_ids
     preds = pred.predictions if pred_labs else pred.predictions.argmax(-1) 
     result['classification_report'] = classification_report(labels, preds, digits=4)
@@ -158,6 +158,6 @@ def token_classification_metrics(pred, task: str, id2label: Dict[int, str]):
         }
     else:
         result = token_level_classification_metrics(sum(true_labels, []),
-                                               sum(true_predictions, []))
+                                                    sum(true_predictions, []))
         result = {k: v for k, v in result.items() if k != 'classification_report'}
         return result
