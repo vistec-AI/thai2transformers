@@ -120,6 +120,7 @@ class SequenceClassificationFinetuner(BaseFinetuner):
                 name_or_path,
                 num_labels=num_labels
             )
+            self.num_labels = num_labels
 
         if isinstance(task, Task):
             task = task.value
