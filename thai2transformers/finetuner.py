@@ -77,7 +77,6 @@ class SequenceClassificationFinetuner(BaseFinetuner):
         self.task = task.value if type(task) == Task else task
         self.num_labels = num_labels
         self.metric = metric
-        self._metric = None
         self.training_args = None
         self.trainer = None
 
@@ -122,7 +121,7 @@ class SequenceClassificationFinetuner(BaseFinetuner):
                 num_labels=num_labels
             )
 
-        if type(task) == Task:
+        if isinstance(task) == Task:
             task = task.value
 
         self.task = task
@@ -146,9 +145,9 @@ class SequenceClassificationFinetuner(BaseFinetuner):
                                                 padding=True,
                                                 pad_to_multiple_of=8 if training_args.fp16 else None)
         if self.task == Task.MULTILABEL_CLS.value:
-            self._metric = partial(self.metric, n_labels=self.num_labels)
+            metric = partial(self.metric, n_labels=self.num_labels)
         else:
-            self._metric = self.metric
+            metric = self.metric
 
         self.trainer = Trainer(
             model=self.model,
