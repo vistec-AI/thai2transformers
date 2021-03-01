@@ -219,6 +219,7 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
 
         self.assertIsNotNone(seq_cls_finetuner.finetuner.model)
         self.assertEqual(seq_cls_finetuner.num_labels, prachathai_num_labels)
+        self.assertEqual(seq_cls_finetuner.finetuner.num_labels, prachathai_num_labels)
         self.assertEqual(seq_cls_finetuner.finetuner.model.num_labels, prachathai_num_labels)
 
         # training_args = {
