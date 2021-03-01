@@ -39,8 +39,8 @@ AIRESEARCH_MODEL_NAME = {
 FINETUNE_METRIC_MAPPING = {
     Task.MULTICLASS_CLS.value: classification_metrics,
     Task.MULTILABEL_CLS.value: multilabel_classification_metrics,
-    Task.CHUNK_LEVEL_CLS: chunk_level_classification_metrics,
-    Task.TOKEN_LEVEL_CLS: token_level_classification_metrics,
+    Task.CHUNK_LEVEL_CLS.value: chunk_level_classification_metrics,
+    Task.TOKEN_LEVEL_CLS.value: token_level_classification_metrics,
 }
 
 FINETUNE_MODEL_MAPPING = {
