@@ -48,10 +48,9 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
         self.train_dataset = train_dataset
         self.val_dataset = val_dataset
         self.test_dataset = test_dataset
-        self.finetuner = finetuner
         self.label_encoder = None
         self.tokenizer = None
-
+        self.num_labels = None
         self.finetuner = SequenceClassificationFinetuner()
 
     def load_dataset(self,
