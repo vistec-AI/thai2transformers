@@ -152,7 +152,7 @@ class SequenceClassificationFinetuner(BaseFinetuner):
         self.trainer = Trainer(
             model=self.model,
             args=self.training_args,
-            compute_metrics=self._metric,
+            compute_metrics=metric,
             train_dataset=train_dataset,
             eval_dataset=val_dataset,
             data_collator=data_collator
