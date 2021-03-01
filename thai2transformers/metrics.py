@@ -1,11 +1,17 @@
+from typing import List, Dict, Union
+
 import pandas as pd
 import numpy as np
+from datasets import load_metric
 from sklearn.metrics import f1_score, accuracy_score, precision_recall_fscore_support, classification_report
 from seqeval.metrics import (accuracy_score as seqeval_accuracy_score, 
                              classification_report as seqeval_classification_report, 
                              f1_score as seqeval_f1_score,
                              precision_score as seqeval_precision_score, 
                              recall_score as seqeval_recall_score)
+
+from .conf import Task
+
 
 def sk_classification_metrics(pred, pred_labs=False):
     result = classification_metrics(pred)
@@ -127,3 +133,31 @@ def token_level_classification_metrics(agg_chunk_labels, agg_chunk_preds):
         predictions = agg_chunk_preds
 
     return sk_classification_metrics(LabelsPreds, pred_labs=True)
+
+seq_metric = load_metric("seqeval")
+def token_classification_metrics(pred, task: str, id2label: Dict[int, str]):
+    predictions, labels = pred
+    predictions = np.argmax(predictions, axis=2)
+
+    # Remove ignored index (special tokens)
+    true_predictions = [
+        [ id2label[p] for (p, l) in zip(prediction, label) if l != -100]
+        for prediction, label in zip(predictions, labels)
+    ]
+    true_labels = [
+        [ id2label[l] for (p, l) in zip(prediction, label) if l != -100]
+        for prediction, label in zip(predictions, labels)
+    ]
+    if task == Task.CHUNK_LEVEL_CLS.value:
+        results = seq_metric.compute(predictions=true_predictions, references=true_labels)
+        return {
+            "precision": results["overall_precision"],
+            "recall": results["overall_recall"],
+            "f1": results["overall_f1"],
+            "accuracy": results["overall_accuracy"],
+        }
+    else:
+        result = token_level_classification_metrics(sum(true_labels, []),
+                                               sum(true_predictions, []))
+        result = {k: v for k, v in result.items() if k != 'classification_report'}
+        return result
