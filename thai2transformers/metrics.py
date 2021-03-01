@@ -109,3 +109,21 @@ def multilabel_classification_metrics(pred, n_labels):
         'recall_macro': recall_macro,
         'nb_samples': len(labels)
     }
+
+
+def chunk_level_classification_metrics(agg_chunk_labels, agg_chunk_preds):
+    
+    class LabelsPreds:
+        label_ids = agg_chunk_labels
+        predictions = agg_chunk_preds
+
+    return seqeval_classification_metrics(LabelsPreds)
+
+
+def token_level_classification_metrics(agg_chunk_labels, agg_chunk_preds):
+    
+    class LabelsPreds:
+        label_ids = agg_chunk_labels
+        predictions = agg_chunk_preds
+
+    return sk_classification_metrics(LabelsPreds, pred_labs=True)
