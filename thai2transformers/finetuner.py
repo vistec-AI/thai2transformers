@@ -74,7 +74,7 @@ class SequenceClassificationFinetuner(BaseFinetuner):
 
         self.tokenizer = tokenizer
         self.config = config
-        self.task = task.value if type(task) == Task else task
+        self.task = task.value if isinstance(task, Task) else task
         self.num_labels = num_labels
         self.metric = metric
         self.training_args = None
