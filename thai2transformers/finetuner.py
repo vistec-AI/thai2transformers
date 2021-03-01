@@ -235,7 +235,7 @@ class TokenClassificationFinetuner(BaseFinetuner):
                 num_labels=num_labels
             )
 
-        if type(task) == Task:
+        if isinstance(task, Task):
             task = task.value
 
         self.task = task
