@@ -94,111 +94,107 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         self.assertEqual(token_cls_finetuner.tokenizer.additional_special_tokens,
                          ['<s>NOTUSED', '</s>NOTUSED', '<_>'])
 
-    # @require_torch
-    # def test_load_pretrained_tokenizer_wangchanberta_spm(self):
+    @require_torch
+    def test_load_pretrained_tokenizer_wangchanberta_spm(self):
         
-    #     pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-spm'
-    #     tokenizer_cls = TOKENIZER_CLS_MAPPING['spm']
+        pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-spm'
+        tokenizer_cls = TOKENIZER_CLS_MAPPING['spm']
         
-    #     seq_cls_finetuner = SequenceClassificationFinetuner()
-    #     seq_cls_finetuner.load_pretrained_tokenizer(
-    #         tokenizer_cls=tokenizer_cls,
-    #         name_or_path=pretrained_tokenizer_name
-    #     )
+        token_cls_finetuner = TokenClassificationFinetuner()
+        token_cls_finetuner.load_pretrained_tokenizer(
+            tokenizer_cls=tokenizer_cls,
+            name_or_path=pretrained_tokenizer_name
+        )
 
-    #     self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'ThaiRobertaTokenizer')
+        self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'ThaiRobertaTokenizer')
     
-    # #@pytest.mark.skip(reason="change api")
-    # @require_torch
-    # def test_load_pretrained_tokenizer_wangchanberta_newmm(self):
+    @require_torch
+    def test_load_pretrained_tokenizer_wangchanberta_newmm(self):
         
-    #     pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-newmm'
-    #     tokenizer_cls = TOKENIZER_CLS_MAPPING['newmm']
+        pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-newmm'
+        tokenizer_cls = TOKENIZER_CLS_MAPPING['newmm']
         
-    #     seq_cls_finetuner = SequenceClassificationFinetuner()
-    #     seq_cls_finetuner.load_pretrained_tokenizer(
-    #         tokenizer_cls=tokenizer_cls,
-    #         name_or_path=pretrained_tokenizer_name
-    #     )
+        token_cls_finetuner = TokenClassificationFinetuner()
+        token_cls_finetuner.load_pretrained_tokenizer(
+            tokenizer_cls=tokenizer_cls,
+            name_or_path=pretrained_tokenizer_name
+        )
 
-    #     self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsNewmmTokenizer')
+        self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsNewmmTokenizer')
     
-    # #@pytest.mark.skip(reason="change api")
-    # @require_torch
-    # def test_load_pretrained_tokenizer_wangchanberta_syllable(self):
+    @require_torch
+    def test_load_pretrained_tokenizer_wangchanberta_syllable(self):
         
-    #     pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-ssg'
-    #     tokenizer_cls = TOKENIZER_CLS_MAPPING['syllable']
+        pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-ssg'
+        tokenizer_cls = TOKENIZER_CLS_MAPPING['syllable']
         
-    #     seq_cls_finetuner = SequenceClassificationFinetuner()
-    #     seq_cls_finetuner.load_pretrained_tokenizer(
-    #         tokenizer_cls=tokenizer_cls,
-    #         name_or_path=pretrained_tokenizer_name
-    #     )
+        token_cls_finetuner = TokenClassificationFinetuner()
+        token_cls_finetuner.load_pretrained_tokenizer(
+            tokenizer_cls=tokenizer_cls,
+            name_or_path=pretrained_tokenizer_name
+        )
 
-    #     self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsSyllableTokenizer')
+        self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsSyllableTokenizer')
 
-    # #@pytest.mark.skip(reason="change api")
-    # @require_torch
-    # def test_load_pretrained_tokenizer_wangchanberta_sefr(self):
+    @require_torch
+    def test_load_pretrained_tokenizer_wangchanberta_sefr(self):
         
-    #     pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-sefr'
-    #     tokenizer_cls = TOKENIZER_CLS_MAPPING['sefr_cut']
+        pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-sefr'
+        tokenizer_cls = TOKENIZER_CLS_MAPPING['sefr_cut']
         
-    #     seq_cls_finetuner = SequenceClassificationFinetuner()
-    #     seq_cls_finetuner.load_pretrained_tokenizer(
-    #         tokenizer_cls=tokenizer_cls,
-    #         name_or_path=pretrained_tokenizer_name
-    #     )
+        token_cls_finetuner = TokenClassificationFinetuner()
+        token_cls_finetuner.load_pretrained_tokenizer(
+            tokenizer_cls=tokenizer_cls,
+            name_or_path=pretrained_tokenizer_name
+        )
 
-    #     self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'FakeSefrCutTokenizer')
+        self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'FakeSefrCutTokenizer')
     
-    # #@pytest.mark.skip(reason="change api")
-    # @require_torch
-    # def test_load_pretrained_tokenizer_xlmr(self):
+    @require_torch
+    def test_load_pretrained_tokenizer_xlmr(self):
         
-    #     pretrained_tokenizer_name = 'xlm-roberta-base'
-    #     tokenizer_cls = TOKENIZER_CLS_MAPPING['xlmr']
+        pretrained_tokenizer_name = 'xlm-roberta-base'
+        tokenizer_cls = TOKENIZER_CLS_MAPPING['xlmr']
         
-    #     seq_cls_finetuner = SequenceClassificationFinetuner()
-    #     seq_cls_finetuner.load_pretrained_tokenizer(
-    #         tokenizer_cls=tokenizer_cls,
-    #         name_or_path=pretrained_tokenizer_name
-    #     )
+        token_cls_finetuner = TokenClassificationFinetuner()
+        token_cls_finetuner.load_pretrained_tokenizer(
+            tokenizer_cls=tokenizer_cls,
+            name_or_path=pretrained_tokenizer_name
+        )
 
-    #     self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'XLMRobertaTokenizer')
+        self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'XLMRobertaTokenizer')
     
-    # #@pytest.mark.skip(reason="change api")
-    # @require_torch
-    # def test_load_pretrained_tokenizer_mbert(self):
+    #@pytest.mark.skip(reason="change api")
+    @require_torch
+    def test_load_pretrained_tokenizer_mbert(self):
         
-    #     pretrained_tokenizer_name = 'bert-base-multilingual-cased'
-    #     tokenizer_cls = TOKENIZER_CLS_MAPPING['mbert']
+        pretrained_tokenizer_name = 'bert-base-multilingual-cased'
+        tokenizer_cls = TOKENIZER_CLS_MAPPING['mbert']
         
-    #     seq_cls_finetuner = SequenceClassificationFinetuner()
-    #     seq_cls_finetuner.load_pretrained_tokenizer(
-    #         tokenizer_cls=tokenizer_cls,
-    #         name_or_path=pretrained_tokenizer_name
-    #     )
+        token_cls_finetuner = TokenClassificationFinetuner()
+        token_cls_finetuner.load_pretrained_tokenizer(
+            tokenizer_cls=tokenizer_cls,
+            name_or_path=pretrained_tokenizer_name
+        )
 
-    #     self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'BertTokenizer')
+        self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'BertTokenizer')
     
-    # @require_torch
-    # def test_load_pretrained_model_for_seq_cls_incorrect_task(self):
-    #     pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
+    @require_torch
+    def test_load_pretrained_model_for_seq_cls_incorrect_task(self):
+        pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
         
-    #     # instantiate RobertaModelForSequenceClassification without `num_labels`
-    #     seq_cls_finetuner = SequenceClassificationFinetuner()
-    #     task = 'token_classification'
-    #     with self.assertRaises(NotImplementedError) as context:
-    #         seq_cls_finetuner.load_pretrained_model(
-    #             task=task,
-    #             name_or_path=pretrained_model_name
-    #         )
+        # instantiate RobertaModelForSequenceClassification without `num_labels`
+        token_cls_finetuner = TokenClassificationFinetuner()
+        task = 'multilabel_classification'
+        with self.assertRaises(NotImplementedError) as context:
+            token_cls_finetuner.load_pretrained_model(
+                task=task,
+                name_or_path=pretrained_model_name
+            )
 
-    #     self.assertEqual(
-    #         f'The task specified `{task}` is incorrect or not available for SequenceClassificationFinetuner',
-    #         str(context.exception))
+        self.assertEqual(
+            f'The task specified `{task}` is incorrect or not available for TokenClassificationFinetuner',
+            str(context.exception))
 
     #@pytest.mark.skip(reason="skip")
     @require_torch
@@ -301,3 +297,89 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 10)
+
+
+class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
+
+    def setUp(self):
+        if os.path.exists('./tmp/token_cls_finetuner'):
+            shutil.rmtree('./tmp/token_cls_finetuner')
+
+    @require_torch
+    def test_finetune_wanchanbert_spm_camembert_on_thainer_ner(self):
+
+        # 1. Initiate Token classification finetuner
+        
+        ner_token_cls_finetuner = TokenClassificationFinetuner()
+        ner_token_cls_finetuner.load_pretrained_tokenizer(
+            tokenizer_cls=CamembertTokenizer,
+            name_or_path='airesearch/wangchanberta-base-att-spm-uncased'
+        )
+        ner_token_cls_finetuner.load_pretrained_model(
+            task='multiclass_classification',
+            name_or_path='airesearch/wangchanberta-base-att-spm-uncased',
+            num_labels=5
+        )
+
+        # print(f'\n\n[INFO] For Wongnai reviews dataset, perform train-val set splitting (0.9,0.1)')
+        dataset = load_dataset('thainer')
+        # print(f'\n\n[INFO] Perform dataset splitting')
+        # train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=2020)
+        dataset['train'] = dataset['train'][:100]
+        dataset['validation'] = dataset['validation'][:100]
+        dataset['test'] =  dataset['test'][:100]
+
+        print(f'\n\n[INFO] Done')
+        print(f'# train examples: {len(dataset["train"])}')
+        print(f'# val examples: {len(dataset["validation"])}')
+        print(f'# test examples: {len(dataset["test"])}')
+
+        # label_encoder = preprocessing.LabelEncoder()
+        # label_encoder.fit(get_dict_val(dataset['train'], keys='star_rating'))
+
+        # dataset_preprocessed = { split_name: SequenceClassificationDataset.from_dataset(
+        #                 task=Task.MULTICLASS_CLS,
+        #                 tokenizer=seq_cls_finetuner.tokenizer,
+        #                 dataset=dataset[split_name],
+        #                 text_column_name='review_body',
+        #                 label_column_name='star_rating',
+        #                 max_length=416,
+        #                 space_token='<_>',
+        #                 preprocessor=partial(_process_transformers, 
+        #                     pre_rules = [
+        #                     preprocess.fix_html,
+        #                     preprocess.rm_brackets,
+        #                     preprocess.replace_newlines,
+        #                     preprocess.rm_useless_spaces,
+        #                     partial(preprocess.replace_spaces, space_token='<_>') if '<_>' != ' ' else lambda x: x,
+        #                     preprocess.replace_rep_after],
+        #                     lowercase=True
+        #                 ),
+        #                 label_encoder=label_encoder) for split_name in ['train', 'validation', 'test']
+        #             }
+
+
+        # # define training args
+        # output_dir = './tmp/seq_cls_finetuner/wangchanbert-base-att-spm-uncased/wongnai_reviews'
+        # training_args = TrainingArguments(output_dir=output_dir)
+
+        # print('training_args', training_args)
+        # training_args.max_steps = 5
+        # training_args.warmup_steps = 1
+        # training_args.no_cuda = True
+        # training_args.run_name = None # Set wandb run name to None
+        
+        # # with test dataset
+
+        # eval_result = seq_cls_finetuner.finetune(training_args, 
+        #                            train_dataset=dataset_preprocessed['train'],
+        #                            val_dataset=None,
+        #                            test_dataset=dataset_preprocessed['test']
+        # )
+
+        # self.assertIsNotNone(eval_result)
+        # print(eval_result)
+
+        # self.assertTrue(os.path.exists(
+        #     os.path.join(training_args.output_dir, 'checkpoint-final', 'pytorch_model.bin')
+        # ))
