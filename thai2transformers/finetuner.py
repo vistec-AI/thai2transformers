@@ -389,7 +389,7 @@ class TokenClassificationFinetuner(BaseFinetuner):
                 result = chunk_level_classification_metrics(agg_chunk_labels, agg_chunk_preds)
             else:
                 result = token_level_classification_metrics(sum(agg_chunk_labels, []),
-                                                    sum(agg_chunk_preds, []))
+                                                            sum(agg_chunk_preds, []))
             print('[ Test Result ]')
             pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
             print(result['classification_report'])
