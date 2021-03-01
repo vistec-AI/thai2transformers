@@ -145,9 +145,9 @@ class SequenceClassificationFinetuner(BaseFinetuner):
                                                 padding=True,
                                                 pad_to_multiple_of=8 if training_args.fp16 else None)
         if self.task == Task.MULTILABEL_CLS.value:
-            metric = partial(FINETUNE_METRIC_MAPPING[self.task], n_labels=self.num_labels)
+            metric = partial(self.metric, n_labels=self.num_labels)
         else:
-            metric = FINETUNE_METRIC_MAPPING[self.task]
+            metric = self.metric
 
         self.trainer = Trainer(
             model=self.model,
