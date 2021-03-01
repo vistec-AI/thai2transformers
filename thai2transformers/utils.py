@@ -21,16 +21,17 @@ def get_dict_val(root:Dict, keys:Union[str, List[str]]):
         [1,2,3]
 
         >>> obj = {"a": [ {"aa": 100, "bb": 0}, {"aa": 2, "bb": 5 } ] }
-        >>> get_dict_val(obj, ("a", "aa"))
+        >>> get_dict_val(obj, "a.aa"))
         [100, 2]
 
     """
-    if type(keys) == str:
+    if type(keys) == str and '.' not in keys:
         return root[keys]
-    elif type(keys) == list:
+    elif type(keys) == str and '.'  in keys and len(keys.split('.')) == 2:
         _results = []
-        for item in root[keys[0]]:
-            _results.append(item[keys[1]])
+        _sub_level = keys.split('.')
+        for item in root[_sub_level[0]]:
+            _results.append(item[_sub_level[1]])
         return _results
     
     return None
