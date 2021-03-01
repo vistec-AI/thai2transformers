@@ -127,7 +127,7 @@ class SequenceClassificationFinetuner(BaseFinetuner):
 
         self.task = task
 
-        if task not in FINETUNE_MODEL_MAPPING.keys():
+        if task not in [ Task.MULTICLASS_CLS.value:, Task.MULTILABELCLS.value ]:
             raise NotImplementedError(
                 f"The task specified `{task}` is incorrect or not available for {self.__class__.__name__}")
 
@@ -240,7 +240,7 @@ class TokenClassificationFinetuner(BaseFinetuner):
 
         self.task = task
 
-        if task not in FINETUNE_MODEL_MAPPING.keys():
+        if task not in [ Task.CHUNK_LEVEL_CLS.value:, Task.TOKEN_LEVEL_CLS.value ]:
             raise NotImplementedError(
                 f"The task specified `{task}` is incorrect or not available for {self.__class__.__name__}")
 
