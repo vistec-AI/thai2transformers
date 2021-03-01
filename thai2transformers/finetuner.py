@@ -77,6 +77,7 @@ class SequenceClassificationFinetuner(BaseFinetuner):
         self.task = task.value if type(task) == Task else task
         self.num_labels = num_labels
         self.metric = metric
+        self._metric = None
         self.training_args = None
         self.trainer = None
 
@@ -145,14 +146,14 @@ class SequenceClassificationFinetuner(BaseFinetuner):
                                                 padding=True,
                                                 pad_to_multiple_of=8 if training_args.fp16 else None)
         if self.task == Task.MULTILABEL_CLS.value:
-            metric = partial(self.metric, n_labels=self.num_labels)
+            self._metric = partial(self.metric, n_labels=self.num_labels)
         else:
-            metric = self.metric
+            self._metric = self.metric
 
         self.trainer = Trainer(
             model=self.model,
             args=self.training_args,
-            compute_metrics=metric,
+            compute_metrics=self._metric,
             train_dataset=train_dataset,
             eval_dataset=val_dataset,
             data_collator=data_collator
