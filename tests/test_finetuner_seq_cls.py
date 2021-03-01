@@ -84,7 +84,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         base_finetuner.load_pretrained_model()
         base_finetuner.finetune()
     
-    @pytest.mark.skip(reason="change api")
+    #@pytest.mark.skip(reason="change api")
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_spm_camembert(self):
         
@@ -101,7 +101,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         self.assertEqual(seq_cls_finetuner.tokenizer.additional_special_tokens,
                          ['<s>NOTUSED', '</s>NOTUSED', '<_>'])
 
-    @pytest.mark.skip(reason="change api")
+    #@pytest.mark.skip(reason="change api")
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_spm(self):
         
@@ -116,7 +116,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'ThaiRobertaTokenizer')
     
-    @pytest.mark.skip(reason="change api")
+    #@pytest.mark.skip(reason="change api")
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_newmm(self):
         
@@ -131,7 +131,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsNewmmTokenizer')
     
-    @pytest.mark.skip(reason="change api")
+    #@pytest.mark.skip(reason="change api")
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_syllable(self):
         
@@ -146,7 +146,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsSyllableTokenizer')
 
-    @pytest.mark.skip(reason="change api")
+    #@pytest.mark.skip(reason="change api")
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_sefr(self):
         
@@ -161,7 +161,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'FakeSefrCutTokenizer')
     
-    @pytest.mark.skip(reason="change api")
+    #@pytest.mark.skip(reason="change api")
     @require_torch
     def test_load_pretrained_tokenizer_xlmr(self):
         
@@ -176,7 +176,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'XLMRobertaTokenizer')
     
-    @pytest.mark.skip(reason="change api")
+    #@pytest.mark.skip(reason="change api")
     @require_torch
     def test_load_pretrained_tokenizer_mbert(self):
         
@@ -191,7 +191,6 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'BertTokenizer')
     
-    @pytest.mark.skip(reason="skip")
     @require_torch
     def test_load_pretrained_model_for_seq_cls_incorrect_task(self):
         pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
@@ -209,7 +208,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             f'The task specified `{task}` is incorrect or not available for SequenceClassificationFinetuner',
             str(context.exception))
 
-    @pytest.mark.skip(reason="skip")
+    #@pytest.mark.skip(reason="skip")
     @require_torch
     def test_load_pretrained_model_for_seq_cls_wangchanberta_spm_camembert(self):
         os.environ['WANDB_DISABLED'] = 'true'
