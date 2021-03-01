@@ -5,6 +5,8 @@ import sys
 import shutil
 from typing import Collection, Iterable, List, Union, Dict, Callable
 from functools import partial
+
+import torch
 from datasets import load_dataset
 from sklearn import preprocessing
 
@@ -23,21 +25,26 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
     def setUp(self):
         if os.path.exists('./tmp/seq_cls_finetuning_pipeline'):
             shutil.rmtree('./tmp/seq_cls_finetuning_pipeline')
-        
 
     def test_seq_cls_finetuning_pipeline_init(self):
 
         seq_cls_finetuner = SequenceClassificationFinetuningPipeline(
             task='multiclass_classification'
         )
-
         self.assertIsNotNone(seq_cls_finetuner)
-
+        
+        seq_cls_finetuner = SequenceClassificationFinetuningPipeline(
+            task='multilabel_classification'
+        )
+        self.assertIsNotNone(seq_cls_finetuner)
 
         seq_cls_finetuner = SequenceClassificationFinetuningPipeline(
             task=Task.MULTICLASS_CLS
         )
-
+        self.assertIsNotNone(seq_cls_finetuner)
+        seq_cls_finetuner = SequenceClassificationFinetuningPipeline(
+            task=Task.MULTILABEL_CLS
+        )
         self.assertIsNotNone(seq_cls_finetuner)
 
     # @pytest.mark.skip(reason="already done")
@@ -86,7 +93,7 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
         training_args = {
             'max_steps': 10,
             'warmup_steps': 1,
-            'no_cuda': True,
+            'no_cuda': not torch.cuda.is_available(),
         }
         
         output_dir = './tmp/seq_cls_finetuning_pipeline/wangchanbert-base-att-spm-uncased/wongnai_reviews'
@@ -149,7 +156,7 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
         training_args = {
             'max_steps': 10,
             'warmup_steps': 1,
-            'no_cuda': True,
+            'no_cuda': not torch.cuda.is_available(),
         }
         
         output_dir = './tmp/seq_cls_finetuning_pipeline/wangchanbert-base-att-spm-uncased/generated_reviews_enth'
@@ -217,7 +224,7 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
         training_args = {
             'max_steps': 10,
             'warmup_steps': 1,
-            'no_cuda': True,
+            'no_cuda': not torch.cuda.is_available(),
         }
         
         output_dir = './tmp/seq_cls_finetuning_pipeline/wangchanbert-base-att-spm-uncased/prachathai67k'
