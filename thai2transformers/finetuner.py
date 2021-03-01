@@ -127,7 +127,7 @@ class SequenceClassificationFinetuner(BaseFinetuner):
 
         self.task = task
 
-        if task not in [ Task.MULTICLASS_CLS.value, Task.MULTILABELCLS.value ]:
+        if task not in [ Task.MULTICLASS_CLS.value, Task.MULTILABEL_CLS.value ]:
             raise NotImplementedError(
                 f"The task specified `{task}` is incorrect or not available for {self.__class__.__name__}")
 
