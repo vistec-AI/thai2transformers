@@ -208,7 +208,6 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             f'The task specified `{task}` is incorrect or not available for SequenceClassificationFinetuner',
             str(context.exception))
 
-    #@pytest.mark.skip(reason="skip")
     @require_torch
     def test_load_pretrained_model_for_seq_cls_wangchanberta_spm_camembert(self):
         os.environ['WANDB_DISABLED'] = 'true'
