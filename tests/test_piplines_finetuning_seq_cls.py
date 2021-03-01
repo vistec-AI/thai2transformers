@@ -211,7 +211,7 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
                         max_length=416)
         self.assertIsNotNone(seq_cls_finetuner.train_dataset)                
         self.assertIsNone(seq_cls_finetuner.val_dataset)                
-        self.assertIsNotNone(seq_cls_finetuner.test_dataset)                
+        self.assertIsNone(seq_cls_finetuner.test_dataset)                
 
         self.assertIsNotNone(seq_cls_finetuner._dataset)
 
