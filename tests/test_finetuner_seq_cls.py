@@ -422,36 +422,34 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
 
-class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
+class TestSequenceClassificationFinetunerIntegration:
 
     def setUp(self):
         if os.path.exists('./tmp/seq_cls_finetuner'):
             shutil.rmtree('./tmp/seq_cls_finetuner')
-    
-    list_of_pretrained_model_name_or_paths = [
-        'airesearch/wangchanberta-base-att-spm-uncased',
-        'airesearch/wangchanberta-base-wiki-spm',
-        'airesearch/wangchanberta-base-wiki-newmm.',
-        'airesearch/wangchanberta-base-wiki-ssg',
-        'airesearch/wangchanberta-base-wiki-sefr',
-        'airesearch/bert-base-multilingual-cased-finetuned',
-        'airesearch/xlm-roberta-base-finetuned',
-    ]
 
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
+        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
+        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
+        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
+        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
+        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
+        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
+        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+    ])
     @require_torch
-    @pytest.mark.parametrize("pretrained_model_name_or_path", list_of_pretrained_model_name_or_paths)
-    def test_finetune_models_on_wongnai(self, pretrained_model_name_or_path):
+    def test_finetune_models_on_wongnai(self, model_name_or_path, tokenizer_name_or_path, tokenizer_cls):
 
         # 1. Initiate Sequence classification finetuner
         
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_tokenizer(
-            tokenizer_cls=CamembertTokenizer,
-            name_or_path=pretrained_model_name_or_path
+            tokenizer_cls=tokenizer_cls,
+            name_or_path=tokenizer_name_or_path,
         )
         seq_cls_finetuner.load_pretrained_model(
             task='multiclass_classification',
-            name_or_path=pretrained_model_name_or_path,
+            name_or_path=model_name_or_path,
             num_labels=5
         )
 
@@ -493,7 +491,10 @@ class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
 
 
         # define training args
-        output_dir = f'./tmp/seq_cls_finetuner/{pretrained_model_name_or_path.spilt("/")[-1]}/wongnai_reviews'
+        if '/' in model_name_or_path:
+            output_dir = f'./tmp/seq_cls_finetuner/{model_name_or_path.split("/")[-1]}/wongnai_reviews'
+        else:
+            output_dir = f'./tmp/seq_cls_finetuner/{model_name_or_path}/wongnai_reviews'
         training_args = TrainingArguments(output_dir=output_dir)
 
         print('training_args', training_args)
@@ -510,9 +511,9 @@ class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
                                    test_dataset=dataset_preprocessed['test']
         )
 
-        self.assertIsNotNone(eval_result)
+        assert eval_result != None
         print(eval_result)
 
-        self.assertTrue(os.path.exists(
+        assert os.path.exists(
             os.path.join(training_args.output_dir, 'checkpoint-final', 'pytorch_model.bin')
-        ))
+        ) == True
