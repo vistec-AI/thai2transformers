@@ -535,3 +535,106 @@ class TestSequenceClassificationFinetunerIntegration:
                                    val_dataset=None,
                                    test_dataset=None,
         )
+    
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
+        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
+        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
+        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
+        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
+        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
+        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
+        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+    ])
+    @require_torch
+    def test_finetune_models_on_prachathai67k(self, model_name_or_path, tokenizer_name_or_path, tokenizer_cls):
+
+        # 1. Initiate Sequence classification finetuner
+        
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_tokenizer(
+            tokenizer_cls=tokenizer_cls,
+            name_or_path=tokenizer_name_or_path,
+        )
+        seq_cls_finetuner.load_pretrained_model(
+            task='multilabel_classification',
+            name_or_path=model_name_or_path,
+            num_labels=5
+        )
+        assert seq_cls_finetuner.tokenizer != None
+        assert seq_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__name__
+        assert 'ForMultilabelSequenceClassification' in seq_cls_finetuner.model.__class__.__name__ == True
+
+        prachathai_dataset_name = 'prachathai67k'
+        prachathai_text_col_name = 'body_text'
+        prachathai_label_col_name =  ['politics', 'human_rights', 'quality_of_life',
+                                      'international', 'social', 'environment',
+                                      'economics', 'culture', 'labor',
+                                      'national_security', 'ict', 'education']
+
+        dataset = load_dataset(prachathai_dataset_name)
+        print(f'\n\n[INFO] Perform dataset splitting')
+        train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=2020)
+        dataset['train'] = train_val_split['train'][:100]
+        dataset['validation'] = train_val_split['test'][:100]
+        dataset['test'] = train_val_split['test'][:100]
+        print(f'\n\n[INFO] Done')
+        print(f'# train examples: {len(dataset["train"])}')
+        print(f'# val examples: {len(dataset["validation"])}')
+        print(f'# test examples: {len(dataset["test"])}')
+
+
+        dataset_preprocessed = { split_name: SequenceClassificationDataset.from_dataset(
+                        task=Task.MULTILABLE_CLS,
+                        tokenizer=seq_cls_finetuner.tokenizer,
+                        dataset=dataset[split_name],
+                        text_column_name=prachathai_text_col_name,
+                        label_column_name=prachathai_label_col_name,
+                        max_length=416,
+                        space_token='<_>',
+                        preprocessor=partial(_process_transformers, 
+                            pre_rules = [
+                            preprocess.fix_html,
+                            preprocess.rm_brackets,
+                            preprocess.replace_newlines,
+                            preprocess.rm_useless_spaces,
+                            partial(preprocess.replace_spaces, space_token='<_>') if '<_>' != ' ' else lambda x: x,
+                            preprocess.replace_rep_after],
+                            lowercase=True
+                        ),
+                        label_encoder=None) for split_name in ['train', 'validation', 'test']
+                    }
+
+
+        # define training args
+        if '/' in model_name_or_path:
+            output_dir = f'./tmp/seq_cls_finetuner/{model_name_or_path.split("/")[-1]}/prachathai67k'
+        else:
+            output_dir = f'./tmp/seq_cls_finetuner/{model_name_or_path}/prachathai67k'
+        training_args = TrainingArguments(output_dir=output_dir)
+
+        print('training_args', training_args)
+        training_args.max_steps = 5
+        training_args.warmup_steps = 1
+        training_args.no_cuda = True
+        training_args.run_name = None # Set wandb run name to None
+        
+        # with test dataset
+        eval_result = seq_cls_finetuner.finetune(training_args, 
+                                   train_dataset=dataset_preprocessed['train'],
+                                   val_dataset=dataset_preprocessed['val'],
+                                   test_dataset=dataset_preprocessed['test']
+        )
+
+        assert eval_result != None
+        print(eval_result)
+
+        assert os.path.exists(
+            os.path.join(training_args.output_dir, 'checkpoint-final', 'pytorch_model.bin')
+        ) == True
+
+        # without test dataset
+        eval_result = seq_cls_finetuner.finetune(training_args, 
+                                   train_dataset=dataset_preprocessed['train'],
+                                   val_dataset=dataset_preprocessed['val'],
+                                   test_dataset=None,
+        )
