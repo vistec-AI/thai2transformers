@@ -280,7 +280,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
     @require_torch
-    def test_load_pretrained_model_for_seq_cls_mbert_spm_camembert(self):
+    def test_load_pretrained_model_for_seq_cls_mbert(self):
         os.environ['WANDB_DISABLED'] = 'true'
         pretrained_model_name = 'airesearch/bert-base-multilingual-cased-finetuned'
         
@@ -288,7 +288,8 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_model(
             task='multiclass_classification',
-            name_or_path=pretrained_model_name
+            name_or_path=pretrained_model_name,
+            revision='finetuned@wongnai_reviews',
 
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForSequenceClassification')
@@ -300,6 +301,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner.load_pretrained_model(
             task='multiclass_classification',
             name_or_path=pretrained_model_name,
+            revision='finetuned@wongnai_reviews',
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForSequenceClassification')
@@ -311,6 +313,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner.load_pretrained_model(
             task=Task.MULTICLASS_CLS,
             name_or_path=pretrained_model_name,
+            revision='finetuned@wongnai_reviews',
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
@@ -321,7 +324,8 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_model(
             task='multilabel_classification',
-            name_or_path=pretrained_model_name
+            name_or_path=pretrained_model_name,
+            revision='finetuned@prachathai67k',
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
@@ -332,6 +336,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner.load_pretrained_model(
             task='multilabel_classification',
             name_or_path=pretrained_model_name,
+            revision='finetuned@prachathai67k',
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
@@ -344,6 +349,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner.load_pretrained_model(
             task=Task.MULTILABEL_CLS,
             name_or_path=pretrained_model_name,
+            revision='finetuned@prachathai67k',
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
@@ -351,7 +357,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
     @require_torch
-    def test_load_pretrained_model_for_seq_cls_xlmr_spm_camembert(self):
+    def test_load_pretrained_model_for_seq_cls_xlmr(self):
         os.environ['WANDB_DISABLED'] = 'true'
         pretrained_model_name = 'airesearch/xlm-roberta-base-finetuned'
         
@@ -359,7 +365,8 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_model(
             task='multiclass_classification',
-            name_or_path=pretrained_model_name
+            name_or_path=pretrained_model_name,
+            revision='finetuned@wongnai_reviews',
 
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForSequenceClassification')
@@ -371,6 +378,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner.load_pretrained_model(
             task='multiclass_classification',
             name_or_path=pretrained_model_name,
+            revision='finetuned@wongnai_reviews',
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForSequenceClassification')
@@ -382,6 +390,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner.load_pretrained_model(
             task=Task.MULTICLASS_CLS,
             name_or_path=pretrained_model_name,
+            revision='finetuned@wongnai_reviews',
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForSequenceClassification')
@@ -392,7 +401,8 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_model(
             task='multilabel_classification',
-            name_or_path=pretrained_model_name
+            name_or_path=pretrained_model_name,
+            revision='finetuned@prachathai67k',
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
@@ -403,6 +413,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner.load_pretrained_model(
             task='multilabel_classification',
             name_or_path=pretrained_model_name,
+            revision='finetuned@prachathai67k',
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
@@ -415,6 +426,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         seq_cls_finetuner.load_pretrained_model(
             task=Task.MULTILABEL_CLS,
             name_or_path=pretrained_model_name,
+            revision='finetuned@prachathai67k',
             num_labels=10
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
