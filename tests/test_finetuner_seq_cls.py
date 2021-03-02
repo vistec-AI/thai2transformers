@@ -516,7 +516,6 @@ class TestSequenceClassificationFinetunerIntegration:
         training_args.run_name = None # Set wandb run name to None
         
         # with test dataset
-
         eval_result = seq_cls_finetuner.finetune(training_args, 
                                    train_dataset=dataset_preprocessed['train'],
                                    val_dataset=None,
@@ -529,3 +528,10 @@ class TestSequenceClassificationFinetunerIntegration:
         assert os.path.exists(
             os.path.join(training_args.output_dir, 'checkpoint-final', 'pytorch_model.bin')
         ) == True
+
+        # without test dataset
+        eval_result = seq_cls_finetuner.finetune(training_args, 
+                                   train_dataset=dataset_preprocessed['train'],
+                                   val_dataset=None,
+                                   test_dataset=None,
+        )
