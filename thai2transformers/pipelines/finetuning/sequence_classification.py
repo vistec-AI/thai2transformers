@@ -125,13 +125,6 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
         elif self.tokenizer == None and tokenizer == None:
             raise AssertionError('A Tokenizer has never been specified')
 
-        if num_train_examples != None and train_dataset_name in self._dataset.keys():
-            self._dataset[train_dataset_name] = self._dataset[train_dataset_name][:num_train_examples]
-        if num_val_examples != None and val_dataset_name in self._dataset.keys():
-            self._dataset[val_dataset_name] = self._dataset[val_dataset_name][:num_val_examples]
-        if num_test_examples != None and test_dataset_name in self._dataset.keys():
-            self._dataset[test_dataset_name] = self._dataset[test_dataset_name][:num_test_examples]
-
         # If tokenizer is SeftCut, then perform pretokenization
         if isinstance(self.tokenizer, FakeSefrCutTokenizer):
 
@@ -139,7 +132,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                     
             def tokenize_fn(batch):
                 results = []
-                for tokens in sefr_cut_tokenize(get_dict_val(batch,  self.text_column_name), n_jobs=1):
+                for tokens in sefr_cut_tokenize(get_dict_val(batch,  self.text_column_name), n_jobs=4):
                     results.append(SEFR_SPLIT_TOKEN.join([ SEFR_SPLIT_TOKEN.join([token] + [space_token]) for token in tokens ] ))
                 return results
 
@@ -150,6 +143,14 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                                             }, batched=True, batch_size=1)
 
                 print(f'[DEBUG] examples from {split_name} , {self._dataset[split_name][self.text_column_name][:3]}')
+
+        if num_train_examples != None and train_dataset_name in self._dataset.keys():
+            self._dataset[train_dataset_name] = self._dataset[train_dataset_name][:num_train_examples]
+        if num_val_examples != None and val_dataset_name in self._dataset.keys():
+            self._dataset[val_dataset_name] = self._dataset[val_dataset_name][:num_val_examples]
+        if num_test_examples != None and test_dataset_name in self._dataset.keys():
+            self._dataset[test_dataset_name] = self._dataset[test_dataset_name][:num_test_examples]
+
 
         if train_dataset_name in self._dataset.keys():
             self.train_dataset = SequenceClassificationDataset.from_dataset(
