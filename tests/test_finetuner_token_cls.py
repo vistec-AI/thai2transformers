@@ -327,7 +327,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         self.assertEqual(token_cls_finetuner.config.num_labels, 10)
 
 
-class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
+class TestTokenClassificationFinetunerIntegration:
 
     def setUp(self):
         if os.path.exists('./tmp/token_cls_finetuner'):
@@ -382,16 +382,27 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
         tokenized_inputs['labels'] = [[-100] + e[:max_length - 2] + [-100]
                                     for e in labels]
         return tokenized_inputs
-        
+    
+
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
+        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
+        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
+        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
+        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
+        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
+        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
+        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+    ])
     @require_torch
-    def test_finetune_wanchanbert_spm_camembert_on_thainer_ner(self):
+    def test_finetune_wanchanbert_spm_camembert_on_thainer_ner(self,
+            model_name_or_path,
+            tokenizer_name_or_path,
+            tokenizer_cls):
 
         # 1. Dowload dataset
         dataset = load_dataset('thainer')
         text_col = 'tokens'
         label_col = 'ner_tags'
-        # print(f'\n\n[INFO] Perform dataset splitting')
-        # train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=2020)
 
         # Remove tag: `ไม่ยืนยัน`
         dataset['train'] = dataset['train'].map(
@@ -417,14 +428,14 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
         # 1. Initiate Token classification finetuner
         
         ner_token_cls_finetuner = TokenClassificationFinetuner()
-        self.assertIsNotNone(ner_token_cls_finetuner)
+        assert ner_token_cls_finetuner  != None
 
         ner_token_cls_finetuner.load_pretrained_tokenizer(
-            tokenizer_cls=CamembertTokenizer,
-            name_or_path='airesearch/wangchanberta-base-att-spm-uncased'
+            tokenizer_cls=tokenizer_cls,
+            name_or_path=model_name_or_path
         )
-        self.assertIsNotNone(ner_token_cls_finetuner.tokenizer)
-        self.assertEqual(ner_token_cls_finetuner.tokenizer.__class__.__name__, 'CamembertTokenizer')
+        assert ner_token_cls_finetuner.tokenizer != None
+        assert ner_token_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__class__.__name__
 
         ner_token_cls_finetuner.load_pretrained_model(
             task='chunk_level_classification',
@@ -432,15 +443,15 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
             num_labels=num_labels,
             id2label=id2label
         )
-        self.assertIsNotNone(ner_token_cls_finetuner.tokenizer)
-        self.assertEqual(ner_token_cls_finetuner.model.__class__.__name__, 'RobertaForTokenClassification')
-        self.assertEqual(ner_token_cls_finetuner.num_labels, num_labels)
-        self.assertEqual(ner_token_cls_finetuner.model.num_labels, num_labels)
+        assert ner_token_cls_finetuner.tokenizer != None
+        assert 'TokenClassification' in ner_token_cls_finetuner.model.__class__.__name__ == True
+        assert ner_token_cls_finetuner.num_labels == num_labels
+        assert ner_token_cls_finetuner.model.num_labels == num_labels
        
         data_collator = DataCollatorForTokenClassification(
                             tokenizer=ner_token_cls_finetuner.tokenizer
                         )
-        self.assertIsNotNone(data_collator)
+        assert data_collator != None
 
         train_dataset = Dataset.from_dict(TestTokenClassificationFinetunerIntegration._token_cls_preprocess(dataset['train'],
                             tokenizer=ner_token_cls_finetuner.tokenizer,
@@ -477,15 +488,32 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
                                    test_dataset=test_dataset
         )
 
-        self.assertIsNotNone(eval_result)
+        assert eval_result != None
         print(eval_result)
 
-        self.assertTrue(os.path.exists(
-            os.path.join(training_args.output_dir, 'checkpoint-final', 'pytorch_model.bin')
-        ))
+        assert os.path.exists(os.path.join(training_args.output_dir, 'checkpoint-final', 'pytorch_model.bin')) == True
     
+        ner_token_cls_finetuner.finetune(training_args, 
+                                   train_dataset=train_dataset,
+                                   val_dataset=val_dataset,
+                                   test_dataset=None
+        )
+
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
+        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
+        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
+        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
+        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
+        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
+        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
+        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+    ])
     @require_torch
-    def test_finetune_wanchanbert_spm_camembert_on_thainer_pos(self):
+    def test_finetune_wanchanbert_spm_camembert_on_thainer_pos(self,
+            model_name_or_path,
+            tokenizer_name_or_path,
+            tokenizer_cls
+        ):
 
         # 1. Dowload dataset
         dataset = load_dataset('thainer')
@@ -512,14 +540,14 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
         # 1. Initiate Token classification finetuner
         
         ner_token_cls_finetuner = TokenClassificationFinetuner()
-        self.assertIsNotNone(ner_token_cls_finetuner)
+        assert ner_token_cls_finetuner != None
 
         ner_token_cls_finetuner.load_pretrained_tokenizer(
             tokenizer_cls=CamembertTokenizer,
             name_or_path='airesearch/wangchanberta-base-att-spm-uncased'
         )
-        self.assertIsNotNone(ner_token_cls_finetuner.tokenizer)
-        self.assertEqual(ner_token_cls_finetuner.tokenizer.__class__.__name__, 'CamembertTokenizer')
+        assert ner_token_cls_finetuner.tokenizer != None
+        assert ner_token_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__class__.__name__
 
         ner_token_cls_finetuner.load_pretrained_model(
             task='token_level_classification',
@@ -527,15 +555,15 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
             num_labels=num_labels,
             id2label=id2label
         )
-        self.assertIsNotNone(ner_token_cls_finetuner.tokenizer)
-        self.assertEqual(ner_token_cls_finetuner.model.__class__.__name__, 'RobertaForTokenClassification')
-        self.assertEqual(ner_token_cls_finetuner.num_labels, num_labels)
-        self.assertEqual(ner_token_cls_finetuner.model.num_labels, num_labels)
+        assert ner_token_cls_finetuner.tokenizer != None
+        assert 'TokenClassification' in ner_token_cls_finetuner.model.__class__.__name__ == True
+        assert ner_token_cls_finetuner.num_labels == num_labels
+        assert ner_token_cls_finetuner.model.num_labels == num_labels
        
         data_collator = DataCollatorForTokenClassification(
                             tokenizer=ner_token_cls_finetuner.tokenizer
                         )
-        self.assertIsNotNone(data_collator)
+        assert data_collator != None
 
         train_dataset = Dataset.from_dict(TestTokenClassificationFinetunerIntegration._token_cls_preprocess(dataset['train'],
                             tokenizer=ner_token_cls_finetuner.tokenizer,
@@ -572,9 +600,13 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
                                    test_dataset=test_dataset
         )
 
-        self.assertIsNotNone(eval_result)
+        assert eval_result != None
         print(eval_result)
 
-        self.assertTrue(os.path.exists(
-            os.path.join(training_args.output_dir, 'checkpoint-final', 'pytorch_model.bin')
-        ))
+        assert os.path.exists(os.path.join(training_args.output_dir, 'checkpoint-final', 'pytorch_model.bin')) == True
+
+        ner_token_cls_finetuner.finetune(training_args, 
+                                   train_dataset=train_dataset,
+                                   val_dataset=val_dataset,
+                                   test_dataset=None
+        )
