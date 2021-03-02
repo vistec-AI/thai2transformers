@@ -16,6 +16,9 @@ from transformers import (
 from thai2transformers.conf import (
     Task
 )
+from thai2transformers.tokenizers import (
+    FakeSefrCutTokenizer
+)
 from thai2transformers.pipelines.finetuning import (
     SequenceClassificationFinetuningPipeline
 )
@@ -48,7 +51,7 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
         self.assertIsNotNone(seq_cls_finetuner)
 
     # @pytest.mark.skip(reason="already done")
-    def test_seq_cls_finetuning_pipeline_wanchanberta_spm_camembert_on_wongnai(self):
+    def test_seq_cls_finetuning_pipeline_models_on_wongnai(self):
 
         seq_cls_finetuner = SequenceClassificationFinetuningPipeline(
             task='multiclass_classification'
@@ -66,6 +69,69 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
         
         seq_cls_finetuner.load_tokenizer(tokenizer_cls=CamembertTokenizer,
                                          name_or_path='airesearch/wangchanberta-base-att-spm-uncased')
+
+        self.assertIsNotNone(seq_cls_finetuner.finetuner.tokenizer)
+
+        seq_cls_finetuner.process_dataset(
+                        space_token='<_>',
+                        train_dataset_name='train',
+                        val_dataset_name='val',
+                        test_dataset_name='test',
+                        num_train_examples=100,
+                        num_val_examples=100,
+                        num_test_examples=100,
+                        max_length=416)
+        self.assertIsNotNone(seq_cls_finetuner.train_dataset)                
+        self.assertIsNone(seq_cls_finetuner.val_dataset)                
+        self.assertIsNotNone(seq_cls_finetuner.test_dataset)                
+
+        self.assertIsNotNone(seq_cls_finetuner._dataset)
+
+        seq_cls_finetuner.load_model(name_or_path='airesearch/wangchanberta-base-att-spm-uncased')
+
+        self.assertIsNotNone(seq_cls_finetuner.finetuner.model)
+        self.assertEqual(seq_cls_finetuner.num_labels, wongnai_num_labels)
+        self.assertEqual(seq_cls_finetuner.finetuner.model.num_labels, wongnai_num_labels)
+
+        training_args = {
+            'max_steps': 10,
+            'warmup_steps': 1,
+            'no_cuda': not torch.cuda.is_available(),
+        }
+        
+        output_dir = './tmp/seq_cls_finetuning_pipeline/wangchanbert-base-att-spm-uncased/wongnai_reviews'
+
+        eval_result = seq_cls_finetuner.finetune(
+            output_dir=output_dir,
+            eval_on_test_set=True,
+            **training_args
+        )
+
+        self.assertIsNotNone(eval_result)
+        print(eval_result)
+
+        self.assertTrue(os.path.exists(
+            os.path.join(output_dir, 'checkpoint-final', 'pytorch_model.bin')
+        ))
+
+    def test_seq_cls_finetuning_pipeline_sefr_model_on_wongnai(self):
+
+        seq_cls_finetuner = SequenceClassificationFinetuningPipeline(
+            task='multiclass_classification'
+        )
+        wongnai_dataset_name = 'wongnai_reviews'
+        wongnai_text_col_name = 'review_body'
+        wongnai_label_col_name = 'star_rating'
+        wongnai_num_labels = 5
+
+        seq_cls_finetuner.load_dataset(dataset_name_or_path=wongnai_dataset_name,
+                                       text_column_name=wongnai_text_col_name,
+                                       label_column_name=wongnai_label_col_name)
+
+        self.assertIsNotNone(seq_cls_finetuner._dataset)
+        
+        seq_cls_finetuner.load_tokenizer(tokenizer_cls=FakeSefrCutTokenizer,
+                                         name_or_path='airesearch/wangchanberta-base-wiki-sefr')
 
         self.assertIsNotNone(seq_cls_finetuner.finetuner.tokenizer)
 
