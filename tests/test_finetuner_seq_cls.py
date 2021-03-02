@@ -437,7 +437,7 @@ class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
         'airesearch/bert-base-multilingual-cased-finetuned',
         'airesearch/xlm-roberta-base-finetuned',
     ]
-    
+
     @require_torch
     @pytest.mark.parametrize("pretrained_model_name_or_path", list_of_pretrained_model_name_or_paths)
     def test_finetune_models_on_wongnai(self, pretrained_model_name_or_path):
@@ -493,7 +493,7 @@ class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
 
 
         # define training args
-        output_dir = f'./tmp/seq_cls_finetuner/{pretrained_model_name_or_path.spilt('/')[-1]}/wongnai_reviews'
+        output_dir = f'./tmp/seq_cls_finetuner/{pretrained_model_name_or_path.spilt("/")[-1]}/wongnai_reviews'
         training_args = TrainingArguments(output_dir=output_dir)
 
         print('training_args', training_args)
