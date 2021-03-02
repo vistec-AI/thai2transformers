@@ -140,7 +140,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                
                 self._dataset[split_name] = self._dataset[split_name].map(lambda batch: {
                                                  self.text_column_name: tokenize_fn(batch) 
-                                            }, batched=True, batch_size=1)
+                                            }, batched=True, batch_size=1000)
 
                 print(f'[DEBUG] examples from {split_name} , {self._dataset[split_name][self.text_column_name][:3]}')
 
