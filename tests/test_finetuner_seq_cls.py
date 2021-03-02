@@ -587,7 +587,7 @@ class TestSequenceClassificationFinetunerIntegration:
 
 
         dataset_preprocessed = { split_name: SequenceClassificationDataset.from_dataset(
-                        task=Task.MULTILABLE_CLS,
+                        task=Task.MULTILABEL_CLS,
                         tokenizer=seq_cls_finetuner.tokenizer,
                         dataset=dataset[split_name],
                         text_column_name=prachathai_text_col_name,
