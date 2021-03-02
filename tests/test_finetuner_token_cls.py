@@ -435,7 +435,7 @@ class TestTokenClassificationFinetunerIntegration:
             name_or_path=model_name_or_path
         )
         assert ner_token_cls_finetuner.tokenizer != None
-        assert ner_token_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__class__.__name__
+        assert ner_token_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__name__
 
         ner_token_cls_finetuner.load_pretrained_model(
             task='chunk_level_classification',
@@ -547,7 +547,7 @@ class TestTokenClassificationFinetunerIntegration:
             name_or_path='airesearch/wangchanberta-base-att-spm-uncased'
         )
         assert ner_token_cls_finetuner.tokenizer != None
-        assert ner_token_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__class__.__name__
+        assert ner_token_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__name__
 
         ner_token_cls_finetuner.load_pretrained_model(
             task='token_level_classification',
