@@ -79,12 +79,16 @@ def _process_transformers(
 
 class TestTokenClassificationFinetuner(unittest.TestCase):
 
-    @pytest.mark.skip(reason="done")
+    
     def test_init(self):
         token_cls_finetuner = TokenClassificationFinetuner()
         self.assertIsNotNone(token_cls_finetuner)
 
-    @pytest.mark.skip(reason="done")
+    def setUp(self):
+        self.wongnai_dataset = load_dataset('thainer')
+        label_col = 'ner_tags'
+        self.wongnai_id2label = {i: name for i, name in
+                    enumerate(self.wongnai_dataset['train'].features[label_col].feature.names)}
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_spm_camembert(self):
         
@@ -101,7 +105,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         self.assertEqual(token_cls_finetuner.tokenizer.additional_special_tokens,
                          ['<s>NOTUSED', '</s>NOTUSED', '<_>'])
 
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_spm(self):
         
@@ -116,7 +120,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'ThaiRobertaTokenizer')
     
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_newmm(self):
         
@@ -131,7 +135,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsNewmmTokenizer')
     
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_syllable(self):
         
@@ -146,7 +150,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsSyllableTokenizer')
 
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_sefr(self):
         
@@ -161,7 +165,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'FakeSefrCutTokenizer')
     
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_tokenizer_xlmr(self):
         
@@ -176,7 +180,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'XLMRobertaTokenizer')
     
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_tokenizer_mbert(self):
         
@@ -191,7 +195,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'BertTokenizer')
     
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_model_for_seq_cls_incorrect_task(self):
         pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
@@ -202,14 +206,15 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         with self.assertRaises(NotImplementedError) as context:
             token_cls_finetuner.load_pretrained_model(
                 task=task,
-                name_or_path=pretrained_model_name
+                name_or_path=pretrained_model_name,
+                id2label=self.wongnai_id2label
             )
 
         self.assertEqual(
             f'The task specified `{task}` is incorrect or not available for TokenClassificationFinetuner',
             str(context.exception))
 
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_model_for_chunk_level_cls_wangchanberta_spm_camembert_1(self):
 
@@ -220,14 +225,15 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         token_cls_finetuner = TokenClassificationFinetuner()
         token_cls_finetuner.load_pretrained_model(
             task='chunk_level_classification',
-            name_or_path=pretrained_model_name
+            name_or_path=pretrained_model_name,
+            id2label=self.wongnai_id2label
 
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'chunk_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
     
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_model_for_chunk_level_cls_wangchanberta_spm_camembert_2(self):
         os.environ['WANDB_DISABLED'] = 'true'
@@ -238,13 +244,14 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         token_cls_finetuner.load_pretrained_model(
             task='chunk_level_classification',
             name_or_path=pretrained_model_name,
-            num_labels=10
+            num_labels=10,
+            id2label=self.wongnai_id2label
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'chunk_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 10)
 
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_model_for_chunk_level_cls_wangchanberta_spm_camembert_3(self):
         os.environ['WANDB_DISABLED'] = 'true'
@@ -256,13 +263,14 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         token_cls_finetuner.load_pretrained_model(
             task=Task.CHUNK_LEVEL_CLS,
             name_or_path=pretrained_model_name,
-            num_labels=10
+            num_labels=10,
+            id2label=self.wongnai_id2label
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'chunk_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 10)
 
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_model_for_token_level_cls_wangchanberta_spm_camembert_1(self):
 
@@ -273,14 +281,14 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         token_cls_finetuner = TokenClassificationFinetuner()
         token_cls_finetuner.load_pretrained_model(
             task='token_level_classification',
-            name_or_path=pretrained_model_name
-
+            name_or_path=pretrained_model_name,
+            id2label=self.wongnai_id2label
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
     
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_model_for_token_level_cls_wangchanberta_spm_camembert_2(self):
 
@@ -292,13 +300,14 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         token_cls_finetuner.load_pretrained_model(
             task='token_level_classification',
             name_or_path=pretrained_model_name,
-            num_labels=10
+            num_labels=10,
+            id2label=self.wongnai_id2label
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 10)
 
-    @pytest.mark.skip(reason="done")
+    
     @require_torch
     def test_load_pretrained_model_for_token_level_cls_wangchanberta_spm_camembert_3(self):
 
@@ -310,7 +319,8 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         token_cls_finetuner.load_pretrained_model(
             task=Task.TOKEN_LEVEL_CLS,
             name_or_path=pretrained_model_name,
-            num_labels=10
+            num_labels=10,
+            id2label=self.wongnai_id2label
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
@@ -483,7 +493,6 @@ class TestTokenClassificationFinetunerIntegration(unittest.TestCase):
         label_col = 'pos_tags'
         # print(f'\n\n[INFO] Perform dataset splitting')
         # train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=2020)
-
 
         id2label = {i: name for i, name in
                     enumerate(dataset['train'].features[label_col].feature.names)}
