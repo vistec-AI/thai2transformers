@@ -444,7 +444,7 @@ class TestTokenClassificationFinetunerIntegration:
             id2label=id2label
         )
         assert ner_token_cls_finetuner.tokenizer != None
-        assert 'TokenClassification' in ner_token_cls_finetuner.model.__class__.__name__ == True
+        assert 'ForTokenClassification' in ner_token_cls_finetuner.model.__class__.__name__ == True
         assert ner_token_cls_finetuner.num_labels == num_labels
         assert ner_token_cls_finetuner.model.num_labels == num_labels
        
@@ -556,7 +556,7 @@ class TestTokenClassificationFinetunerIntegration:
             id2label=id2label
         )
         assert ner_token_cls_finetuner.tokenizer != None
-        assert 'TokenClassification' in ner_token_cls_finetuner.model.__class__.__name__ == True
+        assert 'ForTokenClassification' in ner_token_cls_finetuner.model.__class__.__name__ == True
         assert ner_token_cls_finetuner.num_labels == num_labels
         assert ner_token_cls_finetuner.model.num_labels == num_labels
        
