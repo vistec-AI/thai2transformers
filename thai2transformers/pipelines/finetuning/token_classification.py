@@ -134,7 +134,7 @@ class TokenClassificationFinetuningPipeline(BaseFinetuningPipeline):
         return tokenized_inputs
 
     def process_dataset(self,
-                        tokenizer=None,
+                        tokenizer: PreTrainedTokenizer = None,
                         lowercase:bool = False,
                         max_length=128,
                         space_token='<_>',

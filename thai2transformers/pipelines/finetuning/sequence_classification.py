@@ -108,7 +108,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                         num_labels=self.num_labels)
 
     def process_dataset(self,
-                        tokenizer=None,
+                        tokenizer: PreTrainedTokenizer = None,
                         preprocessor: Callable[[str], str]=None,
                         max_length=128,
                         bs=1000,
