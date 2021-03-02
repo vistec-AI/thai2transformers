@@ -14,9 +14,13 @@ from filelock import FileLock
 import logging, time
 from typing import Optional
 import joblib
+from transformers.utils import logging
+
 from .utils import get_dict_val
 from .conf import Task
+
 nb_cores = multiprocessing.cpu_count()
+logger = logging.get_logger(__name__)
 
 @contextmanager
 def disable_gc():
@@ -391,6 +395,7 @@ class SequenceClassificationDataset(Dataset):
         if preprocessor != None:
             print('[INFO] Apply preprocessor to texts.')
             texts = list(map(preprocessor, texts))
+            logger.debug(f'Example preprocessed texts {texts[:3]}')
 
         for i in tqdm(range(math.ceil(len(texts) / bs))):
 
