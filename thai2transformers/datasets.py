@@ -395,7 +395,7 @@ class SequenceClassificationDataset(Dataset):
         if preprocessor != None:
             print('[INFO] Apply preprocessor to texts.')
             texts = list(map(preprocessor, texts))
-            logger.debug(f'Example preprocessed texts {texts[:3]}')
+            print(f'[DEBUG] Example preprocessed texts {texts[:3]}')
 
         for i in tqdm(range(math.ceil(len(texts) / bs))):
 
