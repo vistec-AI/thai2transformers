@@ -464,6 +464,9 @@ class TestSequenceClassificationFinetunerIntegration:
             name_or_path=model_name_or_path,
             num_labels=5
         )
+        assert seq_cls_finetuner.tokenizer != None
+        assert seq_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__name__
+        assert 'ForSequenceClassification' in seq_cls_finetuner.model.__class__.__name__ == True
 
         print(f'\n\n[INFO] For Wongnai reviews dataset, perform train-val set splitting (0.9,0.1)')
         dataset = load_dataset('wongnai_reviews')
