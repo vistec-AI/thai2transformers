@@ -428,19 +428,30 @@ class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
         if os.path.exists('./tmp/seq_cls_finetuner'):
             shutil.rmtree('./tmp/seq_cls_finetuner')
     
+    list_of_pretrained_model_name_or_paths = [
+        'airesearch/wangchanberta-base-att-spm-uncased',
+        'airesearch/wangchanberta-base-wiki-spm',
+        'airesearch/wangchanberta-base-wiki-newmm.',
+        'airesearch/wangchanberta-base-wiki-ssg',
+        'airesearch/wangchanberta-base-wiki-sefr',
+        'airesearch/bert-base-multilingual-cased-finetuned',
+        'airesearch/xlm-roberta-base-finetuned',
+    ]
+    
     @require_torch
-    def test_finetune_wangchanberta_spm_camembert_on_wongnai(self):
+    @pytest.mark.parametrize("pretrained_model_name_or_path", list_of_pretrained_model_name_or_paths)
+    def test_finetune_models_on_wongnai(self, pretrained_model_name_or_path):
 
         # 1. Initiate Sequence classification finetuner
         
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_tokenizer(
             tokenizer_cls=CamembertTokenizer,
-            name_or_path='airesearch/wangchanberta-base-att-spm-uncased'
+            name_or_path=pretrained_model_name_or_path
         )
         seq_cls_finetuner.load_pretrained_model(
             task='multiclass_classification',
-            name_or_path='airesearch/wangchanberta-base-att-spm-uncased',
+            name_or_path=pretrained_model_name_or_path,
             num_labels=5
         )
 
@@ -482,7 +493,7 @@ class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
 
 
         # define training args
-        output_dir = './tmp/seq_cls_finetuner/wangchanbert-base-att-spm-uncased/wongnai_reviews'
+        output_dir = f'./tmp/seq_cls_finetuner/{pretrained_model_name_or_path.spilt('/')[-1]}/wongnai_reviews'
         training_args = TrainingArguments(output_dir=output_dir)
 
         print('training_args', training_args)
