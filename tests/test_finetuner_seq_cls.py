@@ -466,7 +466,7 @@ class TestSequenceClassificationFinetunerIntegration:
         )
         assert seq_cls_finetuner.tokenizer != None
         assert seq_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__name__
-        assert 'ForSequenceClassification' in seq_cls_finetuner.model.__class__.__name__ == True
+        assert ('ForSequenceClassification' in seq_cls_finetuner.model.__class__.__name__) == True
 
         print(f'\n\n[INFO] For Wongnai reviews dataset, perform train-val set splitting (0.9,0.1)')
         dataset = load_dataset('wongnai_reviews')
@@ -565,7 +565,7 @@ class TestSequenceClassificationFinetunerIntegration:
         )
         assert seq_cls_finetuner.tokenizer != None
         assert seq_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__name__
-        assert 'ForMultilabelSequenceClassification' in seq_cls_finetuner.model.__class__.__name__ == True
+        assert ('ForMultilabelSequenceClassification' in seq_cls_finetuner.model.__class__.__name__) == True
 
         prachathai_dataset_name = 'prachathai67k'
         prachathai_text_col_name = 'body_text'

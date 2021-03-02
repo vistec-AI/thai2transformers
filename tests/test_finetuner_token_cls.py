@@ -435,7 +435,7 @@ class TestTokenClassificationFinetunerIntegration:
             name_or_path=model_name_or_path
         )
         assert ner_token_cls_finetuner.tokenizer != None
-        assert (ner_token_cls_finetuner.tokenizer.__class__.__name__) == tokenizer_cls.__name__
+        assert ner_token_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__name__
 
         ner_token_cls_finetuner.load_pretrained_model(
             task='chunk_level_classification',
@@ -444,7 +444,7 @@ class TestTokenClassificationFinetunerIntegration:
             id2label=id2label
         )
         assert ner_token_cls_finetuner.tokenizer != None
-        assert 'ForTokenClassification' in ner_token_cls_finetuner.model.__class__.__name__ == True
+        assert ('ForTokenClassification' in ner_token_cls_finetuner.model.__class__.__name__) == True
         assert ner_token_cls_finetuner.num_labels == num_labels
         assert ner_token_cls_finetuner.model.num_labels == num_labels
        
@@ -556,7 +556,7 @@ class TestTokenClassificationFinetunerIntegration:
             id2label=id2label
         )
         assert ner_token_cls_finetuner.tokenizer != None
-        assert 'ForTokenClassification' in ner_token_cls_finetuner.model.__class__.__name__ == True
+        assert ('ForTokenClassification' in ner_token_cls_finetuner.model.__class__.__name__) == True
         assert ner_token_cls_finetuner.num_labels == num_labels
         assert ner_token_cls_finetuner.model.num_labels == num_labels
        
