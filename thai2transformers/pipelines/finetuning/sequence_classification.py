@@ -133,7 +133,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
             self._dataset[test_dataset_name] = self._dataset[test_dataset_name][:num_test_examples]
 
         # If tokenizer is SeftCut, then perform pretokenization
-        if self.tokenizer.__class__.__name__ == FakeSefrCutTokenizer.__name__:
+        if isinstance(self.tokenizer, FakeSefrCutTokenizer):
 
             logger.info(f'Apply `sefr_cut` tokenizer to the text inputs of the dataset')
                     
