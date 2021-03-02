@@ -135,10 +135,13 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
         # If tokenizer is SeftCut, then perform pretokenization
         if isinstance(self.tokenizer, FakeSefrCutTokenizer):
 
-            logger.info(f'Apply `sefr_cut` tokenizer to the text inputs of the dataset')
+            print(f'Apply `sefr_cut` tokenizer to the text inputs of the dataset')
                     
             def tokenize_fn(batch):
-                return [SEFR_SPLIT_TOKEN.join([ SEFR_SPLIT_TOKEN.join(tok + [space_token]) for tok in tokens for tokens in sefr_cut_tokenize(get_dict_val(batch, self.text_column_name), n_jobs=1) ])] 
+                results = []
+                for tokens in sefr_cut_tokenize(get_dict_val(batch,  self.text_column_name), n_jobs=1):
+                    results.append(SEFR_SPLIT_TOKEN.join([ SEFR_SPLIT_TOKEN.join([token] + [space_token]) for token in tokens ] ))
+                return results
 
             for split_name in self._dataset.keys():
                
@@ -146,7 +149,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                                                  self.text_column_name: tokenize_fn(batch) 
                                             }, batched=True, batch_size=1)
 
-                logger.debug(f'[DEBUG] examples from {split_name} , {self._dataset[split_name][self.text_column_name][:3]}')
+                print(f'[DEBUG] examples from {split_name} , {self._dataset[split_name][self.text_column_name][:3]}')
 
         if train_dataset_name in self._dataset.keys():
             self.train_dataset = SequenceClassificationDataset.from_dataset(
