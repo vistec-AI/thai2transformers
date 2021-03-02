@@ -5,6 +5,7 @@ import sys
 import shutil
 from typing import Collection, Iterable, List, Union, Dict, Callable
 from functools import partial
+from collections import defaultdict
 from datasets import load_dataset
 from sklearn import preprocessing
 
@@ -21,7 +22,9 @@ from thai2transformers.tokenizers import (
     ThaiRobertaTokenizer,
     ThaiWordsNewmmTokenizer,
     ThaiWordsSyllableTokenizer,
-    FakeSefrCutTokenizer
+    FakeSefrCutTokenizer,
+    sefr_cut_tokenize,
+    SEFR_SPLIT_TOKEN,
 )
 from thai2transformers import preprocess
 from thai2transformers.utils import (
@@ -441,13 +444,13 @@ class TestSequenceClassificationFinetunerIntegration:
             shutil.rmtree('./tmp/seq_cls_finetuner')
 
     @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
-        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
-        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
-        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
-        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
+        # ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
+        # ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
+        # ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
+        # ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
         ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
-        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
-        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+        # ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
+        # ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
     ])
     @require_torch
     def test_finetune_models_on_wongnai(self, model_name_or_path, tokenizer_name_or_path, tokenizer_cls):
@@ -469,19 +472,39 @@ class TestSequenceClassificationFinetunerIntegration:
         assert ('ForSequenceClassification' in seq_cls_finetuner.model.__class__.__name__) == True
 
         print(f'\n\n[INFO] For Wongnai reviews dataset, perform train-val set splitting (0.9,0.1)')
-        dataset = load_dataset('wongnai_reviews')
-        print(f'\n\n[INFO] Perform dataset splitting')
-        train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=2020)
-        dataset['train'] = train_val_split['train'][:100]
-        dataset['validation'] = train_val_split['test'][:100]
-        dataset['test'] = train_val_split['test'][:100]
+        dataset = defaultdict()
+        dataset['train'] = load_dataset('wongnai_reviews', split='train[:100]')
+        dataset['validation'] = load_dataset('wongnai_reviews', split='train[100:200]')
+        dataset['test'] = load_dataset('wongnai_reviews', split='train[200:300]')
+        
+
         print(f'\n\n[INFO] Done')
         print(f'# train examples: {len(dataset["train"])}')
         print(f'# val examples: {len(dataset["validation"])}')
         print(f'# test examples: {len(dataset["test"])}')
-
+        
+        text_column_name = 'review_body'
         label_encoder = preprocessing.LabelEncoder()
-        label_encoder.fit(get_dict_val(dataset['train'], keys='star_rating'))
+        dataset['train_full'] = load_dataset('wongnai_reviews', split='train')
+        label_encoder.fit(get_dict_val(dataset['train_full'], keys='star_rating'))
+
+        if tokenizer_cls.__name__ == 'FakeSefrCutTokenizer':
+            
+            space_token = '<_>'        
+            def tokenize_fn(batch):
+                results = []
+                for tokens in sefr_cut_tokenize(get_dict_val(batch, text_column_name), n_jobs=1):
+                    results.append(SEFR_SPLIT_TOKEN.join([ SEFR_SPLIT_TOKEN.join([token] + [space_token]) for token in tokens ] ))
+                return results
+
+            for split_name in dataset.keys():
+                if split_name == 'train_full':
+                    continue
+                dataset[split_name] = dataset[split_name].map(lambda batch: {
+                                                 text_column_name: tokenize_fn(batch) 
+                                            }, batched=True, batch_size=1)
+
+                print(f'[DEBUG] examples from {split_name} , {dataset[split_name][text_column_name][:3]}')
 
         dataset_preprocessed = { split_name: SequenceClassificationDataset.from_dataset(
                         task=Task.MULTICLASS_CLS,
@@ -576,15 +599,38 @@ class TestSequenceClassificationFinetunerIntegration:
 
         dataset = load_dataset(prachathai_dataset_name)
         print(f'\n\n[INFO] Perform dataset splitting')
-        train_val_split = dataset['train'].train_test_split(test_size=0.1, shuffle=True, seed=2020)
-        dataset['train'] = train_val_split['train'][:100]
-        dataset['validation'] = train_val_split['test'][:100]
-        dataset['test'] = train_val_split['test'][:100]
+        dataset = defaultdict()
+        dataset['train'] = load_dataset(prachathai_dataset_name, split='train[:100]')
+        dataset['validation'] = load_dataset(prachathai_dataset_name, split='train[100:200]')
+        dataset['test'] = load_dataset(prachathai_dataset_name, split='train[200:300]')
+        
+
         print(f'\n\n[INFO] Done')
         print(f'# train examples: {len(dataset["train"])}')
         print(f'# val examples: {len(dataset["validation"])}')
         print(f'# test examples: {len(dataset["test"])}')
+        
+        label_encoder = preprocessing.LabelEncoder()
+        dataset['train_full'] = load_dataset(prachathai_dataset_name, split='train')
+        label_encoder.fit(get_dict_val(dataset['train_full'], keys='star_rating'))
 
+        if tokenizer_cls.__name__ == 'FakeSefrCutTokenizer':
+            
+            space_token = '<_>'        
+            def tokenize_fn(batch):
+                results = []
+                for tokens in sefr_cut_tokenize(get_dict_val(batch, prachathai_dataset_name), n_jobs=1):
+                    results.append(SEFR_SPLIT_TOKEN.join([ SEFR_SPLIT_TOKEN.join([token] + [space_token]) for token in tokens ] ))
+                return results
+
+            for split_name in dataset.keys():
+                if split_name == 'train_full':
+                    continue
+                dataset[split_name] = dataset[split_name].map(lambda batch: {
+                                                 prachathai_dataset_name: tokenize_fn(batch) 
+                                            }, batched=True, batch_size=1)
+
+                print(f'[DEBUG] examples from {split_name} , {dataset[split_name][prachathai_dataset_name][:3]}')
 
         dataset_preprocessed = { split_name: SequenceClassificationDataset.from_dataset(
                         task=Task.MULTILABEL_CLS,
