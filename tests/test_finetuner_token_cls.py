@@ -543,7 +543,7 @@ class TestTokenClassificationFinetunerIntegration:
         assert ner_token_cls_finetuner != None
 
         ner_token_cls_finetuner.load_pretrained_tokenizer(
-            tokenizer_cls=CamembertTokenizer,
+            tokenizer_cls=tokenizer_cls,
             name_or_path='airesearch/wangchanberta-base-att-spm-uncased'
         )
         assert ner_token_cls_finetuner.tokenizer != None
