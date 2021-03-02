@@ -130,12 +130,13 @@ class SequenceClassificationFinetuner(BaseFinetuner):
             task: Union[str, Task],
         """
         if num_labels == None:
-            self.config = AutoConfig.from_pretrained(name_or_path)
+            self.config = AutoConfig.from_pretrained(name_or_path, revision=revision)
             self.num_labels = self.config.num_labels
         else:
             self.config = AutoConfig.from_pretrained(
                 name_or_path,
-                num_labels=num_labels
+                num_labels=num_labels,
+                revision=revision
             )
             self.num_labels = num_labels
 
@@ -252,12 +253,13 @@ class TokenClassificationFinetuner(BaseFinetuner):
             task: Union[str, Task],
         """
         if num_labels == None:
-            self.config = AutoConfig.from_pretrained(name_or_path)
+            self.config = AutoConfig.from_pretrained(name_or_path, revision=revision)
             self.num_labels = self.config.num_labels
         else:
             self.config = AutoConfig.from_pretrained(
                 name_or_path,
-                num_labels=num_labels
+                num_labels=num_labels,
+                revision=revision
             )
             self.num_labels = num_labels
 
