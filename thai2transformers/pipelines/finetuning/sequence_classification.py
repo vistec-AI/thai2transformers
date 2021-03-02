@@ -24,6 +24,7 @@ from transformers import (
     TrainingArguments,
 )
 from transformers.tokenization_utils import PreTrainedTokenizer
+from transformers.utils import logging
 
 from .base import BaseFinetuningPipeline
 from thai2transformers.conf import Task
@@ -35,6 +36,8 @@ from thai2transformers.tokenizers import (
     sefr_cut_tokenize,
     SEFR_SPLIT_TOKEN
 )
+
+logger = logging.get_logger(__name__)
 
 
 class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
@@ -132,7 +135,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
         # If tokenizer is SeftCut, then perform pretokenization
         if self.tokenizer.__class__.__name__ == FakeSefrCutTokenizer.__name__:
 
-            print(f'Apply `sefr_cut` tokenizer to the text inputs of the dataset')
+            logger.info(f'Apply `sefr_cut` tokenizer to the text inputs of the dataset')
                     
             def tokenize_fn(batch):
                 return [SEFR_SPLIT_TOKEN.join([ SEFR_SPLIT_TOKEN.join(tok + [space_token]) for tok in tokens for tokens in sefr_cut_tokenize(get_dict_val(batch, self.text_column_name), n_jobs=1) ])] 
@@ -143,7 +146,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                                                  self.text_column_name: tokenize_fn(batch) 
                                             }, batched=True, batch_size=1)
 
-                print(f'[DEBUG] examples from {split_name} , {self._dataset[split_name][self.text_column_name][:3]}')
+                logger.debug(f'[DEBUG] examples from {split_name} , {self._dataset[split_name][self.text_column_name][:3]}')
 
         if train_dataset_name in self._dataset.keys():
             self.train_dataset = SequenceClassificationDataset.from_dataset(
