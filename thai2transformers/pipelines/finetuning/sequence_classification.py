@@ -120,7 +120,7 @@ class SequenceClassificationFinetuningPipeline(BaseFinetuningPipeline):
                         num_val_examples: int=None,
                         num_test_examples: int=None):
  
-        if self.tokenizer == None and tokenizer != None:
+        if self.tokenizer == None and tokenizer != None and isinstance(tokenizer, PreTrainedTokenizer):
             self.tokenizer = tokenizer
         elif self.tokenizer == None and tokenizer == None:
             raise AssertionError('A Tokenizer has never been specified')
