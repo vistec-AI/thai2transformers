@@ -429,7 +429,7 @@ class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
             shutil.rmtree('./tmp/seq_cls_finetuner')
     
     @require_torch
-    def test_finetune_wangchanbertaspm_camembert_on_wongnai(self):
+    def test_finetune_wangchanberta_spm_camembert_on_wongnai(self):
 
         # 1. Initiate Sequence classification finetuner
         
