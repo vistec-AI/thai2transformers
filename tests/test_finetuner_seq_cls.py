@@ -444,13 +444,13 @@ class TestSequenceClassificationFinetunerIntegration:
             shutil.rmtree('./tmp/seq_cls_finetuner')
 
     @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
-        # ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
-        # ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
-        # ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
-        # ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
+        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
+        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
+        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
+        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
         ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
-        # ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
-        # ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
+        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
     ])
     @require_torch
     def test_finetune_models_on_wongnai(self, model_name_or_path, tokenizer_name_or_path, tokenizer_cls):
