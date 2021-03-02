@@ -279,13 +279,155 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
+    @require_torch
+    def test_load_pretrained_model_for_seq_cls_mbert_spm_camembert(self):
+        os.environ['WANDB_DISABLED'] = 'true'
+        pretrained_model_name = 'airesearch/bert-base-multilingual-cased-finetuned'
+        
+        # instantiate BertForSequenceClassification without `num_labels`
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task='multiclass_classification',
+            name_or_path=pretrained_model_name
+
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
+        
+        # instantiate BertForSequenceClassification with `num_labels` specified
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task='multiclass_classification',
+            name_or_path=pretrained_model_name,
+            num_labels=10
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+
+        # instantiate BertForMultilabelSequenceClassification with `num_labels` specified and using Task enum variable
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task=Task.MULTICLASS_CLS,
+            name_or_path=pretrained_model_name,
+            num_labels=10
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+
+        # instantiate RobertaForMBertForMultilabelSequenceClassificationultiLabelSequenceClassification without `num_labels`
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task='multilabel_classification',
+            name_or_path=pretrained_model_name
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
+        
+        # instantiate BertForMultilabelSequenceClassification with `num_labels` specified
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task='multilabel_classification',
+            name_or_path=pretrained_model_name,
+            num_labels=10
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+
+
+        # instantiate BertForMultilabelSequenceClassification with `num_labels` specified and using Task enum variable
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task=Task.MULTILABEL_CLS,
+            name_or_path=pretrained_model_name,
+            num_labels=10
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+
+    @require_torch
+    def test_load_pretrained_model_for_seq_cls_xlmr_spm_camembert(self):
+        os.environ['WANDB_DISABLED'] = 'true'
+        pretrained_model_name = 'airesearch/xlm-roberta-base-finetuned'
+        
+        # instantiate XLMRobertaForSequenceClassification without `num_labels`
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task='multiclass_classification',
+            name_or_path=pretrained_model_name
+
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
+        
+        # instantiate XLMRobertaForSequenceClassification with `num_labels` specified
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task='multiclass_classification',
+            name_or_path=pretrained_model_name,
+            num_labels=10
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+
+        # instantiate XLMRobertaForSequenceClassification with `num_labels` specified and using Task enum variable
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task=Task.MULTICLASS_CLS,
+            name_or_path=pretrained_model_name,
+            num_labels=10
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+
+        # instantiate XLMRobertaForMultilabelSequenceClassification without `num_labels`
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task='multilabel_classification',
+            name_or_path=pretrained_model_name
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
+        
+        # instantiate XLMRobertaForMultilabelSequenceClassification with `num_labels` specified
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task='multilabel_classification',
+            name_or_path=pretrained_model_name,
+            num_labels=10
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+
+
+        # instantiate XLMRobertaForMultilabelSequenceClassification with `num_labels` specified and using Task enum variable
+        seq_cls_finetuner = SequenceClassificationFinetuner()
+        seq_cls_finetuner.load_pretrained_model(
+            task=Task.MULTILABEL_CLS,
+            name_or_path=pretrained_model_name,
+            num_labels=10
+        )
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+
 
 class TestSequenceClassificationFinetunerIntegration(unittest.TestCase):
 
     def setUp(self):
         if os.path.exists('./tmp/seq_cls_finetuner'):
             shutil.rmtree('./tmp/seq_cls_finetuner')
-
+    
     @require_torch
     def test_finetune_wanchanbert_spm_camembert_on_wongnai(self):
 
