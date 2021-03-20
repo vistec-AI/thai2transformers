@@ -24,7 +24,7 @@ requirements = [
 
 setup(
     name="thai2transformers",
-    version="0.1.1",
+    version="0.1.2",
     description="Pretraining transformer based Thai language models",
     long_description=readme,
     long_description_content_type="text/markdown",
