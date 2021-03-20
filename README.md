@@ -10,7 +10,7 @@ thai2transformers provides customized scripts to pretrain transformer-based mask
 
 - __spm__: a subword-level token from [SentencePiece](https://github.com/google/sentencepiece) library.
 - __newmm__ : a dictionary-based Thai word tokenizer based on maximal matching from [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp).
-- __ssg__: a CRF-based Thai syllable tokenizer [[Chormai et al., 2020]](https://www.aclweb.org/anthology/2020.emnlp-main.315.pdf),
+- __syllable__: a dictionary-based Thai syllable tokenizer based on maximal matching from [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp). The list of syllables used is from [pythainlp/corpus/syllables_th.txt](https://github.com/PyThaiNLP/pythainlp/blob/dev/pythainlp/corpus/syllables_th.txt).
 - __sefr__: a ML-based Thai word tokenizer based on Stacked Ensemble Filter and Refine (SEFR) [[Limkonchotiwat et al., 2020]](https://www.aclweb.org/anthology/2020.emnlp-main.315/) based on probabilities from CNN-based [deepcut](https://github.com/rkcosmos/deepcut) and SEFR tokenizer is loaded with `engine="best"`.
 
 
