@@ -5,7 +5,7 @@ This step is for building the vocabulary for tokenizer. Currently, there are 4 t
 ## Type of tokenizers
 
  1. newmm - Dictionary-based word-level maximal matching tokenizer from [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp)
- 2. syllable - Syllable-level tokenizer from CRF-basd syllable segmentor for Thai ([ssg](https://github.com/ponrawee/ssg))
+ 2. __syllable__: a dictionary-based Thai syllable tokenizer based on maximal matching from [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp). The list of syllables used is from [pythainlp/corpus/syllables_th.txt](https://github.com/PyThaiNLP/pythainlp/blob/dev/pythainlp/corpus/syllables_th.txt).
  3. fake_sefr_cut - ML-based word-level tokenizer from "Stacked Ensemble Filter and Refine for Word Segmentation" ([seft-cut](https://github.com/mrpeerat/SEFR_CUT)). In this configuration, the texts are required to be pretokenized with SEFR tokenizer, and it will split tokens by `SEFR_SPLIT_TOKEN` which is equivalent to `<|>`.
  4. spm - Subword-level tokenizer trained from [SentencePiece](https://github.com/google/sentencepiece) library.
 
