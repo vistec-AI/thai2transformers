@@ -17,7 +17,6 @@ requirements = [
     "pytorch-lightning",
     "pydantic",
     "jsonlines",
-    "ssg==0.0.6",
     "tokenizers==0.9.3",
     "pandas",
 ]
@@ -25,7 +24,7 @@ requirements = [
 
 setup(
     name="thai2transformers",
-    version="0.1.1",
+    version="0.1.2",
     description="Pretraining transformer based Thai language models",
     long_description=readme,
     long_description_content_type="text/markdown",
