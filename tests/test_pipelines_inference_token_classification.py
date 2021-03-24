@@ -506,6 +506,32 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         actual = pipeline._group_entities(input_ner_tags)
         self.assertEqual(actual, expected)
 
+    def test_ner_merge_pred(self):
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = False
+        pipeline.strict = False
+
+        preds = [
+            ('บ็อบ', 'B-PERSON'),
+            ('เดิน', 'O'),
+            ('ทาง', 'O'),
+            ('ใน', 'O'),
+            ('เดือ', 'B-DATE'),
+            ('น', 'BBB-DATE'),
+            ('มกรา', 'I-DATE'),
+            ('คม', 'I-DATE')
+        ]
+        ids = [[0], [1,2], [3], [4,5], [6,7] ]
+        expected = [  ('บ็อบ', 'B-PERSON'),
+            ('เดินทาง', 'O'),
+            ('ใน', 'O'),
+            ('เดือน', 'B-DATE'),
+            ('มกราคม', 'I-DATE')]
+        actual = pipeline._merged_pred(preds, ids)
+        self.assertEqual(actual, expected)
 
     def test_ner_newmm_inference_ungrouped_entities_1(self):
         space_token =  '<_>'
