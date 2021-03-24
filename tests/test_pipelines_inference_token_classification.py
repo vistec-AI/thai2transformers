@@ -441,6 +441,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         ]
         expected = [
             {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '},
             {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
             {'entity_group': 'TIME', 'word': 'มกราคม'},
         ]
