@@ -180,16 +180,6 @@ class TokenClassificationPipeline:
       
             elif tags[i].startswith('I-') and i -1 >= 0 and len(_ne_position_mapping) > 0 \
               and _ne_position_mapping[-1][1] != current_ne and not self.strict:
-         
-                ne_position_mappings.append(_ne_position_mapping)
-            
-                _ne_position_mapping = []
-                _ne_position_mapping.append((i, current_ne))
-            elif tags[i].startswith('I-') and i - 1 >= 0 \
-              and ( tags[i-1] == 'O' or tags[i-1].startswith('I-') or tags[i-1].startswith('B-')) \
-              and len(_ne_position_mapping) > 0 \
-              and _ne_position_mapping[-1][1] != current_ne \
-              and not self.strict:
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
                 _ne_position_mapping.append((i, current_ne))
