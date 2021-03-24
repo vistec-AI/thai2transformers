@@ -443,7 +443,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
             {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
             {'entity_group': 'O', 'word': ' '},
             {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
-            {'entity_group': 'TIME', 'word': 'มกราคม'},
+            {'entity_group': 'O', 'word': ' '},
         ]
         actual = pipeline._group_entities(input_ner_tags)
         self.assertEqual(actual, expected)
@@ -456,7 +456,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         expected = [
             {'entity_group': 'PERSON', 'word': 'เจนนี่'},
             {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
-            {'entity_group': 'TIME', 'word': 'มกราคม'},
+            {'entity_group': 'O', 'word': ' '},
         ]
         actual = pipeline._group_entities(input_ner_tags)
         self.assertEqual(actual, expected)
