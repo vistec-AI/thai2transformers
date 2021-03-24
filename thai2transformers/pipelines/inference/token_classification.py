@@ -15,7 +15,6 @@ SPIECE = '▁'
 
 class TokenClassificationPipeline:
 
-
     def __init__(self,
                  model: PreTrainedModel,
                  tokenizer: PreTrainedTokenizer,
@@ -58,41 +57,48 @@ class TokenClassificationPipeline:
 
         return tokens
 
+    def _inference(self, input: str):
+
+        tokens = [[self.tokenizer.bos_token]] + \
+                    [self.tokenizer.tokenize(tok) if tok != SPIECE else [SPIECE] for tok in self.preprocess(input)] + \
+                    [[self.tokenizer.eos_token]]
+        ids = [self.tokenizer.convert_tokens_to_ids(token) for token in tokens]
+        flatten_tokens = list(itertools.chain(*tokens))
+        flatten_ids = list(itertools.chain(*ids))
+
+        input_ids = torch.LongTensor([flatten_ids]).to(self.device)
+
+
+        out = self.model(input_ids=input_ids, return_dict=True)
+        probs = torch.softmax(out['logits'], dim=-1)
+        vals, indices = probs.topk(1)
+        indices_np = indices.detach().cpu().numpy().reshape(-1)
+
+        list_of_token_label_tuple = list(zip(flatten_tokens, [ self.id2label[idx] for idx in indices_np] ))
+        merged_preds = self._merged_pred(preds=list_of_token_label_tuple, ids=ids)
+        merged_preds_removed_spiece = list(map(lambda x: (x[0].replace(SPIECE, ''), x[1]), merged_preds))
+
+        # remove start and end tokens
+        merged_preds_removed_bos_eos = merged_preds_removed_spiece[1:-1]
+        # convert to list of Dict objects
+        merged_preds_return_dict = [ {'word': word if word != self.space_token else ' ', 'entity': tag } for word, tag in merged_preds_removed_bos_eos ]
+        if not self.group_entities:
+            return merged_preds_return_dict
+        else:
+            return self._group_entities(merged_preds_removed_bos_eos)
+
     def __call__(self, inputs: Union[str, List[str]]):
 
         """     
             
         """
         if type(inputs) == str:
-            tokens = [[self.tokenizer.bos_token]] + \
-                     [self.tokenizer.tokenize(tok) if tok != SPIECE else [SPIECE] for tok in self.preprocess(inputs)] + \
-                     [[self.tokenizer.eos_token]]
-            ids = [self.tokenizer.convert_tokens_to_ids(token) for token in tokens]
-            flatten_tokens = list(itertools.chain(*tokens))
-            flatten_ids = list(itertools.chain(*ids))
-
-            input_ids = torch.LongTensor([flatten_ids]).to(self.device)
-
-
-            out = self.model(input_ids=input_ids, return_dict=True)
-            probs = torch.softmax(out['logits'], dim=-1)
-            vals, indices = probs.topk(1)
-            indices_np = indices.detach().cpu().numpy().reshape(-1)
-    
-            list_of_token_label_tuple = list(zip(flatten_tokens, [ self.id2label[idx] for idx in indices_np] ))
-            merged_preds = self._merged_pred(preds=list_of_token_label_tuple, ids=ids)
-            merged_preds_removed_spiece = list(map(lambda x: (x[0].replace(SPIECE, ''), x[1]), merged_preds))
-    
-            # remove start and end tokens
-            merged_preds_removed_bos_eos = merged_preds_removed_spiece[1:-1]
-            # convert to list of Dict objects
-            merged_preds_return_dict = [ {'word': word if word != self.space_token else ' ', 'entity': tag } for word, tag in merged_preds_removed_bos_eos ]
-            if not self.group_entities:
-                return merged_preds_return_dict
-            else:
-                return self._group_entities(merged_preds_removed_bos_eos)
-
-        return None
+            return self._inference(inputs)
+        
+        if type(inputs) == list:
+            results = [ self._inference(text) for text in inputs]
+            return results
+       
 
     def _merged_pred(self, preds: List[Tuple[str, str]], ids: List[List[int]]):
     
