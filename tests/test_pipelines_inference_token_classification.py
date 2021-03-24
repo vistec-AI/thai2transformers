@@ -19,6 +19,16 @@ class TokenClassificationPipelineTest(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
         self.assertEqual(pythainlp.__version__, '2.2.4')
+        self.base_pipeline = TokenClassificationPipeline(
+                    model=AutoModelForTokenClassification.from_pretrained(
+                        'airesearch/wangchanberta-base-att-spm-uncased',
+                        revision='finetuned@thainer-ner'
+                    ),
+                    tokenizer=AutoTokenizer.from_pretrained(
+                        'airesearch/wangchanberta-base-att-spm-uncased',
+                        revision='finetuned@thainer-ner'
+                    )
+        )
 
     def test_init_pipeline_1(self):
 
