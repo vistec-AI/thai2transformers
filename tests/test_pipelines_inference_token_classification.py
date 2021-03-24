@@ -77,17 +77,10 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
 
     def test_ner_newmm_pretokenizer(self):
-
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    )
-        )
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = False
 
         sentence = 'เจ้าพ่อสื่อระดับโลก﻿รูเพิร์ท เมอร์ดอค﻿สามารถเข้าซื้อกิจการดาวโจนส์ได้สำเร็จ'
         tokens = ['เจ้า', 'พ่อสื่อ', 'ระดับโลก', '\ufeff', 'รู', 'เพิร์ท', ' ', 'เม', 'อร', '์ดอค\ufeff', 'สามารถ', 'เข้า', 'ซื้อ', 'กิจการ', 'ดาวโจนส์', 'ได้', 'สำเร็จ']
@@ -108,17 +101,9 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_preprocess_1(self):
         space_token =  '<_>'
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token=space_token,
-        )
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = False
         
         sentence = 'เจ้าพ่อสื่อระดับโลก﻿รูเพิร์ท เมอร์ดอค﻿สามารถเข้าซื้อกิจการดาวโจนส์ได้สำเร็จ'
         tokens = ['เจ้า', 'พ่อสื่อ', 'ระดับโลก', '\ufeff', 'รู', 'เพิร์ท', space_token, 'เม', 'อร', '์ดอค\ufeff', 'สามารถ', 'เข้า', 'ซื้อ', 'กิจการ', 'ดาวโจนส์', 'ได้', 'สำเร็จ']
@@ -142,17 +127,9 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_preprocess_2(self):
         space_token =  '<_>'
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token=space_token
-        )
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = False
         
         sentences = ['เจ้าพ่อสื่อระดับโลก﻿รูเพิร์ท เมอร์ดอค﻿สามารถเข้าซื้อกิจการดาวโจนส์ได้สำเร็จ',
                      '​เกาะสมุยฝนตกน้ำท่วมเตือนห้ามลงเล่นน้ำ',
@@ -170,18 +147,9 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_preprocess_3(self):
         space_token =  '<_>'
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token=space_token,
-                    lowercase=True
-        )
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
         
         sentence = 'เจ้าพ่อสื่อระดับโลก﻿รูเพิร์ท เมอร์ดอค﻿สามารถเข้าซื้อกิจการดาวโจนส์ได้สำเร็จ'
         tokens = ['เจ้า', 'พ่อสื่อ', 'ระดับโลก', '\ufeff', 'รู', 'เพิร์ท', space_token, 'เม', 'อร', '์ดอค\ufeff', 'สามารถ', 'เข้า', 'ซื้อ', 'กิจการ', 'ดาวโจนส์', 'ได้', 'สำเร็จ']
@@ -205,18 +173,9 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_preprocess_4(self):
         space_token =  '<_>'
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token=space_token,
-                    lowercase=True
-        )
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
         
         sentences = ['เจ้าพ่อสื่อระดับโลก﻿รูเพิร์ท เมอร์ดอค﻿สามารถเข้าซื้อกิจการดาวโจนส์ได้สำเร็จ',
                      '​เกาะสมุยฝนตกน้ำท่วมเตือนห้ามลงเล่นน้ำ',
@@ -234,20 +193,13 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
 
     def test_ner_grouped_entities_unstrict_1(self):
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token='<_>',
-                    lowercase=True,
-                    group_entities=True,
-                    strict=False,
-        )
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
+
         input_ner_tags = [
             ('สถาบัน', 'I-ORGANIZATION'),
             ('วิทย', 'I-ORGANIZATION'),
@@ -287,20 +239,13 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
 
     def test_ner_grouped_entities_unstrict_2(self):
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token='<_>',
-                    lowercase=True,
-                    group_entities=True,
-                    strict=False,
-        )
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
+
         input_ner_tags = [
             ('กรุงเทพ', 'I-LOCATION'),
             ('จังหวัด', 'B-LOCATION'),
@@ -400,20 +345,13 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_ner_grouped_entities_unstrict_3(self):
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token='<_>',
-                    lowercase=True,
-                    group_entities=True,
-                    strict=False,
-        )
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
+        
         input_ner_tags = [
             ('กรุงเทพ', 'I-LOCATION'),
             ('จังหวัด', 'B-LOCATION'),
@@ -429,20 +367,13 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_ner_grouped_entities_unstrict_4(self):
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token='<_>',
-                    lowercase=True,
-                    group_entities=True,
-                    strict=False,
-        )
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
+        
         input_ner_tags = [
             ('กรุงเทพ', 'B-LOCATION'),
             (' ', 'O'),
@@ -472,20 +403,13 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_ner_grouped_entities_strict_1(self):
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token='<_>',
-                    lowercase=True,
-                    group_entities=True,
-                    strict=True,
-        )
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = True
+
         input_ner_tags = [('สถาบัน', 'B-ORGANIZATION'),
             ('วิทย', 'I-ORGANIZATION'),
             ('สิริ', 'I-ORGANIZATION'),
@@ -520,20 +444,13 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_ner_grouped_entities_strict_2(self):
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token='<_>',
-                    lowercase=True,
-                    group_entities=True,
-                    strict=True,
-        )
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = True
+
         input_ner_tags = [('สถาบัน', 'I-ORGANIZATION'),
             ('วิทย', 'I-ORGANIZATION'),
             ('สิริ', 'I-ORGANIZATION'),
@@ -569,21 +486,13 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
 
     def test_ner_grouped_entities_strict_3(self):
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = True
 
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token='<_>',
-                    lowercase=True,
-                    group_entities=True,
-                    strict=True,
-        )
         input_ner_tags = [
             ('ปี', 'B-TIME'),
             (' ', 'I-TIME'),
@@ -599,21 +508,12 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
 
     def test_ner_newmm_inference_ungrouped_entities_1(self):
-        self.maxDiff = None
         space_token =  '<_>'
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token=space_token,
-                    lowercase=True,
-                    group_entities=False
-        )
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = False
+        pipeline.strict = False
 
         sentence = '​เกาะสมุยฝนตกน้ำท่วมเตือนห้ามลงเล่นน้ำ'
         expected = [{'word': 'เกาะ', 'entity':  'B-LOCATION'},
@@ -665,20 +565,11 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_inference_grouped_entities(self):
         space_token =  '<_>'
-        pipeline = TokenClassificationPipeline(
-                    model=AutoModelForTokenClassification.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    tokenizer=AutoTokenizer.from_pretrained(
-                        'airesearch/wangchanberta-base-att-spm-uncased',
-                        revision='finetuned@thainer-ner'
-                    ),
-                    space_token=space_token,
-                    lowercase=True,
-                    group_entities=True,
-                    strict=False
-        )
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
 
         sentence = 'เกาะสมุยฝนตกน้ําท่วมเตือนห้ามลงเล่นน้ํา'
         assert sentence[len('เกาะสมุย'):] == 'ฝนตกน้ําท่วมเตือนห้ามลงเล่นน้ํา'
