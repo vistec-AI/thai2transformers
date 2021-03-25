@@ -708,14 +708,13 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
-        pipeline.strict = False
 
-        sentences = ['เกาะสมุยฝนตกน้ําท่วมเตือนห้ามลงเล่นน้ํา', 'ในเดือนมกราคมมีฝนตก']
+        sentences = ['เกาะสมุยฝนตกน้ําท่วมเตือนห้ามลงเล่นน้ํา', 'ในเกาะสมุยมีฝนตก']
         
         expected = [[{'word': 'เกาะสมุย', 'entity_group': 'LOCATION'},
                      {'word': 'ฝนตกน้ําท่วมเตือนห้ามลงเล่นน้ํา', 'entity_group': 'O'}],
-                    [{'word': 'ในเดือน', 'entity_group': 'O'},
-                     {'word': 'มกราคม', 'entity_group': 'DATE'},
+                    [{'word': 'ใน', 'entity_group': 'O'},
+                     {'word': 'เกาะสมุย', 'entity_group': 'LOCATION'},
                      {'word': 'มีฝนตก', 'entity_group': 'O'}]]
         actual = pipeline(sentences)
 
