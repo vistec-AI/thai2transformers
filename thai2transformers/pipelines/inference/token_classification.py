@@ -153,6 +153,9 @@ class TokenClassificationPipeline:
                 _ne_position_mapping.append((i, current_ne))
             elif tag.startswith('I-') and i == 0 and not self.strict:
                 _ne_position_mapping.append((i, current_ne))
+            elif tag.startswith('I-') and i == 0 and  self.strict:
+                _ne_position_mapping.append((i, 'O'))
+                tags[i] = 'O'
             elif tag.startswith('B-') and i-1 >= 0 and tags[i-1] == 'O' :
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
@@ -161,6 +164,9 @@ class TokenClassificationPipeline:
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
                 _ne_position_mapping.append((i, current_ne))
+            elif tag.startswith('I-') and i-1 >= 0 and tags[i-1] == 'O' and self.strict:
+                _ne_position_mapping.append((i, 'O'))
+                tags[i] = 'O'
             elif tag.startswith('B-') and i-1 >= 0 and tags[i-1].startswith('I-'):
                 print('in case 1c')
                 ne_position_mappings.append(_ne_position_mapping)
