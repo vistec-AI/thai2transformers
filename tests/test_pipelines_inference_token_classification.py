@@ -602,23 +602,21 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         pipeline.strict = False
         pipeline.tag_delimiter = '_'
 
-        sentence = '​เกาะสมุย ฝนตกน้ำท่วมเตือน ห้ามลงเล่นน้ำ'
-        expected = [{'word': 'เกาะสมุย', 'entity':  'LOC'},
-                    {'word': ' ฝนตกน้ำท่วมเตือน ห้ามลงเล่นน้ำ', 'entity':  'O'}]
+        sentence = '​เกาะสมุย ฝนตก แล้ว'
+        expected = [{'word': 'เกาะสมุย', 'entity_group':  'LOC'},
+                    {'word': ' ฝนตก แล้ว', 'entity_group':  'O'}]
 
 
         actual = pipeline(sentence)
         self.assertEqual(actual, expected)
 
         sentence = 'สถาบันวิทยสิริเมธี ตั้งอยู่ในจังหวัดระยอง ก่อตั้งขึ้นเมื่อปี พ.ศ. 2558'
-        expected = [{'word': 'สถาบันวิทยสิริเมธี', 'entity':  'ORG'},
-                    {'word': ' ตั้งอยู่ใน', 'entity': 'O'},
-                    {'word': 'จังหวัดระยอง', 'entity':  'LOC'},
-                    {'word': ' ก่อตั้งขึ้นเมื่อ', 'entity':  'O'},
-                    {'word': 'ปี พ.ศ. 2558', 'entity':  'DTM'}]
+        expected = [{'word': 'สถาบันวิทยสิริเมธี', 'entity_group':  'ORG'},
+                    {'word': ' ตั้งอยู่ใน', 'entity_group': 'O'},
+                    {'word': 'จังหวัดระยอง', 'entity_group':  'LOC'},
+                    {'word': ' ก่อตั้งขึ้นเมื่อ', 'entity_group':  'O'},
+                    {'word': 'ปี พ.ศ. 2558', 'entity_group':  'DTM'}]
         
-        expected_tokens = list(map(lambda x: x['word'], expected))
-        self.assertEqual(pipeline.pretokenizer(sentence), expected_tokens)
         actual = pipeline(sentence)
         self.assertEqual(actual, expected)
 
