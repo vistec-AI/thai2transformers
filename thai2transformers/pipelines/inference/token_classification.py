@@ -140,88 +140,90 @@ class TokenClassificationPipeline:
         
         B_PREFIX = tuple(('B-', 'B_'))
         I_PREFIX = tuple(('I-', 'I_'))
+        O_PREFIX = 'O'
+
         tokens, tags = zip(*ner_tags)
         tokens, tags = list(tokens), list(tags)
         ne_position_mappings = []
         _ne_position_mapping = []
         for i, tag in enumerate(tags):
-            current_ne = tag.split('-')[-1] if tag != 'O' else 'O'
+            current_ne = tag.split('-')[-1] if tag != O_PREFIX else O_PREFIX
 
-            if tag.startswith('B-') and i-1 >= 0 and tags[i-1].startswith('B-') :
+            if tag.startswith(B_PREFIX)and i-1 >= 0 and tags[i-1].startswith(B_PREFIX):
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
                 _ne_position_mapping.append((i, current_ne))
-            elif tag.startswith('I-') and i == 0 and not self.strict:
+            elif tag.startswith(I_PREFIX)and i == 0 and not self.strict:
                 _ne_position_mapping.append((i, current_ne))
-            elif tag.startswith('I-') and i == 0 and  self.strict:
-                _ne_position_mapping.append((i, 'O'))
-                tags[i] = 'O'
-            elif tag.startswith('B-') and i-1 >= 0 and tags[i-1] == 'O' :
+            elif tag.startswith(I_PREFIX)and i == 0 and  self.strict:
+                _ne_position_mapping.append((i, O_PREFIX))
+                tags[i] = O_PREFIX
+            elif tag.startswith(B_PREFIX)and i-1 >= 0 and tags[i-1] == O_PREFIX :
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
                 _ne_position_mapping.append((i, current_ne))
-            elif tag.startswith('I-') and i-1 >= 0 and tags[i-1] == 'O' and not self.strict:
+            elif tag.startswith(I_PREFIX)and i-1 >= 0 and tags[i-1] == O_PREFIX and not self.strict:
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
                 _ne_position_mapping.append((i, current_ne))
-            elif tag.startswith('I-') and i-1 >= 0 and tags[i-1] == 'O' and self.strict:
-                _ne_position_mapping.append((i, 'O'))
-                tags[i] = 'O'
-            elif tag.startswith('B-') and i-1 >= 0 and tags[i-1].startswith('I-'):
+            elif tag.startswith(I_PREFIX)and i-1 >= 0 and tags[i-1] == O_PREFIX and self.strict:
+                _ne_position_mapping.append((i, O_PREFIX))
+                tags[i] = O_PREFIX
+            elif tag.startswith(B_PREFIX)and i-1 >= 0 and tags[i-1].startswith(I_PREFIX):
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
                 _ne_position_mapping.append((i, current_ne))
-            elif tags[i].startswith('B-') :
+            elif tags[i].startswith(B_PREFIX):
                 _ne_position_mapping.append((i, current_ne))
-            elif tags[i].startswith('I-') and i -1 >= 0 \
-              and ( tags[i-1] == 'O' or tags[i-1].startswith('I-') or tags[i-1].startswith('B-')) \
+            elif tags[i].startswith(I_PREFIX)and i -1 >= 0 \
+              and ( tags[i-1] == O_PREFIX or tags[i-1].startswith(I_PREFIX)or tags[i-1].startswith(B_PREFIX)) \
               and len(_ne_position_mapping) > 0 \
               and _ne_position_mapping[-1][1] == current_ne \
               and not self.strict:
                 _ne_position_mapping.append((i, current_ne))
-            elif tags[i].startswith('I-') and i -1 >= 0 and len(_ne_position_mapping) > 0 \
+            elif tags[i].startswith(I_PREFIX)and i -1 >= 0 and len(_ne_position_mapping) > 0 \
               and _ne_position_mapping[-1][1] == current_ne:
                 _ne_position_mapping.append((i, current_ne))
       
-            elif tags[i].startswith('I-') and i -1 >= 0 and len(_ne_position_mapping) > 0 \
+            elif tags[i].startswith(I_PREFIX)and i -1 >= 0 and len(_ne_position_mapping) > 0 \
               and _ne_position_mapping[-1][1] != current_ne and not self.strict:
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
                 _ne_position_mapping.append((i, current_ne))
-            elif tag == 'O'  and i -1 >= 0 and ( tags[i-1].startswith('I-') or tags[i-1].startswith('B-')):
+            elif tag == O_PREFIX  and i -1 >= 0 and ( tags[i-1].startswith(I_PREFIX)or tags[i-1].startswith(B_PREFIX)):
                 # end of I-
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
                 _ne_position_mapping.append((i, current_ne))
-            elif tag == 'O'  and i -1 >= 0 and tags[i-1] == 'O':
+            elif tag == O_PREFIX  and i -1 >= 0 and tags[i-1] == O_PREFIX:
                 _ne_position_mapping.append((i, current_ne))
-            elif tag == 'O' and i == 0:
+            elif tag == O_PREFIX and i == 0:
                 _ne_position_mapping.append((i, current_ne))
 
             if i==len(tags) -1:
-                if tag == 'O':
+                if tag == O_PREFIX:
                     ne_position_mappings.append(_ne_position_mapping)
                     _ne_position_mapping = []
-                elif tag.startswith('B-'):
+                elif tag.startswith(B_PREFIX):
                     ne_position_mappings.append(_ne_position_mapping)
                     _ne_position_mapping = []
-                elif tag.startswith('I-') and tags[i-1].startswith('I-') \
+                elif tag.startswith(I_PREFIX)and tags[i-1].startswith(I_PREFIX)\
                   and len(_ne_position_mapping) >= 3 \
                   and _ne_position_mapping[-1][1] == current_ne:
                     ne_position_mappings.append(_ne_position_mapping)
                     _ne_position_mapping = []
-                elif tag.startswith('I-') and tags[i-1].startswith('B-') \
+                elif tag.startswith(I_PREFIX)and tags[i-1].startswith(B_PREFIX)\
                   and len(_ne_position_mapping) == 2 \
                   and _ne_position_mapping[-1][1] == current_ne:
                     ne_position_mappings.append(_ne_position_mapping)
                     _ne_position_mapping = []
-                elif tag.startswith('I-') and ( tags[i-1].startswith('B-') or tags[i-1].startswith('I-') ) \
+                elif tag.startswith(I_PREFIX)and ( tags[i-1].startswith(B_PREFIX)or tags[i-1].startswith(I_PREFIX)) \
                   and len(_ne_position_mapping) >= 1 \
                   and _ne_position_mapping[-1][1] == current_ne \
                   and not self.strict:
                     ne_position_mappings.append(_ne_position_mapping)
                     _ne_position_mapping = []
-                elif tag.startswith('I-') and ( tags[i-1] == 'O') \
+                elif tag.startswith(I_PREFIX)and ( tags[i-1] == O_PREFIX) \
                   and len(_ne_position_mapping) == 1 \
                   and not self.strict:
                     ne_position_mappings.append(_ne_position_mapping)
