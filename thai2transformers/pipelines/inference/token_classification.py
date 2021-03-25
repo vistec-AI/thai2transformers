@@ -138,6 +138,8 @@ class TokenClassificationPipeline:
 
     def _group_entities(self, ner_tags: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
         
+        B_PREFIX = tuple(('B-', 'B_'))
+        I_PREFIX = tuple(('I-', 'I_'))
         tokens, tags = zip(*ner_tags)
         tokens, tags = list(tokens), list(tags)
         ne_position_mappings = []
