@@ -470,8 +470,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
             ('มกราคม', 'I-TIME'),
             ]
         expected = [
-            {'entity_group': 'O', 'word': 'สถาบันวิทยสิริเมธี'},
-            {'entity_group': 'O', 'word': ' ตั้งอยู่ที่'},
+            {'entity_group': 'O', 'word': 'สถาบันวิทยสิริเมธี ตั้งอยู่ที่'},
             {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
             {'entity_group': 'LOCATION', 'word': 'ระยอง'},
             {'entity_group': 'TIME', 'word': '12:00น.'},
