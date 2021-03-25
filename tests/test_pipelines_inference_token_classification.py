@@ -604,6 +604,15 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
         self.assertEqual(actual, expected)
 
+        sentence = 'เกาะสมุยฝนตกน้ําท่วมเตือนห้าม ลงเล่นน้ํา'
+        assert sentence[len('เกาะสมุย'):] == 'ฝนตกน้ําท่วมเตือนห้ามลงเล่นน้ํา'
+        expected = [{'word': 'เกาะสมุย', 'entity_group': 'LOCATION'},
+                    {'word': 'ฝนตกน้ําท่วมเตือนห้าม ลงเล่นน้ํา', 'entity_group': 'O'}]
+        actual = pipeline(sentence)
+
+        self.assertEqual(actual, expected)
+        
+
     def test_ner_newmm_inference_grouped_entities_multiple_sentences(self):
         space_token =  '<_>'
         pipeline = self.base_pipeline
