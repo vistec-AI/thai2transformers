@@ -161,10 +161,13 @@ class TokenClassificationPipeline:
         groups = []
         for i, ne_position_mapping in enumerate(ne_position_mappings):
         
-            text = ''
-            ne = ne_position_mapping.tag
-            for ne_position in range(ne_position_mapping.start, ne_position_mapping.end):
-                _token = tokens[ne_position[0]]
+
+        for i, ne_position_mapping in enumerate(ne_position_mappings):
+            if type(ne_position_mapping) != tuple:
+                ne_position_mapping = ne_position_mapping.to_tuple()
+            ne = ne_position_mapping[1]
+            for ne_position in range(ne_position_mapping[2], ne_position_mapping[3]):
+                _token = tokens[ne_position]
                 text += _token if _token != self.space_token else ' '
             groups.append({
                 'entity_group': ne,
