@@ -162,9 +162,8 @@ class TokenClassificationPipeline:
         for i, ne_position_mapping in enumerate(ne_position_mappings):
         
             text = ''
-            assert len(ne_position_mapping) == 4    
-            ne = ne_position_mapping[1]
-            for ne_position in range(ne_position_mapping[3], ne_position_mapping[4]):
+            ne = ne_position_mapping.tag
+            for ne_position in range(ne_position_mapping.start, ne_position_mapping.end):
                 _token = tokens[ne_position[0]]
                 text += _token if _token != self.space_token else ' '
             groups.append({
