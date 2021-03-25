@@ -616,7 +616,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         
         expected = [[{'word': 'เกาะสมุย', 'entity_group': 'LOCATION'},
                      {'word': 'ฝนตกน้ําท่วมเตือนห้ามลงเล่นน้ํา', 'entity_group': 'O'}],
-                    [{'word': 'ในเดิอน', 'entity_group': 'O'},
+                    [{'word': 'ในเดือน', 'entity_group': 'O'},
                      {'word': 'มกราคม', 'entity_group': 'DATE'},
                      {'word': 'มีฝนตก', 'entity_group': 'O'}]]
         actual = pipeline(sentences)
