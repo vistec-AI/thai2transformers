@@ -29,6 +29,18 @@ class TokenClassificationPipelineTest(unittest.TestCase):
                         revision='finetuned@thainer-ner'
                     )
         )
+        self.lst20_base_pipeline = TokenClassificationPipeline(
+                    model=AutoModelForTokenClassification.from_pretrained(
+                        'airesearch/wangchanberta-base-att-spm-uncased',
+                        revision='finetuned@lst20-ner'
+                    ),
+                    tokenizer=AutoTokenizer.from_pretrained(
+                        'airesearch/wangchanberta-base-att-spm-uncased',
+                        revision='finetuned@lst20-ner'
+                    ),
+                    scheme='BIOE',
+                    tag_delimiter='_',
+        )
 
     def test_init_pipeline_1(self):
 
@@ -384,7 +396,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
             {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
             {'entity_group': 'O', 'word': ' '},
             {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
-            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'O', 'word': ' '}
         ]
         actual = pipeline._group_entities(input_ner_tags)
         self.assertEqual(actual, expected)
@@ -397,11 +409,12 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         expected = [
             {'entity_group': 'PERSON', 'word': 'เจนนี่'},
             {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
-            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'O', 'word': ' '}
         ]
         actual = pipeline._group_entities(input_ner_tags)
         self.assertEqual(actual, expected)
 
+    @unittest.skip('not implemented')
     def test_ner_grouped_entities_strict_1(self):
         space_token =  '<_>'
         pipeline = self.base_pipeline
@@ -443,6 +456,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         
         self.assertEqual(actual, expected)
 
+    @unittest.skip('not implemented')
     def test_ner_grouped_entities_strict_2(self):
         space_token =  '<_>'
         pipeline = self.base_pipeline
@@ -483,7 +497,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         
         self.assertEqual(actual, expected)
 
-
+    @unittest.skip('not implemented')
     def test_ner_grouped_entities_strict_3(self):
         space_token =  '<_>'
         pipeline = self.base_pipeline
@@ -534,15 +548,16 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_newmm_inference_ungrouped_entities_1(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.lst20_base_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = False
         pipeline.strict = False
+        pipeline.tag_delimiter = '_'
 
         sentence = '​เกาะสมุยฝนตกน้ำท่วมเตือนห้ามลงเล่นน้ำ'
-        expected = [{'word': 'เกาะ', 'entity':  'B_LOCATION'},
-                    {'word': 'สมุย', 'entity':  'I_LOCATION'},
+        expected = [{'word': 'เกาะ', 'entity':  'B_LOC'},
+                    {'word': 'สมุย', 'entity':  'E_LOC'},
                     {'word': 'ฝนตก', 'entity':  'O'},
                     {'word': 'น้ําท่วม', 'entity':  'O'},
                     {'word': 'เตือน', 'entity':  'O'},
@@ -550,37 +565,56 @@ class TokenClassificationPipelineTest(unittest.TestCase):
                     {'word': 'ลง', 'entity':  'O'},
                     {'word': 'เล่น', 'entity':  'O'},
                     {'word': 'น้ํา', 'entity':  'O'}]
+
         actual = pipeline(sentence)
         self.assertEqual(actual, expected)
 
-        sentence = 'สถาบันวิทยสิริเมธี ตั้งอยู่ในพื้นที่วังจันทร์วัลเลย์ ต.ป่ายุบใน จังหวัดระยอง ก่อตั้งขึ้นเมื่อปี พ.ศ. 2558'
-        expected = [{'word': 'สถาบันวิทยสิริเมธี', 'entity':  'B_ORGANIZATION'},
+        sentence = 'สถาบันวิทยสิริเมธี ตั้งอยู่ในจังหวัดระยอง ก่อตั้งขึ้นเมื่อปี พ.ศ. 2558'
+        expected = [{'word': 'สถาบันวิทยสิริเมธี', 'entity':  'B_ORG'},
                     {'word': ' ', 'entity': 'O'},
                     {'word': 'ตั้งอยู่', 'entity': 'O'},
                     {'word': 'ใน', 'entity':  'O'},
-                    {'word': 'พื้นที่', 'entity':  'O'},
-                    {'word': 'วัง', 'entity':  'B_LOCATION'},
-                    {'word': 'จันทร์', 'entity':  'I_LOCATION'},
-                    {'word': 'วัล', 'entity':  'I_LOCATION'},
-                    {'word': 'เลย', 'entity':  'I_LOCATION'},
-                    {'word': '์', 'entity':  'I_LOCATION'},
-                    {'word': ' ', 'entity':  'O'},
-                    {'word': 'ต.', 'entity': 'B_LOCATION'},
-                    {'word': 'ป่า', 'entity':  'I_LOCATION'},
-                    {'word': 'ยุบ', 'entity':  'I_LOCATION'},
-                    {'word': 'ใน', 'entity':  'I_LOCATION'},
-                    {'word': ' ', 'entity':  'O'},
-                    {'word': 'จังหวัด', 'entity':  'B_LOCATION'},
-                    {'word': 'ระยอง', 'entity':  'I_LOCATION'},
+                    {'word': 'จังหวัด', 'entity':  'B_LOC'},
+                    {'word': 'ระยอง', 'entity':  'E_LOC'},
                     {'word': ' ', 'entity':  'O'},
                     {'word': 'ก่อ', 'entity':  'O'},
                     {'word': 'ตั้งขึ้น', 'entity':  'O'},
                     {'word': 'เมื่อ', 'entity':  'O'},
-                    {'word': 'ปี', 'entity':  'O'},
-                    {'word': ' ', 'entity':  'O'},
-                    {'word': 'พ.ศ.', 'entity':  'B_DATE'},
-                    {'word': ' ', 'entity':  'I_DATE'},
-                    {'word': '2558', 'entity':  'I_DATE'}]
+                    {'word': 'ปี', 'entity':  'B_DTM'},
+                    {'word': ' ', 'entity':  'I_DTM'},
+                    {'word': 'พ.ศ.', 'entity':  'I_DTM'},
+                    {'word': ' ', 'entity':  'I_DTM'},
+                    {'word': '2558', 'entity':  'E_DTM'}]
+        
+        expected_tokens = list(map(lambda x: x['word'], expected))
+        self.assertEqual(pipeline.pretokenizer(sentence), expected_tokens)
+        actual = pipeline(sentence)
+        self.assertEqual(actual, expected)
+
+    def test_lst20_ner_newmm_inference_grouped_entities_1(self):
+
+        space_token =  '<_>'
+        pipeline = self.lst20_base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
+        pipeline.tag_delimiter = '_'
+
+        sentence = '​เกาะสมุย ฝนตกน้ำท่วมเตือน ห้ามลงเล่นน้ำ'
+        expected = [{'word': 'เกาะสมุย', 'entity':  'LOC'},
+                    {'word': ' ฝนตกน้ำท่วมเตือน ห้ามลงเล่นน้ำ', 'entity':  'O'}]
+
+
+        actual = pipeline(sentence)
+        self.assertEqual(actual, expected)
+
+        sentence = 'สถาบันวิทยสิริเมธี ตั้งอยู่ในจังหวัดระยอง ก่อตั้งขึ้นเมื่อปี พ.ศ. 2558'
+        expected = [{'word': 'สถาบันวิทยสิริเมธี', 'entity':  'ORG'},
+                    {'word': ' ตั้งอยู่ใน', 'entity': 'O'},
+                    {'word': 'จังหวัดระยอง', 'entity':  'LOC'},
+                    {'word': ' ก่อตั้งขึ้นเมื่อ', 'entity':  'O'},
+                    {'word': 'ปี พ.ศ. 2558', 'entity':  'DTM'}]
         
         expected_tokens = list(map(lambda x: x['word'], expected))
         self.assertEqual(pipeline.pretokenizer(sentence), expected_tokens)
