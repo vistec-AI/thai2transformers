@@ -230,7 +230,8 @@ class TokenClassificationPipeline:
             text = ''
             ne = ne_position_mapping[0][1]
             for ne_position in ne_position_mapping:
-                text += tokens[ne_position[0]]
+                _token += tokens[ne_position[0]]
+                text += _token if _token != self.space_token else ' '
             groups.append({
                 'entity_group': ne,
                 'word': text
