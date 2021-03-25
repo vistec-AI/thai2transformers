@@ -499,7 +499,6 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         
         self.assertEqual(actual, expected)
 
-    @unittest.skip('not implemented')
     def test_ner_grouped_entities_strict_3(self):
         space_token =  '<_>'
         pipeline = self.base_pipeline
