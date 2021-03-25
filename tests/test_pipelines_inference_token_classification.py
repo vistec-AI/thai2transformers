@@ -599,7 +599,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
-        pipeline.strict = False
+        pipeline.strict = True
         pipeline.tag_delimiter = '_'
 
         sentence = '​เกาะสมุย ฝนตก แล้ว'
@@ -626,7 +626,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = False
-        pipeline.strict = False
+        pipeline.strict = True
 
         sentence = '​เกาะสมุยฝนตกน้ำท่วมเตือนห้ามลงเล่นน้ำ'
         expected = [{'word': 'เกาะ', 'entity':  'B-LOCATION'},
@@ -682,7 +682,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
-        pipeline.strict = False
+        pipeline.strict = True
 
         sentence = 'เกาะสมุยฝนตกน้ําท่วมเตือนห้ามลงเล่นน้ํา'
         assert sentence[len('เกาะสมุย'):] == 'ฝนตกน้ําท่วมเตือนห้ามลงเล่นน้ํา'
