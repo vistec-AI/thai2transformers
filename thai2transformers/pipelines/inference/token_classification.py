@@ -164,9 +164,9 @@ class TokenClassificationPipeline:
             begin_end_pos.append((ne_position_mapping.start, ne_position_mapping.end))
         
         j = 0
-        print(f'tokens: {tokens}')
+        # print(f'tokens: {tokens}')
         for i, pos_tuple in enumerate(begin_end_pos):   
-            print(f'j = {j}')
+            # print(f'j = {j}')
             if pos_tuple[0] > 0 and i == 0:
                 ne_position_mappings.insert(0, (None, 'O', 0, pos_tuple[0]))
                 j += 1   
@@ -174,11 +174,11 @@ class TokenClassificationPipeline:
                 ne_position_mappings.insert(j, (None, 'O', begin_end_pos[i-1][1], begin_end_pos[i][0]))
                 j += 1 
             if begin_end_pos[i][1] != num_tags and i == len(begin_end_pos) - 1:
-                print(f' c3 j={j}, begin_end_pos[i][1]={begin_end_pos[i][1]}, num_tags={num_tags}')
+                # print(f' c3 j={j}, begin_end_pos[i][1]={begin_end_pos[i][1]}, num_tags={num_tags}')
                 ne_position_mappings.insert(j+1, (None, 'O', begin_end_pos[i][1], num_tags))
                 
             j += 1
-            print('ne_position_mappings', ne_position_mappings) 
+            # print('ne_position_mappings', ne_position_mappings) 
 
         groups = []
         for i, ne_position_mapping in enumerate(ne_position_mappings):
