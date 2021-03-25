@@ -197,6 +197,8 @@ class TokenClassificationPipeline:
                 _ne_position_mapping.append((i, current_ne))
             elif tag == 'O'  and i -1 >= 0 and tags[i-1] == 'O':
                 _ne_position_mapping.append((i, current_ne))
+            elif tag == 'O' and i == 0:
+                _ne_position_mapping.append((i, current_ne))
 
             if i==len(tags) -1:
                 if tag == 'O':
@@ -229,18 +231,10 @@ class TokenClassificationPipeline:
         groups = []
         for i, ne_position_mapping in enumerate(ne_position_mappings):
         
-            if len(ne_position_mapping) == 0:
-                # begining and ending position_mapping token indix
-                begin_tok_idx = ne_position_mappings[i-1][-1][0]  if i - 1 >= 0 else 0
-                end_tok_idx = ne_position_mappings[i+1][0][0] if i != len(ne_position_mappings) -1 else len(tokens) - 1
-
-                text = ''.join(tokens[begin_tok_idx:end_tok_idx])
-                ne = 'O'
-            else:
-                text = ''
-                ne = ne_position_mapping[0][1]
-                for ne_position in ne_position_mapping:
-                    text += tokens[ne_position[0]]
+            text = ''
+            ne = ne_position_mapping[0][1]
+            for ne_position in ne_position_mapping:
+                text += tokens[ne_position[0]]
             groups.append({
                 'entity_group': ne,
                 'word': text
