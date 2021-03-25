@@ -145,8 +145,6 @@ class TokenClassificationPipeline:
         for i, tag in enumerate(tags):
             current_ne = tag.split('-')[-1] if tag != 'O' else 'O'
 
-            print(f'i = {i}, _ne_position_mapping={_ne_position_mapping}')
-
             if tag.startswith('B-') and i-1 >= 0 and tags[i-1].startswith('B-') :
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
@@ -168,12 +166,10 @@ class TokenClassificationPipeline:
                 _ne_position_mapping.append((i, 'O'))
                 tags[i] = 'O'
             elif tag.startswith('B-') and i-1 >= 0 and tags[i-1].startswith('I-'):
-                print('in case 1c')
                 ne_position_mappings.append(_ne_position_mapping)
                 _ne_position_mapping = []
                 _ne_position_mapping.append((i, current_ne))
             elif tags[i].startswith('B-') :
-                print('in case 2')
                 _ne_position_mapping.append((i, current_ne))
             elif tags[i].startswith('I-') and i -1 >= 0 \
               and ( tags[i-1] == 'O' or tags[i-1].startswith('I-') or tags[i-1].startswith('B-')) \
