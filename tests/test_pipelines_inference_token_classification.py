@@ -412,7 +412,215 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         actual = pipeline._group_entities(input_ner_tags)
         self.assertEqual(actual, expected)
 
-    @unittest.skip('not implemented')
+    def test_lst20_ner_grouped_entities_unstrict_1(self):
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
+
+        input_ner_tags = [
+            ('สถาบัน', 'E-ORGANIZATION'),
+            ('วิทย', 'I-ORGANIZATION'),
+            ('สิริ', 'I-ORGANIZATION'),
+            ('เมธี', 'I-ORGANIZATION'),
+            (' ', 'O'),
+            ('ตั้งอยู่', 'O'),
+            ('ที่', 'O'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            ('ระยอง', 'B-LOCATION'),
+            ('12:00', 'I-TIME'),
+            ('น.', 'I-TIME'),
+            (' ', 'O'),
+            ('จังหวัด', 'I-LOCATION'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            ('มกราคม', 'B-TIME'),
+            ('เดือน', 'B-TIME'),
+            ('มกราคม', 'I-TIME'),
+            (' ', 'O')
+        ]
+        
+        expected = [
+            {'entity_group': 'ORGANIZATION', 'word': 'สถาบันวิทยสิริเมธี'},
+            {'entity_group': 'O', 'word': ' ตั้งอยู่ที่'},
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'LOCATION', 'word': 'ระยอง'},
+            {'entity_group': 'TIME', 'word': '12:00น.'},
+            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'LOCATION', 'word': 'จังหวัดกรุงเทพ'},
+            {'entity_group': 'TIME', 'word': 'มกราคม'},
+            {'entity_group': 'TIME', 'word': 'เดือนมกราคม'},
+            {'entity_group': 'O', 'word': ' '}
+        ]
+        actual = pipeline._group_entities(input_ner_tags)
+        
+        self.assertEqual(actual, expected)
+
+    def test_lst20_ner_grouped_entities_unstrict_2(self):
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
+
+        input_ner_tags = [
+            ('กรุงเทพ', 'E-LOCATION'),
+            ('จังหวัด', 'B-LOCATION'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            (' ', 'O'),
+            ('มกราคม', 'E-TIME'),
+        ]
+        
+        expected = [
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'LOCATION', 'word': 'จังหวัดกรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'TIME', 'word': 'มกราคม'},
+        ]
+        actual = pipeline._group_entities(input_ner_tags)
+        
+        self.assertEqual(actual, expected)
+
+        input_ner_tags = [
+            ('กรุงเทพ', 'I-LOCATION'),
+            ('จังหวัด', 'B-LOCATION'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            ('กรุงเทพ', 'B-LOCATION'),
+            ('มกราคม', 'E-TIME'),
+        ]
+        
+        expected = [
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'LOCATION', 'word': 'จังหวัดกรุงเทพ'},
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'TIME', 'word': 'มกราคม'},
+        ]
+        actual = pipeline._group_entities(input_ner_tags)
+        self.assertEqual(actual, expected)
+
+        input_ner_tags = [
+            ('จังหวัด', 'B-LOCATION'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            (' ', 'O'),
+            ('มกราคม', 'I-TIME'),
+        ]
+        expected = [
+            {'entity_group': 'LOCATION', 'word': 'จังหวัดกรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'TIME', 'word': 'มกราคม'},
+        ]
+        actual = pipeline._group_entities(input_ner_tags)
+        self.assertEqual(actual, expected)
+
+        input_ner_tags = [
+            ('จังหวัด', 'B-LOCATION'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            (' ', 'O'),
+            ('มกราคม', 'I-TIME'),
+            ('ระยอง', 'I-LOCATION'),
+        ]
+        expected = [
+            {'entity_group': 'LOCATION', 'word': 'จังหวัดกรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'TIME', 'word': 'มกราคม'},
+            {'entity_group': 'LOCATION', 'word': 'ระยอง'},
+
+        ]
+        actual = pipeline._group_entities(input_ner_tags)        
+        self.assertEqual(actual, expected)
+
+        input_ner_tags = [
+            ('จังหวัด', 'B-LOCATION'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            (' ', 'O'),
+            ('มกราคม', 'I-TIME'),
+            ('ระยอง', 'I-LOCATION'),
+        ]
+        expected = [
+            {'entity_group': 'LOCATION', 'word': 'จังหวัดกรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'TIME', 'word': 'มกราคม'},
+            {'entity_group': 'LOCATION', 'word': 'ระยอง'},
+
+        ]
+        actual = pipeline._group_entities(input_ner_tags)        
+        self.assertEqual(actual, expected)
+
+        input_ner_tags = [
+            ('จังหวัด', 'B-LOCATION'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            (' ', 'O'),
+            ('ระยอง', 'I-LOCATION'),
+        ]
+        expected = [
+            {'entity_group': 'LOCATION', 'word': 'จังหวัดกรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'LOCATION', 'word': 'ระยอง'},
+
+        ]
+        actual = pipeline._group_entities(input_ner_tags)        
+        self.assertEqual(actual, expected)
+
+    def test_lst20_ner_grouped_entities_unstrict_3(self):
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
+        
+        input_ner_tags = [
+            ('กรุงเทพ', 'I-LOCATION'),
+            ('จังหวัด', 'B-LOCATION'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            ('มกราคม', 'E-TIME'),
+        ]
+        expected = [
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'LOCATION', 'word': 'จังหวัดกรุงเทพ'},
+            {'entity_group': 'TIME', 'word': 'มกราคม'},
+        ]
+        actual = pipeline._group_entities(input_ner_tags)
+        self.assertEqual(actual, expected)
+
+    def test_lst20_ner_grouped_entities_unstrict_4(self):
+        space_token =  '<_>'
+        pipeline = self.base_pipeline
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = False
+        
+        input_ner_tags = [
+            ('กรุงเทพ', 'B-LOCATION'),
+            (' ', 'O'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            (' ', 'O'),
+        ]
+        expected = [
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '}
+        ]
+        actual = pipeline._group_entities(input_ner_tags)
+        self.assertEqual(actual, expected)
+
+        input_ner_tags = [
+            ('เจนนี่', 'I-PERSON'),
+            ('กรุงเทพ', 'I-LOCATION'),
+            (' ', 'O'),
+        ]
+        expected = [
+            {'entity_group': 'PERSON', 'word': 'เจนนี่'},
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '}
+        ]
+        actual = pipeline._group_entities(input_ner_tags)
+        self.assertEqual(actual, expected)
+
     def test_ner_grouped_entities_strict_1(self):
         space_token =  '<_>'
         pipeline = self.base_pipeline
