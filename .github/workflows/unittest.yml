@@ -1,4 +1,4 @@
-name: testing
+name: unittest
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - dev
 
 jobs:
-  testing:
+  unittest:
     name: Unit testing
     runs-on: ubuntu-latest
 
