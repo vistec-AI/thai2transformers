@@ -1,11 +1,10 @@
 torch==1.5.0
 transformers==3.5.0
-sentencepiece==0.1.94
+sentencepiece==0.1.91
 tqdm
 pytorch_lightning
 emoji
 pythainlp==2.2.4
-datasets==1.1.2
 pandas==1.1.4
 swifter==1.0.7
 tensorboard==2.3.0
@@ -15,4 +14,4 @@ nltk==3.4.5
 tensorflow>=2.0.0
 git+git://github.com/huggingface/datasets.git@686717b3cc56dcf830106f0e231bb22406b86156
 sefr_cut==0.2
-tokenizers==0.9.4
+tokenizers==0.9.3
