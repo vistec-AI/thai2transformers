@@ -153,6 +153,53 @@ class TokenClassificationPipeline:
             # Replace E prefix with I prefix
             tags = list(map(lambda x: x.replace(f'E{self.tag_delimiter}', f'I{self.tag_delimiter}'), tags))
         
+        I_PREFIX = f'I{self.tag_delimiter}'
+        E_PREFIX = f'E{self.tag_delimiter}'
+        B_PREFIX = f'B{self.tag_delimiter}'
+        O_PREFIX = 'O'
+        if not self.strict:
+            previous_tag_ne = None
+            for i, current_tag in enumerate(tags):
+                
+                current_tag_ne = current_tag.split(self.tag_delimiter)[-1] if current_tag != O_PREFIX else O_PREFIX
+                
+                if i == 0 and (current_tag.startswith(I_PREFIX) or \
+                  current_tag.startswith(E_PREFIX)):
+                    # if a NE tag (with I-, or E- prefix) occuring at the begining of sentence
+                    # e.g. (I-LOC, I-LOC) , (E-LOC, B-PER) (I-LOC, O, O)
+                    # then, change the prefix of the current tag to B{tag_delimiter}
+                    tags[i] = B_PREFIX + tags[i][2:]
+                elif i >= 1 and tags[i-1] == O_PREFIX and (
+                  current_tag.startswith(I_PREFIX) or \
+                  current_tag.startswith(E_PREFIX)):
+                    # if a NE tag (with I-, or E- prefix) occuring after O tag
+                    # e.g. (O, I-LOC, I-LOC) , (O, E-LOC, B-PER) (O, I-LOC, O, O)
+                    # then, change the prefix of the current tag to B{tag_delimiter}
+                    tags[i] = B_PREFIX + tags[i][2:]
+                elif i >= 1 and ( tags[i-1].startswith(I_PREFIX) or \
+                  tags[i-1].startswith(E_PREFIX) or \
+                  tags[i-1].startswith(B_PREFIX)) and \
+                  ( current_tag.startswith(I_PREFIX) or current_tag.startswith(E_PREFIX) )  and \
+                  previous_tag_ne != current_tag_ne:
+                    # if a NE tag (with I-, or E- prefix) occuring after NE tag with different NE
+                    # e.g. (B-LOC, I-PER) , (B-LOC, E-LOC, E-PER) (B-LOC, I-LOC, I-PER)
+                    # then, change the prefix of the current tag to B{tag_delimiter}
+                    tags[i] = B_PREFIX + tags[i][2:]
+                elif i == len(tags) - 1 and tags[i-1] == O_PREFIX and (
+                  current_tag.startswith(I_PREFIX) or \
+                  current_tag.startswith(E_PREFIX)):
+                    # if a NE tag (with I-, or E- prefix) occuring at the end of sentence
+                    # e.g. (O, O, I-LOC)  , (O, O, E-LOC) 
+                    # then, change the prefix of the current tag to B{tag_delimiter}
+                    tags[i] = B_PREFIX + tags[i][2:]
+              
+
+                previous_tag_ne = current_tag_ne
+            
+
+
+
+
         ent = Tokens(tokens=tags, scheme=IOB2,
                      suffix=False, delimiter=self.tag_delimiter)
 
