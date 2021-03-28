@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 from sklearn.metrics import f1_score, accuracy_score, precision_recall_fscore_support, classification_report
@@ -6,6 +7,8 @@ from seqeval.metrics import (accuracy_score as seqeval_accuracy_score,
                              f1_score as seqeval_f1_score,
                              precision_score as seqeval_precision_score, 
                              recall_score as seqeval_recall_score)
+from datasets import load_metric
+from thai2transformers.utils import get_thai2transformers_path
 
 def sk_classification_metrics(pred, pred_labs=False):
     result = classification_metrics(pred)
@@ -109,3 +112,5 @@ def multilabel_classification_metrics(pred, n_labels):
         'recall_macro': recall_macro,
         'nb_samples': len(labels)
     }
+
+squad_newmm_metrics = load_metric(os.path.join(get_thai2transformers_path(), 'squad_newmm'))
