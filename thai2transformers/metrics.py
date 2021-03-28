@@ -10,6 +10,7 @@ from seqeval.metrics import (accuracy_score as seqeval_accuracy_score,
                              precision_score as seqeval_precision_score, 
                              recall_score as seqeval_recall_score)
 from datasets import load_metric
+from thai2transformers.preprocess import prepare_qa_validation_features
 from thai2transformers.utils import get_thai2transformers_path
 
 def sk_classification_metrics(pred, pred_labs=False):
@@ -117,46 +118,6 @@ def multilabel_classification_metrics(pred, n_labels):
 
 squad_newmm_metric = load_metric(os.path.join(get_thai2transformers_path(), 'squad_newmm'))
 
-def _prepare_validation_features(examples, 
-                           tokenizer,
-                           question_col='question',
-                           context_col='context',
-                           question_id_col = 'question_id',
-                           pad_on_right=True,
-                           max_length=416,
-                           doc_stride=128):
-
-    tokenized_examples = tokenizer(
-        examples[question_col if pad_on_right else context_col],
-        examples[context_col if pad_on_right else question_col],
-        truncation="only_second" if pad_on_right else "only_first",
-        max_length=max_length,
-        stride=doc_stride,
-        return_overflowing_tokens=True,
-        return_offsets_mapping=True,
-        padding="max_length",
-    )
-
-    sample_mapping = tokenized_examples.pop("overflow_to_sample_mapping")
-    tokenized_examples["example_id"] = []
-    pass
-
-    for i in range(len(tokenized_examples["input_ids"])):
-        # Grab the sequence corresponding to that example (to know what is the context and what is the question).
-        sequence_ids = tokenized_examples.sequence_ids(i)
-        context_index = 1 if pad_on_right else 0
-
-        # One example can give several spans, this is the index of the example containing this span of text.
-        sample_index = sample_mapping[i]
-        tokenized_examples["example_id"].append(examples[question_id_col][sample_index])
-
-        # Set to None the offset_mapping that are not part of the context so it's easy to determine if a token position is part of the context or not.
-        tokenized_examples["offset_mapping"][i] = [
-            (o if sequence_ids[k] == context_index else None)
-            for k, o in enumerate(tokenized_examples["offset_mapping"][i])
-        ]
-
-    return tokenized_examples
 
 def _postprocess_qa_predictions(examples,
                                features, 
@@ -263,7 +224,7 @@ def question_answering_metrics(datasets,
                                doc_stride=128):
     
     validation_features = datasets.map(
-        lambda examples: _prepare_validation_features(examples=datasets, 
+        lambda examples: prepare_qa_validation_features(examples=datasets, 
                            tokenizer=trainer.tokenizer,
                            question_col=question_col,
                            context_col=context_col,
