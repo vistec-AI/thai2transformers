@@ -154,7 +154,7 @@ if __name__ == '__main__':
     parser.add_argument('--lowercase', action='store_true', default=False)
 
     # Finetuning
-    parser.add_argument('--model_max_length', type=int, default=512)
+    parser.add_argument('--model_max_length', type=int, default=416)
     parser.add_argument('--pad_on_right', action='store_true', default=False)
     parser.add_argument('--fp16', action='store_true', default=False)
     parser.add_argument('--num_train_epochs', type=int, default=2)
