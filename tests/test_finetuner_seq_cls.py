@@ -301,29 +301,18 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         # num_labels = 5 is the default value for wongnai_reviews
         self.assertEqual(seq_cls_finetuner.config.num_labels, 5) 
         
-        # instantiate BertForSequenceClassification with `num_labels` specified
-        seq_cls_finetuner = SequenceClassificationFinetuner()
-        seq_cls_finetuner.load_pretrained_model(
-            task='multiclass_classification',
-            name_or_path=pretrained_model_name,
-            revision='finetuned@wongnai_reviews',
-            num_labels=10
-        )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForSequenceClassification')
-        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+        with self.assertRaises(RuntimeError) as context:
+            # expect RuntimeError due to num_labels mismatch
+            # instantiate BertForSequenceClassification with `num_labels` specified
+            seq_cls_finetuner = SequenceClassificationFinetuner()
+            seq_cls_finetuner.load_pretrained_model(
+                task='multiclass_classification',
+                name_or_path=pretrained_model_name,
+                revision='finetuned@wongnai_reviews',
+                num_labels=10
+            )
 
-        # instantiate BertForMultilabelSequenceClassification with `num_labels` specified and using Task enum variable
-        seq_cls_finetuner = SequenceClassificationFinetuner()
-        seq_cls_finetuner.load_pretrained_model(
-            task=Task.MULTICLASS_CLS,
-            name_or_path=pretrained_model_name,
-            revision='finetuned@wongnai_reviews',
-            num_labels=10
-        )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
-        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+        self.assertEqual('RuntimeError' in str(context.exception), True)
 
         # instantiate RobertaForMBertForMultilabelSequenceClassificationultiLabelSequenceClassification without `num_labels`
         seq_cls_finetuner = SequenceClassificationFinetuner()
@@ -337,30 +326,18 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         # num_labels = 12 is the default value for prachathai67k
         self.assertEqual(seq_cls_finetuner.config.num_labels, 12)
         
-        # instantiate BertForMultilabelSequenceClassification with `num_labels` specified
-        seq_cls_finetuner = SequenceClassificationFinetuner()
-        seq_cls_finetuner.load_pretrained_model(
-            task='multilabel_classification',
-            name_or_path=pretrained_model_name,
-            revision='finetuned@prachathai67k',
-            num_labels=10
-        )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
-        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+        with self.assertRaises(RuntimeError) as context:
+            # expect RuntimeError due to num_labels mismatch
+            # instantiate BertForMultilabelSequenceClassification with `num_labels` specified
+            seq_cls_finetuner = SequenceClassificationFinetuner()
+            seq_cls_finetuner.load_pretrained_model(
+                task='multilabel_classification',
+                name_or_path=pretrained_model_name,
+                revision='finetuned@prachathai67k',
+                num_labels=10
+            )
+        self.assertEqual('RuntimeError' in str(context.exception), True)
 
-
-        # instantiate BertForMultilabelSequenceClassification with `num_labels` specified and using Task enum variable
-        seq_cls_finetuner = SequenceClassificationFinetuner()
-        seq_cls_finetuner.load_pretrained_model(
-            task=Task.MULTILABEL_CLS,
-            name_or_path=pretrained_model_name,
-            revision='finetuned@prachathai67k',
-            num_labels=10
-        )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
-        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
     @require_torch
     def test_load_pretrained_model_for_seq_cls_xlmr(self):
@@ -380,29 +357,17 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         # num_labels = 5 is the default value for wongnai_reviews
         self.assertEqual(seq_cls_finetuner.config.num_labels, 5)
         
-        # instantiate XLMRobertaForSequenceClassification with `num_labels` specified
-        seq_cls_finetuner = SequenceClassificationFinetuner()
-        seq_cls_finetuner.load_pretrained_model(
-            task='multiclass_classification',
-            name_or_path=pretrained_model_name,
-            revision='finetuned@wongnai_reviews',
-            num_labels=10
-        )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForSequenceClassification')
-        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
-
-        # instantiate XLMRobertaForSequenceClassification with `num_labels` specified and using Task enum variable
-        seq_cls_finetuner = SequenceClassificationFinetuner()
-        seq_cls_finetuner.load_pretrained_model(
-            task=Task.MULTICLASS_CLS,
-            name_or_path=pretrained_model_name,
-            revision='finetuned@wongnai_reviews',
-            num_labels=10
-        )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForSequenceClassification')
-        self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+        with self.assertRaises(RuntimeError) as context:
+            # expect RuntimeError due to num_labels mismatch
+            # instantiate XLMRobertaForSequenceClassification with `num_labels` specified
+            seq_cls_finetuner = SequenceClassificationFinetuner()
+            seq_cls_finetuner.load_pretrained_model(
+                task='multiclass_classification',
+                name_or_path=pretrained_model_name,
+                revision='finetuned@wongnai_reviews',
+                num_labels=10
+            )
+        self.assertEqual('RuntimeError' in str(context.exception), True)
 
         # instantiate XLMRobertaForMultilabelSequenceClassification without `num_labels`
         seq_cls_finetuner = SequenceClassificationFinetuner()
@@ -416,30 +381,17 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         # num_labels = 2 is the default value for prachathai67k
         self.assertEqual(seq_cls_finetuner.config.num_labels, 12) 
         
-        # instantiate XLMRobertaForMultilabelSequenceClassification with `num_labels` specified
-        seq_cls_finetuner = SequenceClassificationFinetuner()
-        seq_cls_finetuner.load_pretrained_model(
-            task='multilabel_classification',
-            name_or_path=pretrained_model_name,
-            revision='finetuned@prachathai67k',
-            num_labels=10
-        )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
-        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
-
-
-        # instantiate XLMRobertaForMultilabelSequenceClassification with `num_labels` specified and using Task enum variable
-        seq_cls_finetuner = SequenceClassificationFinetuner()
-        seq_cls_finetuner.load_pretrained_model(
-            task=Task.MULTILABEL_CLS,
-            name_or_path=pretrained_model_name,
-            revision='finetuned@prachathai67k',
-            num_labels=10
-        )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
-        self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
+        with self.assertRaises(RuntimeError) as context:
+            # expect RuntimeError due to num_labels mismatch
+            # instantiate XLMRobertaForMultilabelSequenceClassification with `num_labels` specified
+            seq_cls_finetuner = SequenceClassificationFinetuner()
+            seq_cls_finetuner.load_pretrained_model(
+                task='multilabel_classification',
+                name_or_path=pretrained_model_name,
+                revision='finetuned@prachathai67k',
+                num_labels=10
+            )
+        self.assertEqual('RuntimeError' in str(context.exception), True)
 
 @pytest.fixture()
 def skip_sefr(pytestconfig):
