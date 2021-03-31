@@ -483,7 +483,7 @@ class TestTokenClassificationFinetunerIntegration:
                             evaluation_strategy = 'steps',
                             eval_steps = 10,
                             logging_steps = 1,
-                            no_cuda = True,
+                            no_cuda = not torch.cuda.is_available(),
                             run_name = None ,
                         )
 
@@ -601,7 +601,7 @@ class TestTokenClassificationFinetunerIntegration:
                             evaluation_strategy = 'steps',
                             eval_steps = 25,
                             logging_steps = 1,
-                            no_cuda = True,
+                            no_cuda = not torch.cuda.is_available(),
                             run_name = None # Set wandb run name to None
                         )
 

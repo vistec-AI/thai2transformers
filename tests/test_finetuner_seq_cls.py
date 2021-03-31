@@ -500,7 +500,7 @@ class TestSequenceClassificationFinetunerIntegration:
         training_args = TrainingArguments(output_dir=output_dir,
                             max_steps = 5,
                             warmup_steps = 1,
-                            no_cuda = True,
+                            no_cuda = not torch.cuda.is_available(),
                             run_name = None)
 
 
@@ -630,7 +630,7 @@ class TestSequenceClassificationFinetunerIntegration:
         training_args = TrainingArguments(output_dir=output_dir,
                             max_steps = 5,
                             warmup_steps = 1,
-                            no_cuda = True,
+                            no_cuda = not torch.cuda.is_available(),
                             run_name = None)
 
         print('training_args', training_args)
