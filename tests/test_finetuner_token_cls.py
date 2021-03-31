@@ -142,7 +142,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_syllable(self):
         
-        pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-ssg'
+        pretrained_tokenizer_name = 'airesearch/wangchanberta-base-wiki-syllable'
         tokenizer_cls = TOKENIZER_CLS_MAPPING['syllable']
         
         token_cls_finetuner = TokenClassificationFinetuner()
@@ -391,7 +391,7 @@ class TestTokenClassificationFinetunerIntegration:
         ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),
-        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-syllable', 'airesearch/wangchanberta-base-wiki-syllable', ThaiWordsSyllableTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer, skip_sefr),
         ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer, False),
         ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer, False),
@@ -510,7 +510,7 @@ class TestTokenClassificationFinetunerIntegration:
         ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),
-        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-syllable', 'airesearch/wangchanberta-base-wiki-syllable', ThaiWordsSyllableTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer, skip_sefr),
         ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer, False),
         ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer, False),
