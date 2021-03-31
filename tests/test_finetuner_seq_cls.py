@@ -418,7 +418,7 @@ class TestSequenceClassificationFinetunerIntegration:
 
         if skip_sefr:
             pytest.skip('Skip tests requiring SEFR tokenizer')
-
+        os.environ['WANDB_DISABLED'] = 'true'
         # 1. Initiate Sequence classification finetuner
         
         seq_cls_finetuner = SequenceClassificationFinetuner()
@@ -497,13 +497,14 @@ class TestSequenceClassificationFinetunerIntegration:
             output_dir = f'./tmp/seq_cls_finetuner/{model_name_or_path.split("/")[-1]}/wongnai_reviews'
         else:
             output_dir = f'./tmp/seq_cls_finetuner/{model_name_or_path}/wongnai_reviews'
-        training_args = TrainingArguments(output_dir=output_dir)
+        training_args = TrainingArguments(output_dir=output_dir,
+                            max_steps = 5,
+                            warmup_steps = 1,
+                            no_cuda = True,
+                            run_name = None)
+
 
         print('training_args', training_args)
-        training_args.max_steps = 5
-        training_args.warmup_steps = 1
-        training_args.no_cuda = True
-        training_args.run_name = None # Set wandb run name to None
         
         # with test dataset
         eval_result = seq_cls_finetuner.finetune(training_args, 
@@ -539,7 +540,8 @@ class TestSequenceClassificationFinetunerIntegration:
     def test_finetune_models_on_prachathai67k(self, model_name_or_path, tokenizer_name_or_path, tokenizer_cls, skip_sefr):
         if skip_sefr:
             pytest.skip('Skip tests requiring SEFR tokenizer')
-
+        
+        os.environ['WANDB_DISABLED'] = 'true'
         # 1. Initiate Sequence classification finetuner
         
         seq_cls_finetuner = SequenceClassificationFinetuner()
@@ -625,14 +627,14 @@ class TestSequenceClassificationFinetunerIntegration:
             output_dir = f'./tmp/seq_cls_finetuner/{model_name_or_path.split("/")[-1]}/prachathai67k'
         else:
             output_dir = f'./tmp/seq_cls_finetuner/{model_name_or_path}/prachathai67k'
-        training_args = TrainingArguments(output_dir=output_dir)
+        training_args = TrainingArguments(output_dir=output_dir,
+                            max_steps = 5,
+                            warmup_steps = 1,
+                            no_cuda = True,
+                            run_name = None)
 
         print('training_args', training_args)
-        training_args.max_steps = 5
-        training_args.warmup_steps = 1
-        training_args.no_cuda = True
-        training_args.run_name = None # Set wandb run name to None
-        
+
         # with test dataset
         eval_result = seq_cls_finetuner.finetune(training_args, 
                                    train_dataset=dataset_preprocessed['train'],
