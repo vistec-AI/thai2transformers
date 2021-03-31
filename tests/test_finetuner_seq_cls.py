@@ -553,7 +553,7 @@ class TestSequenceClassificationFinetunerIntegration:
         seq_cls_finetuner.load_pretrained_model(
             task='multilabel_classification',
             name_or_path=model_name_or_path,
-            num_labels=5
+            num_labels=12
         )
         assert seq_cls_finetuner.tokenizer != None
         assert seq_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__name__
