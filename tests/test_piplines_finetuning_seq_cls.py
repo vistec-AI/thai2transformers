@@ -249,7 +249,7 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
             task='multilabel_classification'
         )
         prachathai_dataset_name = 'prachathai67k'
-        prachathai_text_col_name = 'body_text'
+        prachathai_text_col_name = 'title'
         prachathai_label_col_name =  ['politics', 'human_rights', 'quality_of_life',
                                       'international', 'social', 'environment',
                                       'economics', 'culture', 'labor',
