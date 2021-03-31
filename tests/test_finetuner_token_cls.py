@@ -480,7 +480,7 @@ class TestTokenClassificationFinetunerIntegration:
                             eval_steps = 10,
                             logging_steps = 1,
                             no_cuda = not torch.cuda.is_available(),
-                            run_name = None ,
+                            run_name = None,
                         )
 
         print('training_args', training_args)
@@ -503,6 +503,8 @@ class TestTokenClassificationFinetunerIntegration:
                                    val_dataset=val_dataset,
                                    test_dataset=None
         )
+
+        del ner_token_cls_finetuner
 
     @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls,skip_sefr", [
         ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
@@ -620,3 +622,5 @@ class TestTokenClassificationFinetunerIntegration:
                                    val_dataset=val_dataset,
                                    test_dataset=None
         )
+
+        del ner_token_cls_finetuner
