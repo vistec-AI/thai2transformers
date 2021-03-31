@@ -251,7 +251,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.func.__name__, 'token_classification_metrics')
-        self.assertEqual(token_cls_finetuner.config.num_labels, len(self.thainer_id2label.keys()))
+        self.assertEqual(token_cls_finetuner.config.num_labels, 2)
 
     
     @require_torch
@@ -269,7 +269,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_classification_metrics')
-        self.assertEqual(token_cls_finetuner.config.num_labels, len(self.thainer_id2label.keys()))
+        self.assertEqual(token_cls_finetuner.config.num_labels, 2)
 
     
     @require_torch
@@ -287,7 +287,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
-        self.assertEqual(token_cls_finetuner.config.num_labels, len(self.thainer_id2label.keys()))
+        self.assertEqual(token_cls_finetuner.config.num_labels, 2)
     
     
     @require_torch
@@ -305,7 +305,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
-        self.assertEqual(token_cls_finetuner.config.num_labels, len(self.thainer_id2label.keys()))
+        self.assertEqual(token_cls_finetuner.config.num_labels, 2)
 
     
     @require_torch
@@ -323,7 +323,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
-        self.assertEqual(token_cls_finetuner.config.num_labels, len(self.thainer_id2label.keys()))
+        self.assertEqual(token_cls_finetuner.config.num_labels, 2)
 
 
 class TestTokenClassificationFinetunerIntegration:
