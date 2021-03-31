@@ -256,7 +256,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             task='multilabel_classification',
             name_or_path=pretrained_model_name
         )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'CamembertForultiLabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'CamembertForMultiLabelSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
         
