@@ -247,12 +247,11 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         token_cls_finetuner.load_pretrained_model(
             task='chunk_level_classification',
             name_or_path=pretrained_model_name,
-            num_labels=10,
             id2label=self.thainer_id2label
         )
         self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'chunk_level_classification_metrics')
-        self.assertEqual(token_cls_finetuner.config.num_labels, 10)
+        self.assertEqual(token_cls_finetuner.config.num_labels, len(thainer_id2label.keys()))
 
     
     @require_torch
