@@ -387,7 +387,7 @@ class TestTokenClassificationFinetunerIntegration:
         return tokenized_inputs
     
 
-    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls,skip_sefr", [
         ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),
@@ -506,7 +506,7 @@ class TestTokenClassificationFinetunerIntegration:
                                    test_dataset=None
         )
 
-    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls,skip_sefr", [
         ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),

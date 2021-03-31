@@ -447,7 +447,7 @@ class TestSequenceClassificationFinetunerIntegration:
         if os.path.exists('./tmp/seq_cls_finetuner'):
             shutil.rmtree('./tmp/seq_cls_finetuner')
 
-    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls,skip_sefr", [
         ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),
@@ -569,7 +569,7 @@ class TestSequenceClassificationFinetunerIntegration:
                                    test_dataset=None,
         )
     
-    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls,skip_sefr", [
         ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
         ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),
