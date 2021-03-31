@@ -313,7 +313,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             )
             print('context.exception', context.exception)
 
-        self.assertEqual('RuntimeError' in str(context.exception), True)
+        self.assertEqual(type(RuntimeError()), type(context.exception))
 
         # instantiate RobertaForMBertForMultilabelSequenceClassificationultiLabelSequenceClassification without `num_labels`
         seq_cls_finetuner = SequenceClassificationFinetuner()
@@ -337,7 +337,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
                 revision='finetuned@prachathai67k',
                 num_labels=10
             )
-        self.assertEqual('RuntimeError' in str(context.exception), True)
+        self.assertEqual(type(RuntimeError()), type(context.exception))
 
 
     @require_torch
@@ -368,7 +368,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
                 revision='finetuned@wongnai_reviews',
                 num_labels=10
             )
-        self.assertEqual('RuntimeError' in str(context.exception), True)
+        self.assertEqual(type(RuntimeError()), type(context.exception))
 
         # instantiate XLMRobertaForMultilabelSequenceClassification without `num_labels`
         seq_cls_finetuner = SequenceClassificationFinetuner()
@@ -392,7 +392,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
                 revision='finetuned@prachathai67k',
                 num_labels=10
             )
-        self.assertEqual('RuntimeError' in str(context.exception), True)
+        self.assertEqual(type(RuntimeError()), type(context.exception))
 
 @pytest.fixture()
 def skip_sefr(pytestconfig):
