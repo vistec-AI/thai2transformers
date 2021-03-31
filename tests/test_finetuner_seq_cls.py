@@ -217,36 +217,36 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         os.environ['WANDB_DISABLED'] = 'true'
         pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
         
-        # instantiate RobertaForSequenceClassification without `num_labels`
+        # instantiate CamembertForSequenceClassification without `num_labels`
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_model(
             task='multiclass_classification',
             name_or_path=pretrained_model_name
 
         )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'RobertaForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'CamembertForSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
         
-        # instantiate RobertaForSequenceClassification with `num_labels` specified
+        # instantiate CamembertForSequenceClassification with `num_labels` specified
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_model(
             task='multiclass_classification',
             name_or_path=pretrained_model_name,
             num_labels=10
         )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'RobertaForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'CamembertForSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
-        # instantiate RobertaForSequenceClassification with `num_labels` specified and using Task enum variable
+        # instantiate CamembertForSequenceClassification with `num_labels` specified and using Task enum variable
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_model(
             task=Task.MULTICLASS_CLS,
             name_or_path=pretrained_model_name,
             num_labels=10
         )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'RobertaForSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'CamembertForSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
