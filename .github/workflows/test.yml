@@ -1,4 +1,4 @@
-name: unittest
+name: test
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   unittest:
-    name: Unit testing
+    name: Testing
     runs-on: ubuntu-latest
 
     strategy:
