@@ -315,21 +315,21 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(type(RuntimeError()), type(context.exception))
 
-        # instantiate RobertaForMBertForMultilabelSequenceClassificationultiLabelSequenceClassification without `num_labels`
+        # instantiate BertForMultiLabelSequenceClassificationultiLabelSequenceClassification without `num_labels`
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_model(
             task='multilabel_classification',
             name_or_path=pretrained_model_name,
             revision='finetuned@prachathai67k',
         )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultiLabelSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
         # num_labels = 12 is the default value for prachathai67k
         self.assertEqual(seq_cls_finetuner.config.num_labels, 12)
         
         with self.assertRaises(RuntimeError) as context:
             # expect RuntimeError due to num_labels mismatch
-            # instantiate BertForMultilabelSequenceClassification with `num_labels` specified
+            # instantiate BertForMultiLabelSequenceClassification with `num_labels` specified
             seq_cls_finetuner = SequenceClassificationFinetuner()
             seq_cls_finetuner.load_pretrained_model(
                 task='multilabel_classification',
@@ -370,21 +370,21 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
             )
         self.assertEqual(type(RuntimeError()), type(context.exception))
 
-        # instantiate XLMRobertaForMultilabelSequenceClassification without `num_labels`
+        # instantiate XLMRobertaForMultiLabelSequenceClassification without `num_labels`
         seq_cls_finetuner = SequenceClassificationFinetuner()
         seq_cls_finetuner.load_pretrained_model(
             task='multilabel_classification',
             name_or_path=pretrained_model_name,
             revision='finetuned@prachathai67k',
         )
-        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
+        self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultiLabelSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
         # num_labels = 2 is the default value for prachathai67k
         self.assertEqual(seq_cls_finetuner.config.num_labels, 12) 
         
         with self.assertRaises(RuntimeError) as context:
             # expect RuntimeError due to num_labels mismatch
-            # instantiate XLMRobertaForMultilabelSequenceClassification with `num_labels` specified
+            # instantiate XLMRobertaForMultiLabelSequenceClassification with `num_labels` specified
             seq_cls_finetuner = SequenceClassificationFinetuner()
             seq_cls_finetuner.load_pretrained_model(
                 task='multilabel_classification',
@@ -554,7 +554,7 @@ class TestSequenceClassificationFinetunerIntegration:
         )
         assert seq_cls_finetuner.tokenizer != None
         assert seq_cls_finetuner.tokenizer.__class__.__name__ == tokenizer_cls.__name__
-        assert ('ForMultilabelSequenceClassification' in seq_cls_finetuner.model.__class__.__name__) == True
+        assert ('ForMultiLabelSequenceClassification' in seq_cls_finetuner.model.__class__.__name__) == True
 
         prachathai_dataset_name = 'prachathai67k'
         prachathai_text_col_name = 'body_text'
