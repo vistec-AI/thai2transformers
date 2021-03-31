@@ -311,6 +311,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
                 revision='finetuned@wongnai_reviews',
                 num_labels=10
             )
+            print('context.exception', context.exception)
 
         self.assertEqual('RuntimeError' in str(context.exception), True)
 
