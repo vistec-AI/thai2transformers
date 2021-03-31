@@ -477,16 +477,18 @@ class TestTokenClassificationFinetunerIntegration:
         test_dataset = Dataset.from_dict(data_collator(test_dataset))
         # define training args
         output_dir = './tmp/seq_cls_finetuner/wangchanbert-base-att-spm-uncased/wongnai_reviews'
-        training_args = TrainingArguments(output_dir=output_dir)
+        training_args = TrainingArguments(output_dir=output_dir,
+                            max_steps = 10,
+                            warmup_steps = 2,
+                            evaluation_strategy = 'steps',
+                            eval_steps = 10,
+                            logging_steps = 1,
+                            no_cuda = True,
+                            run_name = None ,
+                        )
 
         print('training_args', training_args)
-        training_args.max_steps = 10
-        training_args.warmup_steps = 2
-        training_args.evaluation_strategy = 'steps'
-        training_args.eval_steps = 10
-        training_args.logging_steps = 1
-        training_args.no_cuda = not torch.cuda.is_available()
-        training_args.run_name = None # Set wandb run name to None
+        # Set wandb run name to None
         
 
         eval_result = ner_token_cls_finetuner.finetune(training_args, 
@@ -593,17 +595,18 @@ class TestTokenClassificationFinetunerIntegration:
         test_dataset = Dataset.from_dict(data_collator(test_dataset))
         # define training args
         output_dir = './tmp/seq_cls_finetuner/wangchanbert-base-att-spm-uncased/wongnai_reviews'
-        training_args = TrainingArguments(output_dir=output_dir)
+        training_args = TrainingArguments(output_dir=output_dir,
+                            max_steps = 50,
+                            warmup_steps = 8,
+                            evaluation_strategy = 'steps',
+                            eval_steps = 25,
+                            logging_steps = 1,
+                            no_cuda = True,
+                            run_name = None # Set wandb run name to None
+                        )
 
         print('training_args', training_args)
-        training_args.max_steps = 50
-        training_args.warmup_steps = 8
-        training_args.evaluation_strategy = 'steps'
-        training_args.eval_steps = 25
-        training_args.logging_steps = 1
-        training_args.no_cuda = not torch.cuda.is_available()
-        training_args.run_name = None # Set wandb run name to None
-        
+
 
         eval_result = ner_token_cls_finetuner.finetune(training_args, 
                                    train_dataset=train_dataset,
