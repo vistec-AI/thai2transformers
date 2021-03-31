@@ -444,7 +444,8 @@ class TestTokenClassificationFinetunerIntegration:
             task='chunk_level_classification',
             name_or_path='airesearch/wangchanberta-base-att-spm-uncased',
             num_labels=num_labels,
-            id2label=id2label
+            id2label=id2label,
+            device='cuda:0' if torch.cuda.is_available() else 'cpu'
         )
         assert ner_token_cls_finetuner.tokenizer != None
         assert ('ForTokenClassification' in ner_token_cls_finetuner.model.__class__.__name__) == True
