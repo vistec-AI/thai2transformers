@@ -91,7 +91,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         self.thainer_dataset = load_dataset('thainer')
         label_col = 'ner_tags'
         self.thainer_id2label = {i: name for i, name in
-                    enumerate(self.thainer__dataset['train'].features[label_col].feature.names)}
+                    enumerate(self.thainer_dataset['train'].features[label_col].feature.names)}
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_spm_camembert(self):
         
