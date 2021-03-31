@@ -298,7 +298,8 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
+        # num_labels = 5 is the default value for wongnai_reviews
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 5) 
         
         # instantiate BertForSequenceClassification with `num_labels` specified
         seq_cls_finetuner = SequenceClassificationFinetuner()
@@ -333,7 +334,8 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'BertForMultilabelSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
+        # num_labels = 12 is the default value for prachathai67k
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 12)
         
         # instantiate BertForMultilabelSequenceClassification with `num_labels` specified
         seq_cls_finetuner = SequenceClassificationFinetuner()
@@ -375,7 +377,8 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
+        # num_labels = 5 is the default value for wongnai_reviews
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 5)
         
         # instantiate XLMRobertaForSequenceClassification with `num_labels` specified
         seq_cls_finetuner = SequenceClassificationFinetuner()
@@ -410,7 +413,8 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         )
         self.assertEqual(seq_cls_finetuner.model.__class__.__name__,'XLMRobertaForMultilabelSequenceClassification')
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
-        self.assertEqual(seq_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
+        # num_labels = 2 is the default value for prachathai67k
+        self.assertEqual(seq_cls_finetuner.config.num_labels, 12) 
         
         # instantiate XLMRobertaForMultilabelSequenceClassification with `num_labels` specified
         seq_cls_finetuner = SequenceClassificationFinetuner()
