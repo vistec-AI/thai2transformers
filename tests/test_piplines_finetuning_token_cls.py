@@ -92,11 +92,12 @@ class TokenClassificationFinetuningPipelineTest(unittest.TestCase):
         self.assertEqual(token_cls_finetuner.finetuner.model.num_labels, num_labels)
 
         training_args = {
-            'max_steps': 10,
-            'warmup_steps': 2,
-            'logging_steps': 1,
+            'max_steps': 50,
+            'warmup_steps': 5,
+            'logging_steps': 5,
             'run_name': None,
             'no_cuda': not torch.cuda.is_available(),
+            'fp16': torch.cuda.is_available(),
         }
         
         output_dir = './tmp/token_cls_finetuning_pipeline/wangchanbert-base-att-spm-uncased/thainer-ner'
@@ -156,11 +157,12 @@ class TokenClassificationFinetuningPipelineTest(unittest.TestCase):
         self.assertEqual(token_cls_finetuner.finetuner.model.num_labels, num_labels)
 
         training_args = {
-            'max_steps': 10,
-            'warmup_steps': 2,
-            'logging_steps': 1,
+            'max_steps': 50,
+            'warmup_steps': 5,
+            'logging_steps': 5,
             'run_name': None,
             'no_cuda': not torch.cuda.is_available(),
+            'fp16': torch.cuda.is_available(),
         }
         
         output_dir = './tmp/token_cls_finetuning_pipeline/wangchanbert-base-att-spm-uncased/thainer-pos'
