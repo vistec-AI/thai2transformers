@@ -25,7 +25,8 @@ from transformers.modeling_outputs import (
 from transformers.modeling_bert import (
     BertPreTrainedModel,
     BertModel,
-    BertConfig
+    BertConfig,
+    CamembertConfig
 )
 
 from transformers.modeling_roberta import (
@@ -166,6 +167,16 @@ class RobertaForMultiLabelSequenceClassification(RobertaPreTrainedModel):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
+
+class CamembertForMultiLabelSequenceClassification(RobertaForMultiLabelSequenceClassification):
+    """
+    This class overrides :class:`~thai2transformers.RobertaForMultiLabelSequenceClassificationn`. Please check the
+    superclass for the appropriate documentation alongside usage examples.
+    """
+
+    config_class = CamembertConfig
+
+    
 
 class XLMRobertaForMultiLabelSequenceClassification(RobertaForMultiLabelSequenceClassification):
     """

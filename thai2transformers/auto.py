@@ -7,12 +7,14 @@ from transformers import (
 
 from transformers.modeling_bert import BertConfig
 from transformers.modeling_roberta import RobertaConfig
+from transformers.modeling_camembert import CamembertConfig
 from transformers.modeling_xlm_roberta import XLMRobertaConfig
 
 from .models import (
     XLMRobertaForMultiLabelSequenceClassification,
     BertForMultiLabelSequenceClassification,
-    RobertaForMultiLabelSequenceClassification
+    RobertaForMultiLabelSequenceClassification,
+    CamembertForMultiLabelSequenceClassification
 )
 
 MODEL_FOR_MULTI_LABEL_SEQUENCE_CLASSIFICATION_MAPPING = OrderedDict(
@@ -20,6 +22,7 @@ MODEL_FOR_MULTI_LABEL_SEQUENCE_CLASSIFICATION_MAPPING = OrderedDict(
         (XLMRobertaConfig, XLMRobertaForMultiLabelSequenceClassification),
         (BertConfig, BertForMultiLabelSequenceClassification),        
         (RobertaConfig, RobertaForMultiLabelSequenceClassification),
+        (CamembertConfig, CamembertForMultiLabelSequenceClassification),
     ]
 )
 
