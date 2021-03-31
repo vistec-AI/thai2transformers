@@ -331,7 +331,7 @@ class TokenClassificationFinetuner(BaseFinetuner):
 
         agg_chunk_preds = []
         agg_chunk_labels = []
-
+        self.model.eval()
         for step, batch in enumerate(TokenClassificationFinetuner._get_batch(dataset, self.training_args.per_device_eval_batch_size)):
             labels = batch['labels']
             old_positions = batch['old_positions']
