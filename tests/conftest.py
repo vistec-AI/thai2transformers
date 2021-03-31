@@ -6,6 +6,9 @@ def pytest_addoption(parser):
         "--skip_sefr", action="store_true", default=False, help="skip tests requiring SEFR tokenizer"
     )
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "sefr: mark test that it requires SEFR tokenizer to run")
+
 def pytest_collection_modifyitems(config, items):
     if config.getoption("--skip_sefr"):
        
