@@ -579,9 +579,7 @@ class TestSequenceClassificationFinetunerIntegration:
         print(f'# val examples: {len(dataset["validation"])}')
         print(f'# test examples: {len(dataset["test"])}')
         
-        label_encoder = preprocessing.LabelEncoder()
         dataset['train_full'] = load_dataset(prachathai_dataset_name, split='train')
-        label_encoder.fit(get_dict_val(dataset['train_full'], keys='star_rating'))
 
         if tokenizer_cls.__name__ == 'FakeSefrCutTokenizer':
             
