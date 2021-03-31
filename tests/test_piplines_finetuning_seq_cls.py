@@ -114,6 +114,7 @@ class SequenceClassificationFinetuningPipelineTest(unittest.TestCase):
             os.path.join(output_dir, 'checkpoint-final', 'pytorch_model.bin')
         ))
 
+    @pytest.mark.sefr
     def test_seq_cls_finetuning_pipeline_sefr_model_on_wongnai(self):
 
         seq_cls_finetuner = SequenceClassificationFinetuningPipeline(
