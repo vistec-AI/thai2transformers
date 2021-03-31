@@ -560,7 +560,7 @@ class TestSequenceClassificationFinetunerIntegration:
         assert ('ForMultiLabelSequenceClassification' in seq_cls_finetuner.model.__class__.__name__) == True
 
         prachathai_dataset_name = 'prachathai67k'
-        prachathai_text_col_name = 'body_text'
+        prachathai_text_col_name = 'title'
         prachathai_label_col_name =  ['politics', 'human_rights', 'quality_of_life',
                                       'international', 'social', 'environment',
                                       'economics', 'culture', 'labor',
