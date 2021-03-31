@@ -26,7 +26,6 @@ from transformers.modeling_bert import (
     BertPreTrainedModel,
     BertModel,
     BertConfig,
-    CamembertConfig
 )
 
 from transformers.modeling_roberta import (
@@ -36,6 +35,9 @@ from transformers.modeling_roberta import (
     RobertaClassificationHead
 )
 
+from transformers.modeling_camembert import (
+    CamembertConfig
+)
 from transformers.modeling_xlm_roberta import (
     XLMRobertaConfig
 )
