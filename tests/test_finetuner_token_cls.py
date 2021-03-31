@@ -76,6 +76,9 @@ def _process_transformers(
         toks = rule(toks)
     return "".join(toks)
 
+@pytest.fixture()
+def skip_sefr(pytestconfig):
+    return pytestconfig.getoption("skip_sefr")
 
 class TestTokenClassificationFinetuner(unittest.TestCase):
 
@@ -150,7 +153,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
 
         self.assertEqual(token_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsSyllableTokenizer')
 
-    
+    @pytest.mark.sefr
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_sefr(self):
         
@@ -384,20 +387,24 @@ class TestTokenClassificationFinetunerIntegration:
         return tokenized_inputs
     
 
-    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
-        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
-        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
-        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
-        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
-        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
-        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
-        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls,skip_sefr", [
+        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer, skip_sefr),
+        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer, False),
+        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer, False),
     ])
     @require_torch
     def test_finetune_wanchanbert_spm_camembert_on_thainer_ner(self,
             model_name_or_path,
             tokenizer_name_or_path,
-            tokenizer_cls):
+            tokenizer_cls,
+            skip_sefr):
+
+        if skip_sefr:
+            pytest.skip('Skip tests requiring SEFR tokenizer')
 
         # 1. Dowload dataset
         dataset = load_dataset('thainer')
@@ -499,21 +506,25 @@ class TestTokenClassificationFinetunerIntegration:
                                    test_dataset=None
         )
 
-    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
-        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
-        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
-        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
-        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
-        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
-        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
-        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls,skip_sefr", [
+        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer, skip_sefr),
+        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer, False),
+        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer, False),
     ])
     @require_torch
     def test_finetune_wanchanbert_spm_camembert_on_thainer_pos(self,
             model_name_or_path,
             tokenizer_name_or_path,
-            tokenizer_cls
+            tokenizer_cls,
+            skip_sefr
         ):
+        
+        if skip_sefr:
+            pytest.skip('Skip tests requiring SEFR tokenizer')
 
         # 1. Dowload dataset
         dataset = load_dataset('thainer')

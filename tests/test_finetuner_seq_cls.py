@@ -150,6 +150,7 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         self.assertEqual(seq_cls_finetuner.tokenizer.__class__.__name__,'ThaiWordsSyllableTokenizer')
 
     #@pytest.mark.skip(reason="change api")
+    @pytest.mark.sefr
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_sefr(self):
         
@@ -436,6 +437,9 @@ class TestSequenceClassificationFinetuner(unittest.TestCase):
         self.assertEqual(seq_cls_finetuner.metric.__name__, 'multilabel_classification_metrics')
         self.assertEqual(seq_cls_finetuner.config.num_labels, 10)
 
+@pytest.fixture()
+def skip_sefr(pytestconfig):
+    return pytestconfig.getoption("skip_sefr")
 
 class TestSequenceClassificationFinetunerIntegration:
 
@@ -443,17 +447,20 @@ class TestSequenceClassificationFinetunerIntegration:
         if os.path.exists('./tmp/seq_cls_finetuner'):
             shutil.rmtree('./tmp/seq_cls_finetuner')
 
-    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
-        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
-        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
-        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
-        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
-        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
-        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
-        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls,skip_sefr", [
+        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer, skip_sefr),
+        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer, False),
+        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer, False),
     ])
     @require_torch
-    def test_finetune_models_on_wongnai(self, model_name_or_path, tokenizer_name_or_path, tokenizer_cls):
+    def test_finetune_models_on_wongnai(self, model_name_or_path, tokenizer_name_or_path, tokenizer_cls, skip_sefr):
+
+        if skip_sefr:
+            pytest.skip('Skip tests requiring SEFR tokenizer')
 
         # 1. Initiate Sequence classification finetuner
         
@@ -562,17 +569,19 @@ class TestSequenceClassificationFinetunerIntegration:
                                    test_dataset=None,
         )
     
-    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls", [
-        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer),
-        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer),
-        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer),
-        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer),
-        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer),
-        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer),
-        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer),
+    @pytest.mark.parametrize("model_name_or_path,tokenizer_name_or_path,tokenizer_cls,skip_sefr", [
+        ('airesearch/wangchanberta-base-att-spm-uncased', 'airesearch/wangchanberta-base-att-spm-uncased', CamembertTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-spm', 'airesearch/wangchanberta-base-wiki-spm', ThaiRobertaTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-newmm', 'airesearch/wangchanberta-base-wiki-newmm', ThaiWordsNewmmTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-ssg', 'airesearch/wangchanberta-base-wiki-ssg', ThaiWordsSyllableTokenizer, False),
+        ('airesearch/wangchanberta-base-wiki-sefr', 'airesearch/wangchanberta-base-wiki-sefr', FakeSefrCutTokenizer, skip_sefr),
+        ('bert-base-multilingual-cased', 'bert-base-multilingual-cased', BertTokenizer, False),
+        ('xlm-roberta-base', 'xlm-roberta-base', XLMRobertaTokenizer, False),
     ])
     @require_torch
-    def test_finetune_models_on_prachathai67k(self, model_name_or_path, tokenizer_name_or_path, tokenizer_cls):
+    def test_finetune_models_on_prachathai67k(self, model_name_or_path, tokenizer_name_or_path, tokenizer_cls, skip_sefr):
+        if skip_sefr:
+            pytest.skip('Skip tests requiring SEFR tokenizer')
 
         # 1. Initiate Sequence classification finetuner
         
