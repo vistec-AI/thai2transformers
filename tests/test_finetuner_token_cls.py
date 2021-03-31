@@ -88,10 +88,10 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         self.assertIsNotNone(token_cls_finetuner)
 
     def setUp(self):
-        self.wongnai_dataset = load_dataset('thainer')
+        self.thainer_dataset = load_dataset('thainer')
         label_col = 'ner_tags'
-        self.wongnai_id2label = {i: name for i, name in
-                    enumerate(self.wongnai_dataset['train'].features[label_col].feature.names)}
+        self.thainer_id2label = {i: name for i, name in
+                    enumerate(self.thainer__dataset['train'].features[label_col].feature.names)}
     @require_torch
     def test_load_pretrained_tokenizer_wangchanberta_spm_camembert(self):
         
@@ -210,7 +210,7 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
             token_cls_finetuner.load_pretrained_model(
                 task=task,
                 name_or_path=pretrained_model_name,
-                id2label=self.wongnai_id2label
+                id2label=self.thainer_id2label
             )
 
         self.assertEqual(
@@ -224,15 +224,15 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         os.environ['WANDB_DISABLED'] = 'true'
         pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
         
-        # instantiate RobertaForTokenClassification without `num_labels`
+        # instantiate CamembertForTokenClassification without `num_labels`
         token_cls_finetuner = TokenClassificationFinetuner()
         token_cls_finetuner.load_pretrained_model(
             task='chunk_level_classification',
             name_or_path=pretrained_model_name,
-            id2label=self.wongnai_id2label
+            id2label=self.thainer_id2label
 
         )
-        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
+        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'chunk_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
     
@@ -242,15 +242,15 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         os.environ['WANDB_DISABLED'] = 'true'
         pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
 
-        # instantiate RobertaForTokenClassification with `num_labels` specified
+        # instantiate CamembertForTokenClassification with `num_labels` specified
         token_cls_finetuner = TokenClassificationFinetuner()
         token_cls_finetuner.load_pretrained_model(
             task='chunk_level_classification',
             name_or_path=pretrained_model_name,
             num_labels=10,
-            id2label=self.wongnai_id2label
+            id2label=self.thainer_id2label
         )
-        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
+        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'chunk_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 10)
 
@@ -260,16 +260,16 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         os.environ['WANDB_DISABLED'] = 'true'
         pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
         
-        # instantiate RobertaForTokenClassification with `num_labels` specified
-        # instantiate RobertaForTokenClassification with `num_labels` specified and using Task enum variable
+        # instantiate CamembertForTokenClassification with `num_labels` specified
+        # instantiate CamembertForTokenClassification with `num_labels` specified and using Task enum variable
         token_cls_finetuner = TokenClassificationFinetuner()
         token_cls_finetuner.load_pretrained_model(
             task=Task.CHUNK_LEVEL_CLS,
             name_or_path=pretrained_model_name,
             num_labels=10,
-            id2label=self.wongnai_id2label
+            id2label=self.thainer_id2label
         )
-        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
+        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'chunk_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 10)
 
@@ -280,14 +280,14 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         os.environ['WANDB_DISABLED'] = 'true'
         pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
         
-        # instantiate RobertaForTokenClassification without `num_labels`
+        # instantiate CamembertForTokenClassification without `num_labels`
         token_cls_finetuner = TokenClassificationFinetuner()
         token_cls_finetuner.load_pretrained_model(
             task='token_level_classification',
             name_or_path=pretrained_model_name,
-            id2label=self.wongnai_id2label
+            id2label=self.thainer_id2label
         )
-        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
+        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 2) # num_labels = 2 is the default value
     
@@ -298,15 +298,15 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         os.environ['WANDB_DISABLED'] = 'true'
         pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
 
-        # instantiate RobertaForTokenClassification with `num_labels` specified
+        # instantiate CamembertForTokenClassification with `num_labels` specified
         token_cls_finetuner = TokenClassificationFinetuner()
         token_cls_finetuner.load_pretrained_model(
             task='token_level_classification',
             name_or_path=pretrained_model_name,
             num_labels=10,
-            id2label=self.wongnai_id2label
+            id2label=self.thainer_id2label
         )
-        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
+        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 10)
 
@@ -317,15 +317,15 @@ class TestTokenClassificationFinetuner(unittest.TestCase):
         os.environ['WANDB_DISABLED'] = 'true'
         pretrained_model_name = 'airesearch/wangchanberta-base-att-spm-uncased'
 
-        # instantiate RobertaForTokenClassification with `num_labels` specified and using Task enum variable
+        # instantiate CamembertForTokenClassification with `num_labels` specified and using Task enum variable
         token_cls_finetuner = TokenClassificationFinetuner()
         token_cls_finetuner.load_pretrained_model(
             task=Task.TOKEN_LEVEL_CLS,
             name_or_path=pretrained_model_name,
             num_labels=10,
-            id2label=self.wongnai_id2label
+            id2label=self.thainer_id2label
         )
-        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'RobertaForTokenClassification')
+        self.assertEqual(token_cls_finetuner.model.__class__.__name__,'CamembertForTokenClassification')
         self.assertEqual(token_cls_finetuner.metric.__name__, 'token_level_classification_metrics')
         self.assertEqual(token_cls_finetuner.config.num_labels, 10)
 
