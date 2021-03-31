@@ -316,8 +316,6 @@ class TokenClassificationFinetuner(BaseFinetuner):
         # override self.training_args 
         if self.training_args == None and training_args != None:
             self.training_args = training_args
-
-        device = self.model.device
         
         agg_chunk_preds = []
         agg_chunk_labels = []
@@ -326,7 +324,7 @@ class TokenClassificationFinetuner(BaseFinetuner):
             labels = batch['labels']
             old_positions = batch['old_positions']
             dont_include = ['labels', 'old_positions']
-            batch = {k: torch.tensor(v, dtype=torch.int64).to(device) for k, v in batch.items()
+            batch = {k: torch.tensor(v, dtype=torch.int64) for k, v in batch.items()
                     if k not in dont_include}
 
             preds, = self.model(**batch)
