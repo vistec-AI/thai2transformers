@@ -216,6 +216,7 @@ class TokenClassificationFinetuner(BaseFinetuner):
         self.id2label = None
         self.metric = None
         self.training_args = None
+        self.device = None
 
     def load_pretrained_tokenizer(self,
                                   tokenizer_cls: PreTrainedTokenizer,
@@ -244,6 +245,7 @@ class TokenClassificationFinetuner(BaseFinetuner):
                               id2label: Dict[int,str],
                               revision: str = None,
                               num_labels: int = None,
+                              device: str = None,
                               ):
         """
         Load a pretrained model to the finetuner instance and modify classification head
@@ -252,6 +254,13 @@ class TokenClassificationFinetuner(BaseFinetuner):
         Arguments:
             task: Union[str, Task],
         """
+        if device == None and self.device == None:
+            self.device = 'cpu' if not torch.cuda.is_available() else 'cuda:0'
+        elif device != None and self.device == None:
+            self.device = device
+        elif device == None and self.device != None:
+            pass
+
         if num_labels == None:
             self.config = AutoConfig.from_pretrained(name_or_path, revision=revision)
             self.num_labels = self.config.num_labels
@@ -275,7 +284,10 @@ class TokenClassificationFinetuner(BaseFinetuner):
         self.model = FINETUNE_MODEL_MAPPING['TokenClassification'][task] \
                             .from_pretrained(name_or_path,
                                              config=self.config,
-                                             revision=revision)
+                                             revision=revision) \
+                            .to(self.device)
+                            
+
         self.metric = partial(token_classification_metrics,
                         task=self.task,
                         id2label=id2label,
@@ -316,7 +328,7 @@ class TokenClassificationFinetuner(BaseFinetuner):
         # override self.training_args 
         if self.training_args == None and training_args != None:
             self.training_args = training_args
-        
+
         agg_chunk_preds = []
         agg_chunk_labels = []
 
@@ -324,7 +336,7 @@ class TokenClassificationFinetuner(BaseFinetuner):
             labels = batch['labels']
             old_positions = batch['old_positions']
             dont_include = ['labels', 'old_positions']
-            batch = {k: torch.tensor(v, dtype=torch.int64) for k, v in batch.items()
+            batch = {k: torch.tensor(v, dtype=torch.int64).to(self.device) for k, v in batch.items()
                     if k not in dont_include}
 
             preds, = self.model(**batch)
