@@ -637,7 +637,7 @@ class TestSequenceClassificationFinetunerIntegration:
         # with test dataset
         eval_result = seq_cls_finetuner.finetune(training_args, 
                                    train_dataset=dataset_preprocessed['train'],
-                                   val_dataset=dataset_preprocessed['val'],
+                                   val_dataset=dataset_preprocessed['validation'],
                                    test_dataset=dataset_preprocessed['test']
         )
 
@@ -651,6 +651,6 @@ class TestSequenceClassificationFinetunerIntegration:
         # without test dataset
         eval_result = seq_cls_finetuner.finetune(training_args, 
                                    train_dataset=dataset_preprocessed['train'],
-                                   val_dataset=dataset_preprocessed['val'],
+                                   val_dataset=dataset_preprocessed['validation'],
                                    test_dataset=None,
         )
