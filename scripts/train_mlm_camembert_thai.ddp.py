@@ -81,6 +81,7 @@ def main():
     parser.add_argument("--binarized_path_train",  type=str, default=None)
     parser.add_argument("--binarized_path_val",  type=str, default=None)
 
+    parser.add_argument("--local_rank", type=int, default=-1)
     args = parser.parse_args()
 
     #initialize tokenizer
@@ -145,6 +146,7 @@ def main():
         fp16=args.fp16,
         fp16_opt_level=args.fp16_opt_level,
         dataloader_drop_last=args.dataloader_drop_last,
+        local_rank=args.local_rank
     )
 
     logging.info(" Number of devices: %d", training_args.n_gpu)
@@ -172,11 +174,16 @@ def main():
         trainer.train(model_path=args.model_dir)
     else:
         trainer.train()
-    #save
-    trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
+
+    if trainer.is_world_master():
+        tokenizer.save_pretrained(training_args.output_dir)
+        #save
+        trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
     
-    #evaluate
-    trainer.evaluate()
+        #evaluate
+        trainer.evaluate()
+    
+
 
 if __name__ == "__main__":
     main()
