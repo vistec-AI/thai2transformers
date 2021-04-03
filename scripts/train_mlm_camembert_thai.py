@@ -1,6 +1,7 @@
 import os
 import logging
 import torch
+import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 
@@ -82,7 +83,12 @@ def main():
     parser.add_argument("--binarized_path_val",  type=str, default=None)
 
     args = parser.parse_args()
-
+    
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed_all(args.seed)
+    np.random.seed(args.seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
     #initialize tokenizer
    
     tokenizer = CamembertTokenizer.from_pretrained(args.tokenizer_name_or_path)
