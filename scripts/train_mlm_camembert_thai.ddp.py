@@ -184,8 +184,11 @@ def main():
 
         #evaluate
     print('evaluate')
-    trainer.evaluate()
-    
+    eval_results = trainer.evaluate()
+    if training_args.local_rank == 0:
+        print('eval_results', eval_results)
+
+    return eval_results
 
 
 if __name__ == "__main__":
