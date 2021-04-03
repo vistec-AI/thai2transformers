@@ -175,13 +175,16 @@ def main():
     else:
         trainer.train()
 
-    if trainer.is_world_master():
+    if training_args.local_rank == 0:
+        print('main process')
+        print('save tokenizer and model')
         tokenizer.save_pretrained(training_args.output_dir)
         #save
-        trainer.save_model(os.path.join(args.output_dir, 'roberta_thai'))
-    
+        trainer.save_model(os.path.join(training_args.output_dir, 'roberta_thai'))
+
         #evaluate
-        trainer.evaluate()
+    print('evaluate')
+    trainer.evaluate()
     
 
 
