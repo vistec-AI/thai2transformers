@@ -1,10 +1,10 @@
 # distributed data parallel
-
+import torch
 import os
 import logging
-
 logging.basicConfig(level=logging.INFO)
 
+import numpy as np
 from transformers import (
     CamembertTokenizer,
     RobertaConfig,
@@ -89,7 +89,7 @@ def main():
     np.random.seed(args.seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-    
+
     #initialize tokenizer
    
     tokenizer = CamembertTokenizer.from_pretrained(args.tokenizer_name_or_path)
