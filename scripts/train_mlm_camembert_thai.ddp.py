@@ -84,6 +84,12 @@ def main():
     parser.add_argument("--local_rank", type=int, default=-1)
     args = parser.parse_args()
 
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed_all(args.seed)
+    np.random.seed(args.seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
     #initialize tokenizer
    
     tokenizer = CamembertTokenizer.from_pretrained(args.tokenizer_name_or_path)
