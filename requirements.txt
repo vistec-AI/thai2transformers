@@ -15,3 +15,4 @@ tensorflow>=2.0.0
 git+git://github.com/huggingface/datasets.git@686717b3cc56dcf830106f0e231bb22406b86156
 sefr_cut==0.2
 tokenizers==0.9.3
+seqeval==1.2.2
