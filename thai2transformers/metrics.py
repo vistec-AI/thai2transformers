@@ -124,7 +124,8 @@ def _postprocess_qa_predictions(examples,
                                raw_predictions,
                                tokenizer,
                                n_best_size = 20, 
-                               max_answer_length = 100,
+                               max_answer_length = 30,
+                               allow_no_answer=False,
                                question_id_col='question_id'):
     
     #get start_logits and end_logits
@@ -201,10 +202,12 @@ def _postprocess_qa_predictions(examples,
         else:
             # In the very rare edge case we have not a single non-null prediction, we create a fake prediction to avoid failure.
             best_answer = {"text": "", "score": 0.0}
-        
-        # Let's pick our final answer: the best one or the null answer 
-        answer = best_answer["text"] if best_answer["score"] > min_null_score else ""
-        predictions[example[question_id_col]] = answer
+            
+        if not allow_no_answer:
+            predictions[example[question_id_col]] = best_answer["text"]
+        else:
+            answer = best_answer["text"] if best_answer["score"] > min_null_score else ""
+            predictions[example[question_id_col]] = answer
 
     return predictions
 
@@ -213,6 +216,7 @@ def question_answering_metrics(datasets,
                                metric=squad_newmm_metric,
                                n_best_size=20,
                                max_answer_length=100,
+                               allow_no_answer=False,
                                question_col='question',
                                context_col='context',
                                question_id_col='question_id',
@@ -246,6 +250,7 @@ def question_answering_metrics(datasets,
                                tokenizer=trainer.tokenizer,
                                n_best_size = n_best_size, 
                                max_answer_length = max_answer_length,
+                               allow_no_answer = allow_no_answer,
                                question_id_col=question_id_col)
 
 
@@ -257,4 +262,4 @@ def question_answering_metrics(datasets,
                    "answers": {'text': ex[answers_col][text_col],
                                'answer_start':ex[answers_col][start_col]}} for ex in datasets]
 
-    return metric.compute(predictions=formatted_predictions, references=references)
+    return metric.compute(predictions=formatted_predictions, references=references), formatted_predictions, references
