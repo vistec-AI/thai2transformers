@@ -174,6 +174,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_best_size', type=int, default=20)
     parser.add_argument('--max_answer_length', type=int, default=100)
     parser.add_argument('--doc_stride', type=int, default=128)
+    parser.add_argument('--allow_no_answer', action='store_true', default=False)
     
     #column names; default to SQuAD naming
     parser.add_argument('--question_col', type=str, default='question')
@@ -250,7 +251,7 @@ if __name__ == '__main__':
     print('[INFO] Done.\n')
     print('\nBegin model evaluation on test set.')
     
-    result = question_answering_metrics(datasets=datasets['test'], 
+    result,_,_ = question_answering_metrics(datasets=datasets['test'], 
                                         trainer=trainer,
                                         metric=squad_newmm_metric,
                                         n_best_size=args.n_best_size,
@@ -263,7 +264,8 @@ if __name__ == '__main__':
                                         start_col=args.start_col,
                                         pad_on_right=args.pad_on_right,
                                         max_length=args.model_max_length,
-                                        doc_stride=args.doc_stride,)
+                                        doc_stride=args.doc_stride,
+                                        allow_no_answer=args.allow_no_answer)
 
     print(f'Evaluation on test set (dataset: {args.dataset_name})')    
     
