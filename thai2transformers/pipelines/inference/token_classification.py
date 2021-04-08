@@ -87,7 +87,7 @@ class TokenClassificationPipeline:
         merged_preds_removed_bos_eos = merged_preds_removed_spiece[1:-1]
         # convert to list of Dict objects
         merged_preds_return_dict = [ {'word': word if word != self.space_token else ' ', 'entity': tag } for word, tag in merged_preds_removed_bos_eos ]
-        if not self.group_entities and self.scheme != None:
+        if not self.group_entities or self.scheme == None:
             return merged_preds_return_dict
         else:
             return self._group_entities(merged_preds_removed_bos_eos)
