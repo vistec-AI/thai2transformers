@@ -41,6 +41,18 @@ class TokenClassificationPipelineTest(unittest.TestCase):
                     scheme='BIOE',
                     tag_delimiter='_',
         )
+        self.lst20_pos_pipeline = TokenClassificationPipeline(
+                    model=AutoModelForTokenClassification.from_pretrained(
+                        'airesearch/wangchanberta-base-att-spm-uncased',
+                        revision='finetuned@lst20-pos'
+                    ),
+                    tokenizer=AutoTokenizer.from_pretrained(
+                        'airesearch/wangchanberta-base-att-spm-uncased',
+                        revision='finetuned@lst20-pos'
+                    ),
+                    scheme=None,
+                    tag_delimiter=None,
+        )
 
     def test_init_pipeline_1(self):
 
@@ -822,6 +834,69 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         
         actual = pipeline(sentence)
         self.assertEqual(actual, expected)
+
+    def test_lst20_pos_newmm_inference_1(self):
+
+        space_token =  '<_>'
+        pipeline = self.lst20_pos_pipeline
+        pipeline.scheme = None
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = False
+        pipeline.strict = True
+        pipeline.tag_delimiter = ''
+
+        sentence = 'จีน-อินเดียเสี่ยงสูญเสียจากภัยธรรมชาติมากสุด'
+        expected_tokens = ['จีน', '-', 'อินเดีย', 'เสี่ยง', 'สูญเสีย',
+                           'จาก', 'ภัยธรรมชาติ', 'มาก', 'สุด']
+
+        self.assertEqual(pipeline.pretokenizer(sentence), expected_tokens)
+
+        expected_result = [{'word': 'จีน',	'entity': 'NN'},
+                            {'word': '-',	'entity': 'PU'},
+                            {'word': 'อินเดีย',	'entity': 'NN'},
+                            {'word': 'เสี่ยง',	'entity': 'VV'},
+                            {'word': 'สูญเสีย',	'entity': 'VV'},
+                            {'word': 'จาก',	'entity': 'PS'},
+                            {'word': 'ภัยธรรมชาติ',	'entity': 'NN'},
+                            {'word': 'มาก',	'entity': 'VV'},
+                            {'word': 'สุด',	'entity': 'AV'}
+                           ]
+        actual = pipeline(sentence)
+
+        self.assertEqual(actual,expected_result)
+
+    def test_lst20_pos_newmm_inference_2(self):
+
+        space_token =  '<_>'
+        pipeline = self.lst20_pos_pipeline
+        pipeline.scheme = None
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = True
+        pipeline.tag_delimiter = ''
+
+        sentence = 'จีน-อินเดียเสี่ยงสูญเสียจากภัยธรรมชาติมากสุด'
+        expected_tokens = ['จีน', '-', 'อินเดีย', 'เสี่ยง', 'สูญเสีย',
+                           'จาก', 'ภัยธรรมชาติ', 'มาก', 'สุด']
+
+        self.assertEqual(pipeline.pretokenizer(sentence), expected_tokens)
+
+        expected_result = [{'word': 'จีน',	'entity': 'NN'},
+                            {'word': '-',	'entity': 'PU'},
+                            {'word': 'อินเดีย',	'entity': 'NN'},
+                            {'word': 'เสี่ยง',	'entity': 'VV'},
+                            {'word': 'สูญเสีย',	'entity': 'VV'},
+                            {'word': 'จาก',	'entity': 'PS'},
+                            {'word': 'ภัยธรรมชาติ',	'entity': 'NN'},
+                            {'word': 'มาก',	'entity': 'VV'},
+                            {'word': 'สุด',	'entity': 'AV'}
+                           ]
+        actual = pipeline(sentence)
+
+        self.assertEqual(actual,expected_result)
+
 
     def test_ner_newmm_inference_ungrouped_entities_1(self):
         space_token =  '<_>'
