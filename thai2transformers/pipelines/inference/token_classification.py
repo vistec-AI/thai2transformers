@@ -160,7 +160,6 @@ class TokenClassificationPipeline:
         I_PREFIX = f'I{self.tag_delimiter}'
         E_PREFIX = f'E{self.tag_delimiter}'
         B_PREFIX = f'B{self.tag_delimiter}'
-        S_PREFIX = f'S{self.tag_delimiter}'
         O_PREFIX = 'O'
         
         if not self.strict:
