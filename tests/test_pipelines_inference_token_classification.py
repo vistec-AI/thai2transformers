@@ -19,7 +19,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
         self.assertEqual(pythainlp.__version__, '2.2.4')
-        self.base_pipeline = TokenClassificationPipeline(
+        self.thainer_ner_pipeline = TokenClassificationPipeline(
                     model=AutoModelForTokenClassification.from_pretrained(
                         'airesearch/wangchanberta-base-att-spm-uncased',
                         revision='finetuned@thainer-ner'
@@ -29,7 +29,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
                         revision='finetuned@thainer-ner'
                     )
         )
-        self.lst20_base_pipeline = TokenClassificationPipeline(
+        self.lst20_ner_pipeline = TokenClassificationPipeline(
                     model=AutoModelForTokenClassification.from_pretrained(
                         'airesearch/wangchanberta-base-att-spm-uncased',
                         revision='finetuned@lst20-ner'
@@ -40,6 +40,18 @@ class TokenClassificationPipelineTest(unittest.TestCase):
                     ),
                     scheme='BIOE',
                     tag_delimiter='_',
+        )
+        self.lst20_pos_pipeline = TokenClassificationPipeline(
+                    model=AutoModelForTokenClassification.from_pretrained(
+                        'airesearch/wangchanberta-base-att-spm-uncased',
+                        revision='finetuned@lst20-pos'
+                    ),
+                    tokenizer=AutoTokenizer.from_pretrained(
+                        'airesearch/wangchanberta-base-att-spm-uncased',
+                        revision='finetuned@lst20-pos'
+                    ),
+                    scheme=None,
+                    tag_delimiter=None,
         )
 
     def test_init_pipeline_1(self):
@@ -90,7 +102,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_pretokenizer(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = False
 
@@ -113,7 +125,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_preprocess_1(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = False
         
@@ -139,7 +151,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_preprocess_2(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = False
         
@@ -159,7 +171,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_preprocess_3(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         
@@ -185,7 +197,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_preprocess_4(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         
@@ -205,7 +217,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_grouped_entities_unstrict_1(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -250,7 +262,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_grouped_entities_unstrict_2(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -356,7 +368,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_grouped_entities_unstrict_3(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -378,7 +390,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_grouped_entities_unstrict_4(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -414,7 +426,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_grouped_entities_unstrict_1(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -459,7 +471,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_grouped_entities_unstrict_2(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -565,7 +577,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_grouped_entities_unstrict_3(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -587,7 +599,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_grouped_entities_unstrict_4(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -623,7 +635,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_grouped_entities_strict_1(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -664,7 +676,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_grouped_entities_strict_2(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -704,7 +716,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_grouped_entities_strict_3(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -725,7 +737,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_merge_pred(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = False
@@ -752,7 +764,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_newmm_inference_ungrouped_entities_1(self):
         space_token =  '<_>'
-        pipeline = self.lst20_base_pipeline
+        pipeline = self.lst20_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = False
@@ -798,7 +810,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
     def test_lst20_ner_newmm_inference_grouped_entities_1(self):
 
         space_token =  '<_>'
-        pipeline = self.lst20_base_pipeline
+        pipeline = self.lst20_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -823,9 +835,72 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         actual = pipeline(sentence)
         self.assertEqual(actual, expected)
 
+    def test_lst20_pos_newmm_inference_1(self):
+
+        space_token =  '<_>'
+        pipeline = self.lst20_pos_pipeline
+        pipeline.scheme = None
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = False
+        pipeline.strict = True
+        pipeline.tag_delimiter = ''
+
+        sentence = 'จีน-อินเดียเสี่ยงสูญเสียจากภัยธรรมชาติมากสุด'
+        expected_tokens = ['จีน', '-', 'อินเดีย', 'เสี่ยง', 'สูญเสีย',
+                           'จาก', 'ภัยธรรมชาติ', 'มาก', 'สุด']
+
+        self.assertEqual(pipeline.pretokenizer(sentence), expected_tokens)
+
+        expected_result = [{'word': 'จีน',	'entity': 'NN'},
+                            {'word': '-',	'entity': 'PU'},
+                            {'word': 'อินเดีย',	'entity': 'NN'},
+                            {'word': 'เสี่ยง',	'entity': 'VV'},
+                            {'word': 'สูญเสีย',	'entity': 'VV'},
+                            {'word': 'จาก',	'entity': 'PS'},
+                            {'word': 'ภัยธรรมชาติ',	'entity': 'NN'},
+                            {'word': 'มาก',	'entity': 'VV'},
+                            {'word': 'สุด',	'entity': 'AV'}
+                           ]
+        actual = pipeline(sentence)
+
+        self.assertEqual(actual,expected_result)
+
+    def test_lst20_pos_newmm_inference_2(self):
+
+        space_token =  '<_>'
+        pipeline = self.lst20_pos_pipeline
+        pipeline.scheme = None
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = True
+        pipeline.tag_delimiter = ''
+
+        sentence = 'จีน-อินเดียเสี่ยงสูญเสียจากภัยธรรมชาติมากสุด'
+        expected_tokens = ['จีน', '-', 'อินเดีย', 'เสี่ยง', 'สูญเสีย',
+                           'จาก', 'ภัยธรรมชาติ', 'มาก', 'สุด']
+
+        self.assertEqual(pipeline.pretokenizer(sentence), expected_tokens)
+
+        expected_result = [{'word': 'จีน',	'entity': 'NN'},
+                            {'word': '-',	'entity': 'PU'},
+                            {'word': 'อินเดีย',	'entity': 'NN'},
+                            {'word': 'เสี่ยง',	'entity': 'VV'},
+                            {'word': 'สูญเสีย',	'entity': 'VV'},
+                            {'word': 'จาก',	'entity': 'PS'},
+                            {'word': 'ภัยธรรมชาติ',	'entity': 'NN'},
+                            {'word': 'มาก',	'entity': 'VV'},
+                            {'word': 'สุด',	'entity': 'AV'}
+                           ]
+        actual = pipeline(sentence)
+
+        self.assertEqual(actual,expected_result)
+
+
     def test_ner_newmm_inference_ungrouped_entities_1(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = False
@@ -881,7 +956,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_inference_grouped_entities(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -906,7 +981,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_ner_newmm_inference_grouped_entities_multiple_sentences(self):
         space_token =  '<_>'
-        pipeline = self.base_pipeline
+        pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
