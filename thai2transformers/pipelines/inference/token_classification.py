@@ -4,7 +4,7 @@ from typing import Callable, List, Tuple, Union
 from functools import partial
 import itertools
 
-from seqeval.scheme import Tokens, IOB2
+from seqeval.scheme import Tokens, IOB2, IOBES
 
 from transformers.modeling_utils import PreTrainedModel
 from transformers.tokenization_utils import PreTrainedTokenizer
@@ -143,7 +143,7 @@ class TokenClassificationPipeline:
 
     def _group_entities(self, ner_tags: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
         
-        if self.scheme not in ['IOB', 'BIOE']:
+        if self.scheme not in ['IOB', 'IOBES', 'BIOE']:
             raise AttributeError()
 
         tokens, tags = zip(*ner_tags)
@@ -152,11 +152,17 @@ class TokenClassificationPipeline:
         if self.scheme == 'BIOE':
             # Replace E prefix with I prefix
             tags = list(map(lambda x: x.replace(f'E{self.tag_delimiter}', f'I{self.tag_delimiter}'), tags))
+        if self.scheme == 'IOBES':
+            # Replace E prefix with I prefix and replace S prefix with B
+            tags = list(map(lambda x: x.replace(f'E{self.tag_delimiter}', f'I{self.tag_delimiter}'), tags))
+            tags = list(map(lambda x: x.replace(f'S{self.tag_delimiter}', f'B{self.tag_delimiter}'), tags))
         
         I_PREFIX = f'I{self.tag_delimiter}'
         E_PREFIX = f'E{self.tag_delimiter}'
         B_PREFIX = f'B{self.tag_delimiter}'
+        S_PREFIX = f'S{self.tag_delimiter}'
         O_PREFIX = 'O'
+        
         if not self.strict:
             previous_tag_ne = None
             for i, current_tag in enumerate(tags):
@@ -192,14 +198,9 @@ class TokenClassificationPipeline:
                     # e.g. (O, O, I-LOC)  , (O, O, E-LOC) 
                     # then, change the prefix of the current tag to B{tag_delimiter}
                     tags[i] = B_PREFIX + tags[i][2:]
-              
 
                 previous_tag_ne = current_tag_ne
             
-
-
-
-
         ent = Tokens(tokens=tags, scheme=IOB2,
                      suffix=False, delimiter=self.tag_delimiter)
 
