@@ -143,13 +143,13 @@ class TokenClassificationPipeline:
 
     def _group_entities(self, ner_tags: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
         
-        if self.scheme not in ['IOB', 'IOBES', 'BIOE']:
+        if self.scheme not in ['IOB', 'IOBES', 'IOBE']:
             raise AttributeError()
 
         tokens, tags = zip(*ner_tags)
         tokens, tags = list(tokens), list(tags)
 
-        if self.scheme == 'BIOE':
+        if self.scheme == 'IOBE':
             # Replace E prefix with I prefix
             tags = list(map(lambda x: x.replace(f'E{self.tag_delimiter}', f'I{self.tag_delimiter}'), tags))
         if self.scheme == 'IOBES':

@@ -38,7 +38,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
                         'airesearch/wangchanberta-base-att-spm-uncased',
                         revision='finetuned@lst20-ner'
                     ),
-                    scheme='BIOE',
+                    scheme='IOBE',
                     tag_delimiter='_',
         )
         self.lst20_pos_pipeline = TokenClassificationPipeline(
