@@ -75,7 +75,7 @@ class TokenClassificationPipeline:
 
         input_ids = torch.LongTensor([flatten_ids]).to(self.device)
 
-        if use_crf:
+        if self.use_crf:
             out = self.model(input_ids=input_ids)
         else:
             out = self.model(input_ids=input_ids, return_dict=True)
