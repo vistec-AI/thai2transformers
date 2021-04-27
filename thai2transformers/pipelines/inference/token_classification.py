@@ -27,7 +27,8 @@ class TokenClassificationPipeline:
                  group_entities: bool = False,
                  strict: bool = False,
                  tag_delimiter: str = '-',
-                 scheme: str = 'IOB'):
+                 scheme: str = 'IOB',
+                 use_crf=False):
 
         super().__init__()
 
@@ -46,6 +47,7 @@ class TokenClassificationPipeline:
         self.scheme = scheme
         self.id2label = self.model.config.id2label
         self.label2id = self.model.config.label2id
+        self.use_crf = use_crf
         self.model.to(self.device)
 
     def preprocess(self, inputs: Union[str, List[str]]) -> Union[List[str], List[List[str]]]:
@@ -73,11 +75,13 @@ class TokenClassificationPipeline:
 
         input_ids = torch.LongTensor([flatten_ids]).to(self.device)
 
-
-        out = self.model(input_ids=input_ids, return_dict=True)
-        probs = torch.softmax(out['logits'], dim=-1)
-        vals, indices = probs.topk(1)
-        indices_np = indices.detach().cpu().numpy().reshape(-1)
+        if use_crf:
+            out = self.model(input_ids=input_ids)
+        else:
+            out = self.model(input_ids=input_ids, return_dict=True)
+            probs = torch.softmax(out['logits'], dim=-1)
+            vals, indices = probs.topk(1)
+            indices_np = indices.detach().cpu().numpy().reshape(-1)
 
         list_of_token_label_tuple = list(zip(flatten_tokens, [ self.id2label[idx] for idx in indices_np] ))
         merged_preds = self._merged_pred(preds=list_of_token_label_tuple, ids=ids)
