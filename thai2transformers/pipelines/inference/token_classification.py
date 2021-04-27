@@ -79,6 +79,7 @@ class TokenClassificationPipeline:
             out = self.model(input_ids=input_ids)
             indices_np = np.array(out)
             indices_np[:, 0] = len(self.id2label.keys()) - 1
+            indices_np = indices_np.reshape(-1)
         else:
             out = self.model(input_ids=input_ids, return_dict=True)
             probs = torch.softmax(out['logits'], dim=-1)
