@@ -78,7 +78,7 @@ class TokenClassificationPipeline:
         if self.use_crf:
             out = self.model(input_ids=input_ids)
             indices_np = np.array(out)
-            indices_np[:, 0] = self.id2label[len(self.id2labe.keys() - 1)]
+            indices_np[:, 0] = self.id2label[len(self.id2label.keys() - 1)]
         else:
             out = self.model(input_ids=input_ids, return_dict=True)
             probs = torch.softmax(out['logits'], dim=-1)
