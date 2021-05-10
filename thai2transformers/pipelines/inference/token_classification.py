@@ -7,7 +7,7 @@ import itertools
 from seqeval.scheme import Tokens, IOB2, IOBES
 
 from transformers.modeling_utils import PreTrainedModel
-from transformers.tokenization_utils import PreTrainedTokenizer
+from transformers.tokenization_utils import PreTrainedTokenizerBase
 from pythainlp.tokenize import word_tokenize as pythainlp_word_tokenize
 newmm_word_tokenizer = partial(pythainlp_word_tokenize, keep_whitespace=True, engine='newmm')
 
@@ -19,7 +19,7 @@ class TokenClassificationPipeline:
 
     def __init__(self,
                  model: PreTrainedModel,
-                 tokenizer: PreTrainedTokenizer,
+                 tokenizer: PreTrainedTokenizerBase,
                  pretokenizer: Callable[[str], List[str]] = newmm_word_tokenizer,
                  lowercase=False,
                  space_token='<_>',
@@ -32,7 +32,7 @@ class TokenClassificationPipeline:
 
         super().__init__()
 
-        assert isinstance(tokenizer, PreTrainedTokenizer)
+        assert isinstance(tokenizer, PreTrainedTokenizerBase)
         assert isinstance(model, PreTrainedModel)
         
         self.model = model
