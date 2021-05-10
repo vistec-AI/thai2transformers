@@ -636,6 +636,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
     def test_lst20_ner_grouped_entities_unstrict_5(self):
         space_token =  '<_>'
         pipeline = self.thainer_ner_pipeline
+        pipeline.scheme = 'IOBES'
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -774,6 +775,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
     def test_ner_grouped_entities_strict_4(self):
         space_token =  '<_>'
         pipeline = self.thainer_ner_pipeline
+        pipeline.scheme = 'IOBES'
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
