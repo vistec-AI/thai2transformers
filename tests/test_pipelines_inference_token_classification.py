@@ -426,7 +426,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_grouped_entities_unstrict_1(self):
         space_token =  '<_>'
-        pipeline = self.thainer_ner_pipeline
+        pipeline = self.lst20_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -471,7 +471,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_grouped_entities_unstrict_2(self):
         space_token =  '<_>'
-        pipeline = self.thainer_ner_pipeline
+        pipeline = self.lst20_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -577,7 +577,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_grouped_entities_unstrict_3(self):
         space_token =  '<_>'
-        pipeline = self.thainer_ner_pipeline
+        pipeline = self.lst20_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -599,7 +599,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_grouped_entities_unstrict_4(self):
         space_token =  '<_>'
-        pipeline = self.thainer_ner_pipeline
+        pipeline = self.lst20_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
         pipeline.group_entities = True
@@ -635,7 +635,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
     def test_lst20_ner_grouped_entities_unstrict_5(self):
         space_token =  '<_>'
-        pipeline = self.thainer_ner_pipeline
+        pipeline = self.lst20_ner_pipeline
         pipeline.scheme = 'IOBES'
         pipeline.space_token = space_token
         pipeline.lowercase = True
@@ -659,6 +659,43 @@ class TokenClassificationPipelineTest(unittest.TestCase):
 
         input_ner_tags = [
             ('เจนนี่', 'I-PERSON'),
+            ('กรุงเทพ', 'S-LOCATION'),
+            (' ', 'O'),
+        ]
+        expected = [
+            {'entity_group': 'PERSON', 'word': 'เจนนี่'},
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '}
+        ]
+        actual = pipeline._group_entities(input_ner_tags)
+        self.assertEqual(actual, expected)
+
+    def test_lst20_ner_grouped_entities_strict_1(self):
+        space_token =  '<_>'
+        pipeline = self.lst20_ner_pipeline
+        pipeline.scheme = 'IOBES'
+        pipeline.space_token = space_token
+        pipeline.lowercase = True
+        pipeline.group_entities = True
+        pipeline.strict = True
+        
+        input_ner_tags = [
+            ('กรุงเทพ', 'B-LOCATION'),
+            (' ', 'O'),
+            ('กรุงเทพ', 'E-LOCATION'),
+            (' ', 'O'),
+        ]
+        expected = [
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '},
+            {'entity_group': 'LOCATION', 'word': 'กรุงเทพ'},
+            {'entity_group': 'O', 'word': ' '}
+        ]
+        actual = pipeline._group_entities(input_ner_tags)
+        self.assertEqual(actual, expected)
+
+        input_ner_tags = [
+            ('เจนนี่', 'S-PERSON'),
             ('กรุงเทพ', 'S-LOCATION'),
             (' ', 'O'),
         ]
@@ -765,28 +802,6 @@ class TokenClassificationPipelineTest(unittest.TestCase):
             ('พ.ศ.', 'I-TIME'),
             (' ', 'I-TIME'),
             ('2211', 'I-TIME')
-            ]
-        expected = [
-            {'entity_group': 'TIME', 'word': 'ปี พ.ศ. 2211'}
-        ]
-        actual = pipeline._group_entities(input_ner_tags)
-        self.assertEqual(actual, expected)
-
-    def test_ner_grouped_entities_strict_4(self):
-        space_token =  '<_>'
-        pipeline = self.thainer_ner_pipeline
-        pipeline.scheme = 'IOBES'
-        pipeline.space_token = space_token
-        pipeline.lowercase = True
-        pipeline.group_entities = True
-        pipeline.strict = True
-
-        input_ner_tags = [
-            ('ปี', 'B-TIME'),
-            (' ', 'I-TIME'),
-            ('พ.ศ.', 'I-TIME'),
-            (' ', 'I-TIME'),
-            ('2211', 'S-TIME')
             ]
         expected = [
             {'entity_group': 'TIME', 'word': 'ปี พ.ศ. 2211'}
