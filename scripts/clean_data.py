@@ -101,13 +101,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    print(f'INFO: Load csv file from {args.input_path}')
     if args.file_type == 'csv':
+        print(f'INFO: Load csv file from {args.input_path}')
+
         df = pd.read_csv(args.input_path)
     else:
+        print(f'INFO: Load txt file from {args.input_path}')
+
         lines = open(args.input_path, 'r').readlines()
         df = pd.DataFrame({'text': lines})
-        df['nb_tokens']= df['text'].apply(lambda x: len(word_tokenize(x)))
+        print('Perform word tokenize to count tokens')
+        df['nb_tokens']= df['text'].swifter.apply(lambda x: len(word_tokenize(x)))
 
     TEXT_FILTERING_RULES = [drop_na, drop_no_thai_char]
     for fn in TEXT_FILTERING_RULES:
