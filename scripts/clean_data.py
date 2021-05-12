@@ -110,9 +110,9 @@ if __name__ == '__main__':
 
         lines = open(args.input_path, 'r').readlines()
         df = pd.DataFrame({'text': lines})
-        print('Perform word tokenize to count tokens')
+        print('Perform word tokenize to count tokens...')
         df['nb_tokens']= df['text'].swifter.apply(lambda x: len(word_tokenize(x)))
-
+        print('Done.')
     TEXT_FILTERING_RULES = [drop_na, drop_no_thai_char]
     for fn in TEXT_FILTERING_RULES:
         print(f'INFO: Perform filtering rule: {fn.__name__}')
