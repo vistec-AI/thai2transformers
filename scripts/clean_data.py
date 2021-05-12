@@ -87,6 +87,7 @@ if __name__ == '__main__':
 
     parser.add_argument('input_path', type=str)
     parser.add_argument('output_path', type=str)
+    parser.add_argument('--file_type', type=str, default='csv')
     parser.add_argument('--drop_na', action='store_true', default=True)
     parser.add_argument('--remove_thwiki_section', action='store_true', default=True)
     parser.add_argument('--break_long_sentence', action='store_true', default=True)
@@ -101,9 +102,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     print(f'INFO: Load csv file from {args.input_path}')
+    if args.file_type == 'csv':
+        df = pd.read_csv(args.input_path)
+    else:
+        lines = open(args.input_path, 'r').readlines()
+        df = pd.DataFrame({'text': lines})
+        df['nb_tokens']= df['text'].apply(lambda x: len(word_tokenize(x)))
 
-    df = pd.read_csv(args.input_path)
-    
     TEXT_FILTERING_RULES = [drop_na, drop_no_thai_char]
     for fn in TEXT_FILTERING_RULES:
         print(f'INFO: Perform filtering rule: {fn.__name__}')
