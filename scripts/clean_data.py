@@ -5,7 +5,7 @@ import swifter
 import re
 from typing import List, Optional, Dict
 from pythainlp.tokenize import word_tokenize, sent_tokenize
-
+from tqdm import tqdm
 
 def break_long_sentence(text:str, sent_tokenizer=sent_tokenize,
                         word_toknizer=word_tokenize,
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     df_short = df[df['nb_tokens'] <= 450]
     long_segments = df[df['nb_tokens'] > 450]['text'].tolist()
     breaked_segments = []
-    for s in long_segments:
+    for s in tqdm(long_segments, total=len(long_segments)):
         breaked_segments += break_long_sentence(s, max_sent_len=args.max_sentence_length)
     print(f'\n\tNumber of long segments: {len(long_segments)}\n\tNumber of new segments: {len(breaked_segments)}')
     nb_tokens = [ len(word_tokenize(s)) for s in breaked_segments ]
