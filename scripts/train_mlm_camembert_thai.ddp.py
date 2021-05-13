@@ -137,8 +137,8 @@ def main():
         warmup_steps=args.warmup_steps,
         weight_decay=args.weight_decay,
         adam_epsilon=args.adam_epsilon,
-        adam_epsilon=args.adam_beta1,
-        adam_epsilon=args.adam_beta2,
+        adam_beta1=args.adam_beta1,
+        adam_beta2=args.adam_beta2,
         max_grad_norm=args.max_grad_norm,
         #checkpoint
         output_dir=args.output_dir,
