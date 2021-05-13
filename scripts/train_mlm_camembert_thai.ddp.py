@@ -58,6 +58,8 @@ def main():
     parser.add_argument("--warmup_steps", type=int, default=500)
     parser.add_argument("--weight_decay", type=float, default=0.01)
     parser.add_argument("--adam_epsilon", type=float, default=1e-6)
+    parser.add_argument("--adam_beta1", type=float, default=0.9)
+    parser.add_argument("--adam_beta2", type=float, default=0.999)
     parser.add_argument("--max_grad_norm", type=float, default=1.0)
     parser.add_argument("--mlm_probability", type=float, default=0.15)
     parser.add_argument('--dataloader_drop_last', default=False, type=lambda x: (str(x).lower() in ['true','True','T']))
@@ -135,6 +137,8 @@ def main():
         warmup_steps=args.warmup_steps,
         weight_decay=args.weight_decay,
         adam_epsilon=args.adam_epsilon,
+        adam_epsilon=args.adam_beta1,
+        adam_epsilon=args.adam_beta2,
         max_grad_norm=args.max_grad_norm,
         #checkpoint
         output_dir=args.output_dir,
