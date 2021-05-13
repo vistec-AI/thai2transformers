@@ -33,6 +33,12 @@ def main():
     parser.add_argument("--eval_dir", type=str,)
     parser.add_argument("--num_train_epochs", type=int,)
     parser.add_argument("--max_steps", type=int,)
+    
+    # DeepSpeed feature
+    # ref: https://huggingface.co/transformers/main_classes/trainer.html?highlight=deepspeed
+    # (str or dict, optional) – Use Deepspeed. This is an experimental feature and its API may evolve in the future.
+    # The value is either the location of DeepSpeed json config file (e.g., ds_config.json) or an already loaded json file as a dict”
+    parser.add_argument("--deepspeed", type=str, help='Path to the DeepSpeed json config') 
 
     #checkpoint
     parser.add_argument("--output_dir", type=str, default="./results")
@@ -156,7 +162,9 @@ def main():
         fp16=args.fp16,
         fp16_opt_level=args.fp16_opt_level,
         dataloader_drop_last=args.dataloader_drop_last,
-        local_rank=args.local_rank
+        local_rank=args.local_rank,
+        #deepspeed
+        deepspeed=args.deepspeed,
     )
 
     logging.info(" Number of devices: %d", training_args.n_gpu)
