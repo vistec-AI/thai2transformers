@@ -165,6 +165,7 @@ def main():
         local_rank=args.local_rank,
         #deepspeed
         deepspeed=args.deepspeed,
+        prediction_loss_only=True,
     )
 
     logging.info(" Number of devices: %d", training_args.n_gpu)
@@ -184,7 +185,6 @@ def main():
         data_collator=data_collator,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
-        prediction_loss_only=True,
     )
     
     #train
