@@ -19,7 +19,8 @@
         "params": {
             "warmup_min_lr": 0,
             "warmup_max_lr": 0.0003,
-            "warmup_num_steps": 2500
+            "warmup_num_steps": 2500,
+            "total_num_steps": 50000
         }
     },
     "fp16": {
