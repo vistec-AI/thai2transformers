@@ -23,6 +23,10 @@
             "total_num_steps": 50000
         }
     },
+    "amp": {
+      "enabled": true,
+      "opt_level": "O1"
+    },
     "fp16": {
       "enabled": true
     },
