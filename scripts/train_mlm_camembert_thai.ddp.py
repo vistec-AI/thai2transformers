@@ -90,6 +90,9 @@ def main():
     parser.add_argument("--binarized_path_val",  type=str, default=None)
 
     parser.add_argument("--local_rank", type=int, default=-1)
+    
+    parser.add_argument("--run_name", type=str, default=None)
+
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
@@ -163,6 +166,7 @@ def main():
         fp16_opt_level=args.fp16_opt_level,
         dataloader_drop_last=args.dataloader_drop_last,
         local_rank=args.local_rank,
+        run_name=args.run_name,
         #deepspeed
         deepspeed=args.deepspeed,
         prediction_loss_only=True,
