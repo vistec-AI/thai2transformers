@@ -18,6 +18,10 @@ import datasets
 
 from .evaluate import evaluate
 
+#tokenize
+from pythainlp.tokenize import word_tokenize, syllable_tokenize
+def character_tokenize(word): return [i for i in word]
+
 
 _CITATION = """\
 @inproceedings{Rajpurkar2016SQuAD10,
@@ -86,7 +90,7 @@ class Squad(datasets.Metric):
             reference_urls=["https://rajpurkar.github.io/SQuAD-explorer/"],
         )
 
-    def _compute(self, predictions, references):
+    def _compute(self, predictions, references, tok_func=word_tokenize):
         pred_dict = {prediction["id"]: prediction["prediction_text"] for prediction in predictions}
         dataset = [
             {
@@ -103,5 +107,5 @@ class Squad(datasets.Metric):
                 ]
             }
         ]
-        score = evaluate(dataset=dataset, predictions=pred_dict)
+        score = evaluate(dataset=dataset, predictions=pred_dict, tok_func=tok_func)
         return score
