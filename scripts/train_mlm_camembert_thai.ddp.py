@@ -168,7 +168,7 @@ def main():
         local_rank=args.local_rank,
         run_name=args.run_name,
         #deepspeed
-        # deepspeed=args.deepspeed,
+        deepspeed=args.deepspeed,
         prediction_loss_only=True,
     )
 
