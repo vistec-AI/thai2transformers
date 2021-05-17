@@ -1,7 +1,7 @@
 {
     "train_batch_size": 2048,
     "train_micro_batch_size_per_gpu": 32,
-    "gradient_accumulation_steps": 16,
+    "gradient_accumulation_steps": 8,
     "optimizer": {
       "type": "AdamW",
       "params": {
@@ -19,8 +19,8 @@
         "params": {
             "warmup_min_lr": 0,
             "warmup_max_lr": 0.0003,
-            "warmup_num_steps": 2500,
-            "total_num_steps": 50000
+            "warmup_num_steps": 1250,
+            "total_num_steps": 24000
         }
     },
     "fp16": {
