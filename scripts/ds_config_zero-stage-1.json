@@ -1,7 +1,7 @@
 {
     "train_batch_size": 2048,
-    "train_micro_batch_size_per_gpu": 64,
-    "gradient_accumulation_steps": 4,
+    "train_micro_batch_size_per_gpu": 32,
+    "gradient_accumulation_steps": 8,
     "optimizer": {
       "type": "AdamW",
       "params": {
@@ -10,7 +10,7 @@
             0.9,
             0.999
           ],
-        "eps": 1e-8,
+        "eps": 1e-6,
         "weight_decay": 0.01
       }
     },
@@ -27,6 +27,6 @@
       "enabled": true
     },
     "zero_optimization": {
-      "stage": 2
+      "stage": 1
     }
   }
