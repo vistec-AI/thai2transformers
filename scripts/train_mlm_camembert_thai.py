@@ -114,7 +114,7 @@ def main():
     )
     
     if args.model_dir != None:
-        print(f'[INFO] Load pretrianed model (state_dict) from {args.model_path}')
+        print(f'[INFO] Load pretrianed model (state_dict) from {args.model_dir}')
         model = RobertaForMaskedLM.from_pretrained(args.model_dir)
     else:
         model = RobertaForMaskedLM(config=config)

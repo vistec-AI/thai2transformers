@@ -90,7 +90,6 @@ def main():
     parser.add_argument("--binarized_path_val",  type=str, default=None)
 
     parser.add_argument("--local_rank", type=int, default=-1)
-    
     parser.add_argument("--run_name", type=str, default=None)
 
     args = parser.parse_args()
@@ -125,7 +124,11 @@ def main():
     #     num_attention_head=16
     )
     
-    model = RobertaForMaskedLM(config=config)
+    if args.model_dir != None:
+        print(f'[INFO] Load pretrianed model (state_dict) from {args.model_dir}')
+        model = RobertaForMaskedLM.from_pretrained(args.model_dir)
+    else:
+        model = RobertaForMaskedLM(config=config)
 
     #datasets
     train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length, binarized_path=args.binarized_path_train)
@@ -177,11 +180,6 @@ def main():
     logging.info(" Local rank: %s", training_args.local_rank)
     logging.info(" FP16 Training: %s", training_args.fp16)
 
-    
-    if args.model_path != None:
-        print(f'[INFO] Load pretrianed model from {args.model_path}')
-        model = RobertaForMaskedLM.from_pretrained(args.model_path)
-
     #initiate trainer
     trainer = Trainer(
         model=model,
@@ -192,10 +190,7 @@ def main():
     )
     
     #train
-    if args.model_path != None:
-        trainer.train(model_path=args.model_dir)
-    else:
-        trainer.train()
+    trainer.train()
 
     if training_args.local_rank == 0:
         print('main process')
