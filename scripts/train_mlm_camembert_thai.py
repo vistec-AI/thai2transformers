@@ -113,7 +113,11 @@ def main():
     #     num_attention_head=16
     )
     
-    model = RobertaForMaskedLM(config=config)
+    if args.model_dir != None:
+        print(f'[INFO] Load pretrianed model (state_dict) from {args.model_path}')
+        model = RobertaForMaskedLM.from_pretrained(args.model_dir)
+    else:
+        model = RobertaForMaskedLM(config=config)
 
     #datasets
     train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length, binarized_path=args.binarized_path_train)
@@ -159,10 +163,7 @@ def main():
     logging.info(" FP16 Training: %s", training_args.fp16)
 
     
-    if args.model_dir != None:
-        print(f'[INFO] Load pretrianed model (state_dict) from {args.model_path}')
-        model.load_state_dict(state_dict=torch.load(args.model_path))
-
+  
     #initiate trainer
     trainer = Trainer(
         model=model,
@@ -176,10 +177,8 @@ def main():
     #train
     logging.info(" Start training.")
 
-    if args.model_dir != None:
-        trainer.train(model_path=args.model_dir)
-    else:
-        trainer.train()
+ 
+    trainer.train()
     #save
     
     output_model_dir = os.path.join(args.output_dir, 'roberta_thai')
