@@ -176,9 +176,11 @@ def main():
     
     #train
     logging.info(" Start training.")
-
- 
-    trainer.train()
+    if args.model_dir != None:
+        print(f'[INFO] Trainer resume from checkpoint {args.model_dir}')
+        trainer.train(resume_from_checkpoint=args.model_dir)
+    else:
+        trainer.train()
     #save
     
     output_model_dir = os.path.join(args.output_dir, 'roberta_thai')

@@ -190,7 +190,13 @@ def main():
     )
     
     #train
-    trainer.train()
+    
+    if args.model_dir != None:
+        print(f'[INFO] Trainer resume from checkpoint {args.model_dir}')
+        trainer.train(resume_from_checkpoint=args.model_dir)
+    else:
+        trainer.train()
+
 
     if training_args.local_rank == 0:
         print('main process')
