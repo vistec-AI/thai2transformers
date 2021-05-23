@@ -19,7 +19,7 @@
         "params": {
             "warmup_min_lr": 0,
             "warmup_max_lr": 0.0003,
-            "warmup_num_steps": 1250,
+            "warmup_num_steps": 2400,
             "total_num_steps": 24000
         }
     },
