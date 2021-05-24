@@ -430,27 +430,27 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
-        pipeline.group_entities = True
+        pipeline.group_entities = False
         pipeline.strict = False
         
-        input_ner_tags = [
-            ('กรุงเทพ', 'I-LOCATION'),
-            ('เจน', 'I-PERSON'),
-            (' ', 'O'),
-            ('Jane', 'I-PERSON'),
-            ('Doe', 'I-PERSON'),
+        input_tags = [ 'I-LOCATION',
+            'I-PERSON',
+            'O',
+            'O',
+            'I-PERSON',
+            'I-PERSON',
         ]
-        input_tags = list(map(lambda x: x[1], map(lambda x: list(x[1]), zip(*input_ner_tags))))
-        expected = [
-            ('กรุงเทพ', 'ฺB-LOCATION'),
-            ('เจน', 'B-PERSON'),
-            (' ', 'O'),
-            ('Jane', 'B-PERSON'),
-            ('Doe', 'I-PERSON'),
+        expected = [ 'B-LOCATION',
+            'B-PERSON',
+            'O',
+            'O',
+            'B-PERSON',
+            'I-PERSON',
         ]
-        expected_tags =  list(map(lambda x: x[1], map(lambda x: list(x[1]), zip(*expected))))
+        
         actual = pipeline._fix_incorrect_tags(input_tags)
-        self.assertEqual(actual, expected_tags)
+        print('actual:', actual)
+        self.assertEqual(actual, expected)
 
 
     def test_lst20_ner_grouped_entities_unstrict_1(self):
