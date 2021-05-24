@@ -430,7 +430,7 @@ class TokenClassificationPipelineTest(unittest.TestCase):
         pipeline = self.thainer_ner_pipeline
         pipeline.space_token = space_token
         pipeline.lowercase = True
-        pipeline.group_entities = True
+        pipeline.group_entities = False
         pipeline.strict = False
         
         input_ner_tags = [
