@@ -96,14 +96,14 @@ class TokenClassificationPipeline:
         merged_preds_return_dict = [ {'word': word if word != self.space_token else ' ', 'entity': tag } for word, tag in merged_preds_removed_bos_eos ]
         if (not self.group_entities or self.scheme == None) and self.strict == True:
             return merged_preds_return_dict
-        elif (not self.group_entities or self.scheme == None) and self.strict == False:
+        elif not self.group_entities and self.strict == False:
 
             tags = list(map(lambda x: x['entity'], merged_preds_return_dict))
             processed_tags = self._fix_incorrect_tags(tags)
             for i, item in enumerate(merged_preds_return_dict):
                 merged_preds_return_dict[i]['entity'] = processed_tags[i]
             return merged_preds_return_dict
-        else:
+        elif self.group_entities:
             return self._group_entities(merged_preds_removed_bos_eos)
 
     def __call__(self, inputs: Union[str, List[str]]):
