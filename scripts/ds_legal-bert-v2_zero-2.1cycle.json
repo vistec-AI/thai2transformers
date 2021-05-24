@@ -21,7 +21,7 @@
           "cycle_first_stair_count": 1250,
           "cycle_second_step_size": 0,
           "cycle_second_stair_count": 0,
-          "decay_step_size": 1000,
+          "decay_step_size": 0,
           "cycle_min_lr": 0.0000,
           "cycle_max_lr": 0.0003,
           "decay_lr_rate": 0.000,
