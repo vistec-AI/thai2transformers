@@ -7,7 +7,7 @@ import itertools
 from seqeval.scheme import Tokens, IOB2, IOBES
 
 from transformers.modeling_utils import PreTrainedModel
-from transformers.tokenization_utils import PreTrainedTokenizer, PreTrainedTokenizerBase
+from transformers.tokenization_utils import PreTrainedTokenizerBase
 from pythainlp.tokenize import word_tokenize as pythainlp_word_tokenize
 newmm_word_tokenizer = partial(pythainlp_word_tokenize, keep_whitespace=True, engine='newmm')
 
@@ -19,7 +19,7 @@ class TokenClassificationPipeline:
 
     def __init__(self,
                  model: PreTrainedModel,
-                 tokenizer: PreTrainedTokenizer,
+                 tokenizer: PreTrainedTokenizerBase,
                  pretokenizer: Callable[[str], List[str]] = newmm_word_tokenizer,
                  lowercase=False,
                  space_token='<_>',
@@ -94,7 +94,9 @@ class TokenClassificationPipeline:
         merged_preds_removed_bos_eos = merged_preds_removed_spiece[1:-1]
         # convert to list of Dict objects
         merged_preds_return_dict = [ {'word': word if word != self.space_token else ' ', 'entity': tag } for word, tag in merged_preds_removed_bos_eos ]
-        if not self.group_entities or self.scheme == None:
+        if (not self.group_entities or self.scheme == None) and self.strict == True:
+            return merged_preds_return_dict
+        elif (not self.group_entities or self.scheme == None) and self.strict == False:
             return merged_preds_return_dict
         else:
             return self._group_entities(merged_preds_removed_bos_eos)
@@ -148,6 +150,52 @@ class TokenClassificationPipeline:
             merged_subtokens.append((_merged_subtoken, first_token_pred))
         return merged_subtokens
 
+    def _fix_incorrect_tags(self, tags: List[str]) -> List[str]:
+
+        I_PREFIX = f'I{self.tag_delimiter}'
+        E_PREFIX = f'E{self.tag_delimiter}'
+        B_PREFIX = f'B{self.tag_delimiter}'
+        O_PREFIX = 'O'
+    
+        previous_tag_ne = None
+        for i, current_tag in enumerate(tags):
+            
+            current_tag_ne = current_tag.split(self.tag_delimiter)[-1] if current_tag != O_PREFIX else O_PREFIX
+            
+            if i == 0 and (current_tag.startswith(I_PREFIX) or \
+                current_tag.startswith(E_PREFIX)):
+                # if a NE tag (with I-, or E- prefix) occuring at the begining of sentence
+                # e.g. (I-LOC, I-LOC) , (E-LOC, B-PER) (I-LOC, O, O)
+                # then, change the prefix of the current tag to B{tag_delimiter}
+                tags[i] = B_PREFIX + tags[i][2:]
+            elif i >= 1 and tags[i-1] == O_PREFIX and (
+                current_tag.startswith(I_PREFIX) or \
+                current_tag.startswith(E_PREFIX)):
+                # if a NE tag (with I-, or E- prefix) occuring after O tag
+                # e.g. (O, I-LOC, I-LOC) , (O, E-LOC, B-PER) (O, I-LOC, O, O)
+                # then, change the prefix of the current tag to B{tag_delimiter}
+                tags[i] = B_PREFIX + tags[i][2:]
+            elif i >= 1 and ( tags[i-1].startswith(I_PREFIX) or \
+                tags[i-1].startswith(E_PREFIX) or \
+                tags[i-1].startswith(B_PREFIX)) and \
+                ( current_tag.startswith(I_PREFIX) or current_tag.startswith(E_PREFIX) )  and \
+                previous_tag_ne != current_tag_ne:
+                # if a NE tag (with I-, or E- prefix) occuring after NE tag with different NE
+                # e.g. (B-LOC, I-PER) , (B-LOC, E-LOC, E-PER) (B-LOC, I-LOC, I-PER)
+                # then, change the prefix of the current tag to B{tag_delimiter}
+                tags[i] = B_PREFIX + tags[i][2:]
+            elif i == len(tags) - 1 and tags[i-1] == O_PREFIX and (
+                current_tag.startswith(I_PREFIX) or \
+                current_tag.startswith(E_PREFIX)):
+                # if a NE tag (with I-, or E- prefix) occuring at the end of sentence
+                # e.g. (O, O, I-LOC)  , (O, O, E-LOC) 
+                # then, change the prefix of the current tag to B{tag_delimiter}
+                tags[i] = B_PREFIX + tags[i][2:]
+
+            previous_tag_ne = current_tag_ne
+        
+        return tags
+
     def _group_entities(self, ner_tags: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
         
         if self.scheme not in ['IOB', 'IOBES', 'IOBE']:
@@ -163,49 +211,10 @@ class TokenClassificationPipeline:
             # Replace E prefix with I prefix and replace S prefix with B
             tags = list(map(lambda x: x.replace(f'E{self.tag_delimiter}', f'I{self.tag_delimiter}'), tags))
             tags = list(map(lambda x: x.replace(f'S{self.tag_delimiter}', f'B{self.tag_delimiter}'), tags))
-        
-        I_PREFIX = f'I{self.tag_delimiter}'
-        E_PREFIX = f'E{self.tag_delimiter}'
-        B_PREFIX = f'B{self.tag_delimiter}'
-        O_PREFIX = 'O'
-        
-        if not self.strict:
-            previous_tag_ne = None
-            for i, current_tag in enumerate(tags):
-                
-                current_tag_ne = current_tag.split(self.tag_delimiter)[-1] if current_tag != O_PREFIX else O_PREFIX
-                
-                if i == 0 and (current_tag.startswith(I_PREFIX) or \
-                  current_tag.startswith(E_PREFIX)):
-                    # if a NE tag (with I-, or E- prefix) occuring at the begining of sentence
-                    # e.g. (I-LOC, I-LOC) , (E-LOC, B-PER) (I-LOC, O, O)
-                    # then, change the prefix of the current tag to B{tag_delimiter}
-                    tags[i] = B_PREFIX + tags[i][2:]
-                elif i >= 1 and tags[i-1] == O_PREFIX and (
-                  current_tag.startswith(I_PREFIX) or \
-                  current_tag.startswith(E_PREFIX)):
-                    # if a NE tag (with I-, or E- prefix) occuring after O tag
-                    # e.g. (O, I-LOC, I-LOC) , (O, E-LOC, B-PER) (O, I-LOC, O, O)
-                    # then, change the prefix of the current tag to B{tag_delimiter}
-                    tags[i] = B_PREFIX + tags[i][2:]
-                elif i >= 1 and ( tags[i-1].startswith(I_PREFIX) or \
-                  tags[i-1].startswith(E_PREFIX) or \
-                  tags[i-1].startswith(B_PREFIX)) and \
-                  ( current_tag.startswith(I_PREFIX) or current_tag.startswith(E_PREFIX) )  and \
-                  previous_tag_ne != current_tag_ne:
-                    # if a NE tag (with I-, or E- prefix) occuring after NE tag with different NE
-                    # e.g. (B-LOC, I-PER) , (B-LOC, E-LOC, E-PER) (B-LOC, I-LOC, I-PER)
-                    # then, change the prefix of the current tag to B{tag_delimiter}
-                    tags[i] = B_PREFIX + tags[i][2:]
-                elif i == len(tags) - 1 and tags[i-1] == O_PREFIX and (
-                  current_tag.startswith(I_PREFIX) or \
-                  current_tag.startswith(E_PREFIX)):
-                    # if a NE tag (with I-, or E- prefix) occuring at the end of sentence
-                    # e.g. (O, O, I-LOC)  , (O, O, E-LOC) 
-                    # then, change the prefix of the current tag to B{tag_delimiter}
-                    tags[i] = B_PREFIX + tags[i][2:]
 
-                previous_tag_ne = current_tag_ne
+        if not self.strict:
+            
+            tags = self._fix_incorrect_tags(tags)
             
         ent = Tokens(tokens=tags, scheme=IOB2,
                      suffix=False, delimiter=self.tag_delimiter)
