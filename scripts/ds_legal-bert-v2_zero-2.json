@@ -18,7 +18,7 @@
         "type": "WarmupDecayLR",
         "params": {
             "warmup_min_lr": 0,
-            "warmup_max_lr": 0.0001,
+            "warmup_max_lr": 0.00015,
             "warmup_num_steps": 2400,
             "total_num_steps": 24000
         }
