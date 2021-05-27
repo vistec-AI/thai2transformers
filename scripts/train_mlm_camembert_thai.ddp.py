@@ -131,8 +131,12 @@ def main():
         model = RobertaForMaskedLM(config=config)
 
     #datasets
-    train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length, binarized_path=args.binarized_path_train)
-    eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length, binarized_path=args.binarized_path_val)
+    train_dataset = MLMDataset(tokenizer, args.train_dir, args.train_max_length, 
+                                binarized_path=args.binarized_path_train,
+                                max_length=args.train_max_length)
+    eval_dataset = MLMDataset(tokenizer, args.eval_dir, args.eval_max_length,
+                                binarized_path=args.binarized_path_val,
+                                max_length=args.eval_max_length)
     
     #data collator
     data_collator = DataCollatorForLanguageModeling(
