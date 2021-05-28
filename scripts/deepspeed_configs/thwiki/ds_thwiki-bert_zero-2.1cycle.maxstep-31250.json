@@ -5,7 +5,7 @@
     "optimizer": {
       "type": "AdamW",
       "params": {
-        "lr": 0.0003,
+        "lr": 0.0007,
         "betas": [
             0.9,
             0.98
@@ -23,7 +23,7 @@
           "cycle_second_stair_count": 30000,
           "decay_step_size": 0,
           "cycle_min_lr": 0.0000,
-          "cycle_max_lr": 0.0003,
+          "cycle_max_lr": 0.0007,
           "decay_lr_rate": 0.000,
           "cycle_min_mom": 0.9,
           "cycle_max_mom": 0.9,
