@@ -19,12 +19,12 @@
       "params": {
           "cycle_first_step_size": 5000,
           "cycle_first_stair_count": 5000,
-          "cycle_second_step_size": 45000,
-          "cycle_second_stair_count": 45000,
-          "decay_step_size": 0,
+          "cycle_second_step_size": 38000,
+          "cycle_second_stair_count": 38000,
+          "decay_step_size": 7000,
           "cycle_min_lr": 0.0000,
           "cycle_max_lr": 0.0003,
-          "decay_lr_rate": 0.000,
+          "decay_lr_rate": 3e-8,
           "cycle_min_mom": 0.85,
           "cycle_max_mom": 0.9,
           "decay_mom_rate": 0.0
