@@ -77,15 +77,14 @@ def init_model_tokenizer(model_name, model_max_length):
     if model_name in TOKENIZERS.keys():
         tokenizer = TOKENIZERS[model_name].from_pretrained(
                         f'airesearch/{model_name}' if model_name in WANGCHANBERTA_MODELS else model_name,
-                        revision='main', #tokenizers are all from the main branch
+                        revision=args.revision, 
                         model_max_length=model_max_length,)
     else:
         tokenizer = AutoTokenizer.from_pretrained(
                         model_name,
+                        revision=args.revision,
                         model_max_length=model_max_length,)
-    #make sure to output hidden states
-#     config = AutoConfig.from_pretrained(f'airesearch/{model_name}' if model_name in WANGCHANBERTA_MODELS else model_name, 
-#                                         output_hidden_states=True)
+        
     model = AutoModelForQuestionAnswering.from_pretrained(
             f'airesearch/{model_name}' if model_name in WANGCHANBERTA_MODELS else model_name,
             revision=args.revision,)
@@ -253,6 +252,8 @@ if __name__ == '__main__':
     print('[INFO] Done.\n')
     print('\nBegin model evaluation on test set.')
     
+    #debug
+    print(args)
     result,_,_ = question_answering_metrics(datasets=datasets['test'],
                                         trainer=trainer,
                                         metric=squad_newmm_metric,
