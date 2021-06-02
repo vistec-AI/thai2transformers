@@ -77,17 +77,17 @@ def init_model_tokenizer(model_name, model_max_length):
     if model_name in TOKENIZERS.keys():
         tokenizer = TOKENIZERS[model_name].from_pretrained(
                         f'airesearch/{model_name}' if model_name in WANGCHANBERTA_MODELS else model_name,
-                        revision='main',
+                        revision=args.revision, 
                         model_max_length=model_max_length,)
     else:
         tokenizer = AutoTokenizer.from_pretrained(
                         model_name,
+                        revision=args.revision,
                         model_max_length=model_max_length,)
         
-    
     model = AutoModelForQuestionAnswering.from_pretrained(
             f'airesearch/{model_name}' if model_name in WANGCHANBERTA_MODELS else model_name,
-            revision='main',)
+            revision=args.revision,)
 
     print(f'\n[INFO] Model architecture: {model} \n\n')
     print(f'\n[INFO] tokenizer: {tokenizer} \n\n')
@@ -148,6 +148,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # Required
     parser.add_argument('--model_name', type=str, help='Model names on Huggingface for tokenizers and architectures')
+    parser.add_argument('--revision', type=str, default='main', help='Specify branch of model')
     parser.add_argument('--dataset_name', help='Specify the dataset name to finetune. Currently, sequence classification datasets include `thaiqa_squad` and `iapp_wiki_qa_squad`.')
     parser.add_argument('--output_dir', type=str)
     parser.add_argument('--log_dir', type=str)
@@ -251,7 +252,9 @@ if __name__ == '__main__':
     print('[INFO] Done.\n')
     print('\nBegin model evaluation on test set.')
     
-    result,_,_ = question_answering_metrics(datasets=datasets['test'], 
+    #debug
+    print(args)
+    result,_,_ = question_answering_metrics(datasets=datasets['test'],
                                         trainer=trainer,
                                         metric=squad_newmm_metric,
                                         n_best_size=args.n_best_size,

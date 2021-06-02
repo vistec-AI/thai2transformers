@@ -1,7 +1,7 @@
 """ 
 Official evaluation script for v1.1 of the SQuAD dataset. 
 modified to 
-* use `newmm` (pythainlp==2.2.4) instead of split by space
+* use `newmm` (pythainlp==2.2.4) / `syllable_tokenize` / `character_tokenize` instead of split by space
 * use `thai2transformers.preprocess.process_transformers` for normalization
 """
 from __future__ import print_function
@@ -12,7 +12,8 @@ import re
 import string
 import sys
 from collections import Counter
-from pythainlp.tokenize import word_tokenize
+from pythainlp.tokenize import word_tokenize, syllable_tokenize
+def character_tokenize(word): return [i for i in word]
 from thai2transformers.preprocess import process_transformers
 
 # def normalize_answer(s):
@@ -36,9 +37,9 @@ from thai2transformers.preprocess import process_transformers
 normalize_answer = lambda x: process_transformers(x).replace('<_>', ' ')
 
 
-def f1_score(prediction, ground_truth):
-    prediction_tokens = word_tokenize(normalize_answer(prediction))
-    ground_truth_tokens = word_tokenize(normalize_answer(ground_truth))
+def f1_score(prediction, ground_truth, tok_func=word_tokenize):
+    prediction_tokens = tok_func(normalize_answer(prediction))
+    ground_truth_tokens = tok_func(normalize_answer(ground_truth))
     common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
     num_same = sum(common.values())
     if num_same == 0:
@@ -49,19 +50,19 @@ def f1_score(prediction, ground_truth):
     return f1
 
 
-def exact_match_score(prediction, ground_truth):
+def exact_match_score(prediction, ground_truth, tok_func):
     return normalize_answer(prediction) == normalize_answer(ground_truth)
 
 
-def metric_max_over_ground_truths(metric_fn, prediction, ground_truths):
+def metric_max_over_ground_truths(metric_fn, prediction, ground_truths, tok_func=word_tokenize):
     scores_for_ground_truths = []
     for ground_truth in ground_truths:
-        score = metric_fn(prediction, ground_truth)
+        score = metric_fn(prediction, ground_truth, tok_func)
         scores_for_ground_truths.append(score)
     return max(scores_for_ground_truths)
 
 
-def evaluate(dataset, predictions):
+def evaluate(dataset, predictions, tok_func=word_tokenize):
     f1 = exact_match = total = 0
     for article in dataset:
         for paragraph in article["paragraphs"]:
@@ -73,8 +74,8 @@ def evaluate(dataset, predictions):
                     continue
                 ground_truths = list(map(lambda x: x["text"], qa["answers"]))
                 prediction = predictions[qa["id"]]
-                exact_match += metric_max_over_ground_truths(exact_match_score, prediction, ground_truths)
-                f1 += metric_max_over_ground_truths(f1_score, prediction, ground_truths)
+                exact_match += metric_max_over_ground_truths(exact_match_score, prediction, ground_truths, tok_func)
+                f1 += metric_max_over_ground_truths(f1_score, prediction, ground_truths, tok_func)
 
     exact_match = 100.0 * exact_match / total
     f1 = 100.0 * f1 / total
