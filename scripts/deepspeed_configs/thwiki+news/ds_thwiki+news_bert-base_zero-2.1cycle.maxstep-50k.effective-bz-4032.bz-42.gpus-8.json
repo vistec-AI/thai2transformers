@@ -24,7 +24,7 @@
           "decay_step_size": 0,
           "cycle_min_lr": 1e-7,
           "cycle_max_lr": 0.0003,
-          "decay_lr_rate": 0.00001,
+          "decay_lr_rate": 0.0,
           "cycle_min_mom": 0.9,
           "cycle_max_mom": 0.9,
           "decay_mom_rate": 0.0
