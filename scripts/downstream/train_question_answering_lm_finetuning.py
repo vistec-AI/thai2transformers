@@ -48,6 +48,12 @@ from thai2transformers.preprocess import (
     prepare_qa_validation_features,
 )
 
+from pythainlp.tokenize import (
+    word_tokenize,
+    syllable_tokenize,
+)
+def character_tokenize(word): return [i for i in word]
+
 TOKENIZERS = {
     'wangchanberta-base-att-spm-uncased': AutoTokenizer,
     'xlm-roberta-base': AutoTokenizer,
@@ -252,11 +258,44 @@ if __name__ == '__main__':
     print('[INFO] Done.\n')
     print('\nBegin model evaluation on test set.')
     
-    #debug
-    print(args)
-    result,_,_ = question_answering_metrics(datasets=datasets['test'],
+    result_word,_,_ = question_answering_metrics(datasets=datasets['test'],
                                         trainer=trainer,
                                         metric=squad_newmm_metric,
+                                        tok_func=word_tokenize,
+                                        n_best_size=args.n_best_size,
+                                        max_answer_length=args.max_answer_length,
+                                        question_col=args.question_col,
+                                        context_col=args.context_col,
+                                        question_id_col=args.question_id_col,
+                                        answers_col=args.answers_col,
+                                        text_col=args.text_col,
+                                        start_col=args.start_col,
+                                        pad_on_right=args.pad_on_right,
+                                        max_length=args.model_max_length,
+                                        doc_stride=args.doc_stride,
+                                        allow_no_answer=args.allow_no_answer)
+    
+    result_syllable,_,_ = question_answering_metrics(datasets=datasets['test'],
+                                        trainer=trainer,
+                                        metric=squad_newmm_metric,
+                                        tok_func=syllable_tokenize,
+                                        n_best_size=args.n_best_size,
+                                        max_answer_length=args.max_answer_length,
+                                        question_col=args.question_col,
+                                        context_col=args.context_col,
+                                        question_id_col=args.question_id_col,
+                                        answers_col=args.answers_col,
+                                        text_col=args.text_col,
+                                        start_col=args.start_col,
+                                        pad_on_right=args.pad_on_right,
+                                        max_length=args.model_max_length,
+                                        doc_stride=args.doc_stride,
+                                        allow_no_answer=args.allow_no_answer)
+    
+    result_character,_,_ = question_answering_metrics(datasets=datasets['test'],
+                                        trainer=trainer,
+                                        metric=squad_newmm_metric,
+                                        tok_func=character_tokenize,
                                         n_best_size=args.n_best_size,
                                         max_answer_length=args.max_answer_length,
                                         question_col=args.question_col,
@@ -270,8 +309,12 @@ if __name__ == '__main__':
                                         doc_stride=args.doc_stride,
                                         allow_no_answer=args.allow_no_answer)
 
-    print(f'Evaluation on test set (dataset: {args.dataset_name})')    
+    print(f'Evaluation on test set (dataset: {args.dataset_name})')
+    print(result_word,result_syllable,result_character)
     
-    for key, value in result.items():
-        print(f'{key} : {value:.4f}')
-        wandb.run.summary[f'test-set_{key}'] = value
+    
+    #record to wandb
+    wandb.run.summary['test-set_exact_match'] = result_word['exact_match']
+    wandb.run.summary['test-set_f1_word'] = result_word['f1']
+    wandb.run.summary['test-set_f1_syllable'] = result_syllable['f1']
+    wandb.run.summary['test-set_f1_character'] = result_character['f1']
