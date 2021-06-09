@@ -204,8 +204,8 @@ if __name__ == '__main__':
                                             pad_to_multiple_of=8 if args.fp16 else None)
 
     print(f'\n\n[INFO] Dataset: {args.dataset_name}')
-    if args.dataset_name == 'iapp_thaiqa':
-        print(f'\n\n[INFO] For `iapp_thaiqa` dataset where you run `combine_iapp_qa.py` and save combined dataset (use directory path as `dataset_name`)')
+    if args.dataset_name == 'iapp_thaiqa_xquad':
+        print(f'\n\n[INFO] For `iapp_thaiqa_xquad` dataset where you run `combine_iapp_qa.py` and save combined dataset (use directory path as `dataset_name`)')
         datasets = load_from_disk(args.dataset_name)
     else:
         datasets = load_dataset(args.dataset_name)
