@@ -196,7 +196,7 @@ def main():
     else:
         trainer.train()
 
-    if training_args.local_rank == 0:
+    if trainer.is_world_process_zero():
             
         logger.info('\nSave tokenizer and model state')
         tokenizer.save_pretrained(os.path.join(training_args.output_dir, 'final_checkpoint-tokenizer'))
