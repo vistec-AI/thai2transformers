@@ -158,7 +158,7 @@ def main():
         logger.info(f'\n[INFO] Load pretrianed model (state_dict) from checkpoint: {data_args.checkpoint_dir}')
         model = AutoModelForMaskedLM.from_pretrained(data_args.checkpoint_dir)
     else:
-        model = AutoModelForMaskedLM(config=config)
+        model = AutoModelForMaskedLM.from_config(config=config)
 
     # Load dataset
     train_dataset = MLMDataset(tokenizer, data_args.train_dir, data_args.train_max_length, binarized_path=data_args.binarized_path_train)
