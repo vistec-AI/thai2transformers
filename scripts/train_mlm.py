@@ -94,6 +94,12 @@ class DataTrainingArguments:
             "than this will be truncated."
         },
     )
+    train_max_length: int = field(
+         default=510,
+    )
+    eval_max_length: int = field(
+         default=510,
+    )
     mlm_probability: float = field(
         default=0.15, metadata={"help": "Ratio of tokens to mask for masked language modeling loss"}
     )
