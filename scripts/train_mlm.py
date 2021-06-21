@@ -58,7 +58,7 @@ class ModelArguments:
         }
     )
     do_lower_case: bool = field(
-        default = True,
+        default = False,
         metadata = {
             "help": "Whether to lower case the text during pretraining"
         }
