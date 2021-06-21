@@ -1,0 +1,40 @@
+{
+    "train_batch_size": 8064,
+    "train_micro_batch_size_per_gpu": 42,
+    "gradient_accumulation_steps": 24,
+    "optimizer": {
+      "type": "AdamW",
+      "params": {
+        "lr": 0.0005,
+        "betas": [
+            0.9,
+            0.98
+          ],
+        "eps": 1e-6,
+        "weight_decay": 0.01
+      }
+    },
+    "scheduler": {
+      "type": "OneCycle",
+      "params": {
+          "cycle_first_step_size": 1250,
+          "cycle_first_stair_count": 1250,
+          "cycle_second_step_size": 30000,
+          "cycle_second_stair_count": 30000,
+          "decay_step_size": 0,
+          "cycle_min_lr": 0.0000,
+          "cycle_max_lr": 0.0005,
+          "decay_lr_rate": 0.000,
+          "cycle_min_mom": 0.9,
+          "cycle_max_mom": 0.9,
+          "decay_mom_rate": 0.0
+      }
+    },
+    "fp16": {
+      "enabled": true
+    },
+    "steps_per_print": 10,
+    "zero_optimization": {
+      "stage": 2
+    }
+  }
