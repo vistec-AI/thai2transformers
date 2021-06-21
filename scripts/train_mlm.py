@@ -12,6 +12,7 @@ import transformers
 from transformers import (
     AutoConfig,
     AutoTokenizer,
+    CamembertTokenizer,
     AutoModelForMaskedLM,
     DataCollatorForLanguageModeling,
     HfArgumentParser,
@@ -141,7 +142,7 @@ def main():
     # set seed
     set_seed(training_args.seed)
 
-    tokenizer = AutoTokenizer.from_pretrained(model_args.tokenizer_name_or_path,
+    tokenizer = CamembertTokenizer.from_pretrained(model_args.tokenizer_name_or_path,
                                               use_fast=model_args.use_fast_tokenizer,
                                               do_lower_case=model_args.do_lower_case)
     tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', '▁']
