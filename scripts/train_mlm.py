@@ -162,7 +162,7 @@ def main():
 
     # Load dataset
     train_dataset = MLMDataset(tokenizer, data_args.train_dir, data_args.train_max_length, binarized_path=data_args.binarized_path_train)
-    eval_dataset = MLMDataset(tokenizer, data_args.eval_dir, data_args.eval_max_length, binarized_path=data_args.binarized_path_val)
+    eval_dataset = MLMDataset(tokenizer, data_args.eval_dir, data_args.eval_max_length, binarized_path=data_args.binarized_path_eval)
     
     #data collator
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer,
