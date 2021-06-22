@@ -181,6 +181,8 @@ def main():
     logging.info(" Run name: %s", training_args.run_name)
     logging.info(" deepspeed: %s", training_args.deepspeed)
 
+    print('\nmodel:', model)
+    print('\ntraining_args:', training_args)
     # Initiate Trainer
     trainer = Trainer(
         model=model,
