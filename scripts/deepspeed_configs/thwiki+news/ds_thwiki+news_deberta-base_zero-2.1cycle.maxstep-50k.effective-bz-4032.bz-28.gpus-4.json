@@ -35,6 +35,9 @@
     },
     "steps_per_print": 25,
     "zero_optimization": {
-      "stage": 2
+      "stage": 2,
+      "cpu_offload": true,
+      "contiguous_gradients": true,
+      "overlap_comm": true
     }
   }
