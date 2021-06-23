@@ -1,7 +1,7 @@
 {
-    "train_batch_size": 4080,
-    "train_micro_batch_size_per_gpu": 20,
-    "gradient_accumulation_steps": 51,
+    "train_batch_size": 4096,
+    "train_micro_batch_size_per_gpu": 16,
+    "gradient_accumulation_steps": 64,
     "optimizer": {
       "type": "AdamW",
       "params": {
@@ -36,7 +36,6 @@
     "steps_per_print": 25,
     "zero_optimization": {
       "stage": 2,
-      "cpu_offload": true,
       "contiguous_gradients": true,
       "overlap_comm": true
     }
