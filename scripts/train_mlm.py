@@ -1,3 +1,4 @@
+from argparse import ArgumentError
 import torch
 import os
 import logging
@@ -20,9 +21,11 @@ from transformers import (
     TrainingArguments,
     set_seed,
 )
+from transformers import data
 
 #thai2transformers
 from thai2transformers.datasets import MLMDataset
+from thai2transformers.conf import DATA_COLLATOR_CLASS_MAPPING, MLMObjective
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +107,14 @@ class DataTrainingArguments:
     mlm_probability: float = field(
         default=0.15, metadata={"help": "Ratio of tokens to mask for masked language modeling loss"}
     )
+    mlm_strategy: str = field(
+        default='subword-level',
+        metadata='Strategy to mask tokens in sequence'
+    )
+    span_mlm_max_gram: str = field(
+        default=3,
+        metadata='Maximum tokens in a span to be masked (for `span-level` masking strategy)'
+    )
     pad_to_multiple_of: int = field(
         default=None,
         metadata={'help': 'Add padding tokens to the multiple of an integer specified (e.g. 8).'}
@@ -165,11 +176,26 @@ def main():
     eval_dataset = MLMDataset(tokenizer, data_args.eval_dir, data_args.eval_max_length, binarized_path=data_args.binarized_path_eval)
     
     #data collator
-    data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer,
-                        mlm=True,
-                        mlm_probability=data_args.mlm_probability,
-                        pad_to_multiple_of=data_args.pad_to_multiple_of
-                    )
+    data_collator_class = DATA_COLLATOR_CLASS_MAPPING[data_args.mlm_strategy]
+    if data_args.mlm_strategy == MLMObjective.SUBWORD_LEVEL:
+        data_collator = data_collator_class(tokenizer=tokenizer,
+                            mlm=True,
+                            mlm_probability=data_args.mlm_probability,
+                            pad_to_multiple_of=data_args.pad_to_multiple_of
+                        )
+    elif data_args.mlm_strategy == MLMObjective.SPAN_LEVEL:
+        data_collator = data_collator_class(tokenizer=tokenizer,
+                            mlm=True,
+                            mlm_probability=data_args.mlm_probability,
+                            pad_to_multiple_of=data_args.pad_to_multiple_of,
+                            max_gram=data_args.span_mlm_max_gram,
+                            max_seq_len=data_args.train_max_length
+                        )
+    else:
+        raise ArgumentError(f'data_args.mlm_strategy specified is not in avaialble stratefy ({list(DATA_COLLATOR_CLASS_MAPPING.keys())})')
+
+            
+    
 
     logger.debug(f'\n\ntraining_args: {training_args}')
 
