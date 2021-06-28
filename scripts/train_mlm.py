@@ -161,9 +161,9 @@ def main():
                                               do_lower_case=model_args.do_lower_case)
     tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', model_args.space_token]
     logger.debug(f'\n\ntokenizer: {tokenizer}')
+    logger.debug(f'\ntokenizer vocab size: {tokenizer.vocab_size}')
 
-    config = AutoConfig.from_pretrained(arch_args.architecture)
-    config.vocab_size = len(tokenizer.get_vocab().keys())
+    config = AutoConfig.from_pretrained(arch_args.architecture, vocab_size=tokenizer.vocab_size)
     
     logger.debug(f'\n\nconfig: {config}')
 
