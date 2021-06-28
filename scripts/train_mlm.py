@@ -163,7 +163,7 @@ def main():
     logger.debug(f'\n\ntokenizer: {tokenizer}')
 
     config = AutoConfig.from_pretrained(arch_args.architecture)
-    config.vocab_size = tokenizer.vocab_size
+    config.vocab_size = len(tokenizer.get_vocab().keys())
     
     logger.debug(f'\n\nconfig: {config}')
 
