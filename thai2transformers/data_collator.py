@@ -100,7 +100,7 @@ class DataCollatorForSpanLevelMask(DataCollatorForLanguageModeling):
                     break
 
         target_labels = [self.vocab_mapping[x] if x else -100 for x in target_labels]
-        return tokens, target_labels    
+        return tokens, target_labels
 
 
     def mask_tokens(
@@ -120,4 +120,4 @@ class DataCollatorForSpanLevelMask(DataCollatorForLanguageModeling):
             
             labels.append(_labels)
       
-        return inputs_masked, labels
+        return torch.LongTensor(inputs_masked), torch.LongTensor(labels)
