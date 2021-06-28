@@ -192,7 +192,7 @@ def main():
                             max_seq_len=data_args.train_max_length
                         )
     else:
-        raise ArgumentError(f'data_args.mlm_strategy specified is not in avaialble stratefy ({list(DATA_COLLATOR_CLASS_MAPPING.keys())})')
+        raise ArgumentError('data_args.mlm_strategy specified is not in avaialble stratefy (%s))', list(DATA_COLLATOR_CLASS_MAPPING.keys()))
 
             
     
