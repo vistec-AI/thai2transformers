@@ -10,7 +10,7 @@ class Task(Enum):
 
 class MLMObjective(Enum):
     SUBWORD_LEVEL = 'subword-level'
-    SPAN_LEVEL = 'span-leve'
+    SPAN_LEVEL = 'span-level'
 
 
 
