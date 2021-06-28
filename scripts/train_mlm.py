@@ -109,11 +109,11 @@ class DataTrainingArguments:
     )
     mlm_strategy: str = field(
         default='subword-level',
-        metadata='Strategy to mask tokens in sequence'
+        metadata={"help": "Strategy to mask tokens in sequence"}
     )
     span_mlm_max_gram: int = field(
         default=3,
-        metadata='Maximum tokens in a span to be masked (for `span-level` masking strategy)'
+        metadata={"help": "Maximum tokens in a span to be masked (for `span-level` masking strategy)"}
     )
     pad_to_multiple_of: int = field(
         default=None,
