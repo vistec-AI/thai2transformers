@@ -177,13 +177,13 @@ def main():
     
     #data collator
     data_collator_class = DATA_COLLATOR_CLASS_MAPPING[data_args.mlm_strategy]
-    if data_args.mlm_strategy == MLMObjective.SUBWORD_LEVEL:
+    if data_args.mlm_strategy == MLMObjective.SUBWORD_LEVEL.value:
         data_collator = data_collator_class(tokenizer=tokenizer,
                             mlm=True,
                             mlm_probability=data_args.mlm_probability,
                             pad_to_multiple_of=data_args.pad_to_multiple_of
                         )
-    elif data_args.mlm_strategy == MLMObjective.SPAN_LEVEL:
+    elif data_args.mlm_strategy == MLMObjective.SPAN_LEVEL.value:
         data_collator = data_collator_class(tokenizer=tokenizer,
                             mlm=True,
                             mlm_probability=data_args.mlm_probability,
