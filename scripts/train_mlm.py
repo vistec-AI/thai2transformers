@@ -111,7 +111,7 @@ class DataTrainingArguments:
         default='subword-level',
         metadata='Strategy to mask tokens in sequence'
     )
-    span_mlm_max_gram: str = field(
+    span_mlm_max_gram: int = field(
         default=3,
         metadata='Maximum tokens in a span to be masked (for `span-level` masking strategy)'
     )
