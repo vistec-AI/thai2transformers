@@ -158,8 +158,9 @@ def main():
 
     tokenizer = CamembertTokenizer.from_pretrained(model_args.tokenizer_name_or_path,
                                               use_fast=model_args.use_fast_tokenizer,
-                                              do_lower_case=model_args.do_lower_case)
-    tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', model_args.space_token]
+                                              do_lower_case=model_args.do_lower_case,
+                                              additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', model_args.space_token])
+    
     logger.debug(f'\n\ntokenizer: {tokenizer}')
     logger.debug(f'\ntokenizer vocab size: {tokenizer.vocab_size}')
 
