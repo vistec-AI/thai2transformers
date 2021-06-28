@@ -67,6 +67,9 @@ class ModelArguments:
             "help": "Whether to lower case the text during pretraining"
         }
     )
+    space_token: str = field(
+        default='▁'
+    )
 
 @dataclass
 class DataTrainingArguments:
@@ -156,7 +159,7 @@ def main():
     tokenizer = CamembertTokenizer.from_pretrained(model_args.tokenizer_name_or_path,
                                               use_fast=model_args.use_fast_tokenizer,
                                               do_lower_case=model_args.do_lower_case)
-    tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', '▁']
+    tokenizer.additional_special_tokens = ['<s>NOTUSED', '</s>NOTUSED', model_args.space_token]
     logger.debug(f'\n\ntokenizer: {tokenizer}')
 
     config = AutoConfig.from_pretrained(arch_args.architecture)
