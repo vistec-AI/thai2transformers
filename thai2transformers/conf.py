@@ -15,6 +15,6 @@ class MLMObjective(Enum):
 
 
 DATA_COLLATOR_CLASS_MAPPING= {
-    MLMObjective.SUBWORD_LEVEL : DataCollatorForLanguageModeling,
-    MLMObjective.SPAN_LEVEL : DataCollatorForSpanLevelMask
+    MLMObjective.SUBWORD_LEVEL.value : DataCollatorForLanguageModeling,
+    MLMObjective.SPAN_LEVEL.value : DataCollatorForSpanLevelMask
 }
