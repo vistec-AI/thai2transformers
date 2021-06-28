@@ -110,26 +110,14 @@ class DataCollatorForSpanLevelMask(DataCollatorForLanguageModeling):
         Prepare masked tokens inputs/labels for masked language modeling: 80% MASK, 10% random, 10% original.
         """
         labels = []
-        # We sample a few tokens in each sequence for MLM training (with probability `self.mlm_probabilityability`)
-        # probability_matrix = torch.full(labels.shape, self.mlm_probabilityability)
-        # if special_tokens_mask is None:
-        #     special_tokens_mask = [
-        #         self.tokenizer.get_special_tokens_mask(val, already_has_special_tokens=True) for val in labels.tolist()
-        #     ]
-        #     special_tokens_mask = torch.tensor(special_tokens_mask, dtype=torch.bool)
-        # else:
-        #     special_tokens_mask = special_tokens_mask.bool()
-
-        print('inputs', inputs.shape, inputs)
         inputs_masked = []
         
-        for i, input in enumerate(inputs[0]):
+        for input in inputs:
             input_tokens = self.tokenizer.convert_ids_to_tokens(input)
             input_masked, _labels = self._mask_tokens(input_tokens)
             input_masked_ids = self.tokenizer.convert_tokens_to_ids(input_masked)
             inputs_masked.append(input_masked_ids)
-            print('_labels, ', _labels)
-            print('inputs_masked, ', input_masked_ids)
+            
             labels.append(_labels)
       
         return inputs_masked, labels
