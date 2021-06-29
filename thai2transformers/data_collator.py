@@ -8,7 +8,7 @@ from bisect import bisect
 from transformers.data.data_collator import DataCollatorForLanguageModeling, _collate_batch, tolist
 from transformers.tokenization_utils_base import BatchEncoding, PreTrainedTokenizerBase
 
-SPECIAL_TOKEN_NAMES = ['bos_token', 'eos_token', 'sep_token', 'cls_token']
+SPECIAL_TOKEN_NAMES = ['bos_token', 'eos_token', 'sep_token', 'cls_token', 'pad_token']
 
 @dataclass
 class DataCollatorForSpanLevelMask(DataCollatorForLanguageModeling):
