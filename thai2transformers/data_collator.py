@@ -32,8 +32,17 @@ class DataCollatorForSpanLevelMask(DataCollatorForLanguageModeling):
     max_seq_len: int = 510
     pad_to_multiple_of: Optional[int] = None
 
-    def __init__(self, tokenizer, mlm=True, mlm_probability=0.15, pad_to_multiple_of=None, *args, **kwargs):
-        super().__init__(tokenizer, mlm=mlm, mlm_probability=mlm_probability, pad_to_multiple_of=pad_to_multiple_of)
+    def __new__(cls, tokenizer, mlm, mlm_probability, pad_to_multiple_of, *args, **kwargs):
+
+        obj = object.__new__(cls)
+        DataCollatorForLanguageModeling.__init__(obj, tokenizer=tokenizer, mlm=mlm,
+                                                 mlm_probability=mlm_probability,
+                                                 pad_to_multiple_of=pad_to_multiple_of)
+
+        return obj
+    
+
+    def __post_init__(self, *args, **kwargs):
 
         assert self.mask_prob + self.keep_prob <= 1, \
             f'The prob of using [MASK]({self.mask_prob}) and the prob of using original token({self.keep_prob}) should between [0,1]'
