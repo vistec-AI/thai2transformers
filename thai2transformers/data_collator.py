@@ -85,7 +85,7 @@ class DataCollatorForSpanLevelMask(DataCollatorForLanguageModeling):
 
         indices = [i for i in range(len(tokens)) if tokens[i] not in self.special_tokens]
         unigrams = [ [idx] for idx in indices ]
-        num_to_predict = min(self.max_preds_per_seq, max(1, int(round(len(tokens) * self.mlm_probability))))
+        num_to_predict = min(self.max_preds_per_seq, max(1, int(round((len(tokens) - len(indices)) * self.mlm_probability))))
            
         offset = 0
         mask_grams = np.array([False]*len(unigrams))
@@ -100,7 +100,7 @@ class DataCollatorForSpanLevelMask(DataCollatorForLanguageModeling):
 
         target_labels = [None]*len(tokens)
         w_cnt = 0
-        for m,word in zip(mask_grams, unigrams):
+        for m, word in zip(mask_grams, unigrams):
             if m:
                 for idx in word:
                     label = self._per_token_mask(idx, tokens, rng, self.mask_prob, self.keep_prob)
