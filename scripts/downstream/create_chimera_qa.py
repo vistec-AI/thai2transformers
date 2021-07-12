@@ -71,10 +71,15 @@ def filter_overlaps(example, overlaps):
 #     example.pop('id', None)
 #     return example
 
+#convert to same dtypes
+def convert_dtypes(example):
+    example['question_id'] = str(example['question_id'])
+    return example
+
 #load and convert datasets
-nsc_qa_w300 = load_from_disk('nsc_qa_w300')
-thaiqa_w300 = load_from_disk('thaiqa_w300')
-iapp = load_dataset('iapp_wiki_qa_squad')
+nsc_qa_w300 = load_from_disk('nsc_qa_w300').map(convert_dtypes)
+thaiqa_w300 = load_from_disk('thaiqa_w300').map(convert_dtypes)
+iapp = load_from_disk('iapp_wiki_qa_squadx').map(convert_dtypes)
 
 #see if there is an exact match
 iapp_contexts = set(iapp['validation']['context'] + iapp['test']['context'])
@@ -89,12 +94,12 @@ sent_nsc_qa_w300 = list(nsc_qa_w300_contexts)
 sent_thaiqa_w300 = list(thaiqa_w300_contexts)
 
 overlaps_nsc_qa_w300 = get_overlaps(sent_iapp, sent_nsc_qa_w300, bs=1000, use_thres=0.8)
-overlaps_thaiqa_w300_contexts = get_overlaps(sent_iapp, sent_thaiqa_w300_contexts, bs=1000, use_thres=0.8)
-print('number overlapping contexts: ', len(overlaps_nsc_qa_w300), len(overlaps_thaiqa_w300_contexts))
+overlaps_thaiqa_w300 = get_overlaps(sent_iapp, sent_thaiqa_w300, bs=1000, use_thres=0.8)
+print('number overlapping contexts: ', len(overlaps_nsc_qa_w300), len(overlaps_thaiqa_w300))
 
 #remove overlaps
 nsc_qa_w300_filtered = nsc_qa_w300.filter(lambda x: filter_overlaps(x,overlaps_nsc_qa_w300))
-thaiqa_w300_filtered = thaiqa_w300.filter(lambda x: filter_overlaps(x,overlaps_thaiqa_w300_contexts))
+thaiqa_w300_filtered = thaiqa_w300.filter(lambda x: filter_overlaps(x,overlaps_thaiqa_w300))
 
 #concatenate them together
 datasets = iapp
