@@ -61,50 +61,48 @@ def get_overlaps(sent_seed, sent_compare, bs=1000, use_thres=0.8):
 def filter_overlaps(example, overlaps):
     return False if example['context'] in overlaps else True
 
-#make xquad looks like iapp
-def convert_xquad_to_iapp(example):
-    example['answers']['answer_start'] = [np.int32(example['answers']['answer_start'][0])]
-    example['answers']['answer_end'] = [np.int32(example['answers']['answer_start'][0] + len(example['answers']['text'][0]))]
-    example['article_id'] = str(example['context'][:30]) #no article id provided to using first 30 characters of context
-    example['question_id'] = str(example['id'])
-    example['title'] = ''
-    example.pop('id', None)
-    return example
+# #make xquad looks like iapp
+# def convert_xquad_to_iapp(example):
+#     example['answers']['answer_start'] = [np.int32(example['answers']['answer_start'][0])]
+#     example['answers']['answer_end'] = [np.int32(example['answers']['answer_start'][0] + len(example['answers']['text'][0]))]
+#     example['article_id'] = str(example['context'][:30]) #no article id provided to using first 30 characters of context
+#     example['question_id'] = str(example['id'])
+#     example['title'] = ''
+#     example.pop('id', None)
+#     return example
 
 #load and convert datasets
 nsc_qa_w300 = load_from_disk('nsc_qa_w300')
-
-xquad_raw = load_dataset('xquad','xquad.th')
-xquad = xquad_raw.map(convert_xquad_to_iapp)
-
+thaiqa_w300 = load_from_disk('thaiqa_w300')
 iapp = load_dataset('iapp_wiki_qa_squad')
 
 #see if there is an exact match
 iapp_contexts = set(iapp['validation']['context'] + iapp['test']['context'])
-nsc_qa_w300_contexts = set(nsc_qa_w300['train']['context'] + nsc_qa_w300['valid']['context'])
-xquad_contexts = set(xquad['validation']['context'])
+nsc_qa_w300_contexts = set(nsc_qa_w300['train']['context'] + nsc_qa_w300['validation']['context'] + nsc_qa_w300['test']['context'])
+thaiqa_w300_contexts = set(thaiqa_w300['train']['context'])
 
-print('number of contexts each:',len(iapp_contexts), len(nsc_qa_w300_contexts), len(xquad_contexts))
-print('number of contexts exact matches:',iapp_contexts.intersection(nsc_qa_w300_contexts), iapp_contexts.intersection(xquad_contexts))
+print('number of contexts each:',len(iapp_contexts), len(nsc_qa_w300_contexts), len(thaiqa_w300_contexts))
+print('number of contexts exact matches:',iapp_contexts.intersection(nsc_qa_w300_contexts), iapp_contexts.intersection(thaiqa_w300_contexts))
 
 sent_iapp = list(iapp_contexts)
 sent_nsc_qa_w300 = list(nsc_qa_w300_contexts)
-sent_xquad = list(xquad_contexts)
+sent_thaiqa_w300 = list(thaiqa_w300_contexts)
 
 overlaps_nsc_qa_w300 = get_overlaps(sent_iapp, sent_nsc_qa_w300, bs=1000, use_thres=0.8)
-overlaps_xquad = get_overlaps(sent_iapp, sent_xquad, bs=1000, use_thres=0.8)
-print('number overlapping contexts: ', len(overlaps_nsc_qa_w300), len(overlaps_xquad))
+overlaps_thaiqa_w300_contexts = get_overlaps(sent_iapp, sent_thaiqa_w300_contexts, bs=1000, use_thres=0.8)
+print('number overlapping contexts: ', len(overlaps_nsc_qa_w300), len(overlaps_thaiqa_w300_contexts))
 
 #remove overlaps
 nsc_qa_w300_filtered = nsc_qa_w300.filter(lambda x: filter_overlaps(x,overlaps_nsc_qa_w300))
-xquad_filtered = xquad.filter(lambda x: filter_overlaps(x,overlaps_xquad))
+thaiqa_w300_filtered = thaiqa_w300.filter(lambda x: filter_overlaps(x,overlaps_thaiqa_w300_contexts))
 
 #concatenate them together
 datasets = iapp
 datasets['train'] = concatenate_datasets([datasets['train'],
                                           nsc_qa_w300_filtered['train'],
-                                          nsc_qa_w300_filtered['valid'],
-                                          xquad_filtered['validation']])
+                                          nsc_qa_w300_filtered['validation'],
+                                          nsc_qa_w300_filtered['test'],
+                                          thaiqa_w300_filtered['train']])
 
 #save to disk
 datasets.save_to_disk('chimera_qa')
