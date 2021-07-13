@@ -5,7 +5,7 @@ import swifter
 import re
 from typing import List, Optional, Dict
 from pythainlp.tokenize import word_tokenize, sent_tokenize
-from tqdm import tqdm
+
 
 def break_long_sentence(text:str, sent_tokenizer=sent_tokenize,
                         word_toknizer=word_tokenize,
@@ -87,13 +87,12 @@ if __name__ == '__main__':
 
     parser.add_argument('input_path', type=str)
     parser.add_argument('output_path', type=str)
-    parser.add_argument('--file_type', type=str, default='csv')
-    parser.add_argument('--drop_na', action='store_true', default=False)
-    parser.add_argument('--remove_thwiki_section', action='store_true', default=False)
-    parser.add_argument('--break_long_sentence', action='store_true', default=False)
+    parser.add_argument('--drop_na', action='store_true', default=True)
+    parser.add_argument('--remove_thwiki_section', action='store_true', default=True)
+    parser.add_argument('--break_long_sentence', action='store_true', default=True)
     parser.add_argument('--max_sentence_length', type=int, default=300)
 
-    parser.add_argument('--drop_no_thai_char', action='store_true', default=False)
+    parser.add_argument('--drop_no_thai_char', action='store_true', default=True)
     parser.add_argument('--min_newmm_token_len', type=int, default=4)
     parser.add_argument('--max_newmm_token_len', type=int, default=500)
 
@@ -101,18 +100,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.file_type == 'csv':
-        print(f'INFO: Load csv file from {args.input_path}')
+    print(f'INFO: Load csv file from {args.input_path}')
 
-        df = pd.read_csv(args.input_path)
-    else:
-        print(f'INFO: Load txt file from {args.input_path}')
-
-        lines = open(args.input_path, 'r').readlines()
-        df = pd.DataFrame({'text': lines})
-        print('Perform word tokenize to count tokens...')
-        df['nb_tokens']= df['text'].swifter.apply(lambda x: len(word_tokenize(x)))
-        print('Done.')
+    df = pd.read_csv(args.input_path)
+    
     TEXT_FILTERING_RULES = [drop_na, drop_no_thai_char]
     for fn in TEXT_FILTERING_RULES:
         print(f'INFO: Perform filtering rule: {fn.__name__}')
@@ -149,7 +140,7 @@ if __name__ == '__main__':
     df_short = df[df['nb_tokens'] <= 450]
     long_segments = df[df['nb_tokens'] > 450]['text'].tolist()
     breaked_segments = []
-    for s in tqdm(long_segments, total=len(long_segments)):
+    for s in long_segments:
         breaked_segments += break_long_sentence(s, max_sent_len=args.max_sentence_length)
     print(f'\n\tNumber of long segments: {len(long_segments)}\n\tNumber of new segments: {len(breaked_segments)}')
     nb_tokens = [ len(word_tokenize(s)) for s in breaked_segments ]
