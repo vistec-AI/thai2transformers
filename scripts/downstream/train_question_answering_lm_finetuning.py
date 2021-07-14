@@ -254,6 +254,16 @@ if __name__ == '__main__':
     print('[INFO] Done.\n')
     print('[INDO] Begin saving best checkpoint.')
     trainer.save_model(os.path.join(args.output_dir, 'checkpoint-best'))
+    
+    print('[INFO] Done.\n')
+    print('[INDO] Begin loading best checkpoint.')
+    model = AutoModelForQuestionAnswering.from_pretrained(os.path.join(args.output_dir, 'checkpoint-best'))
+    trainer, training_args = init_trainer(model=model,
+                                train_dataset=tokenized_datasets['train'],
+                                val_dataset=tokenized_datasets['validation'],
+                                args=args,
+                                data_collator=data_collator,
+                                tokenizer=tokenizer,)
 
     print('[INFO] Done.\n')
     print('\nBegin model evaluation on test set.')
