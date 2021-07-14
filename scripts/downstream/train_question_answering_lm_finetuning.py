@@ -210,8 +210,8 @@ if __name__ == '__main__':
                                             pad_to_multiple_of=8 if args.fp16 else None)
 
     print(f'\n\n[INFO] Dataset: {args.dataset_name}')
-    if args.dataset_name == 'iapp_thaiqa_xquad':
-        print(f'\n\n[INFO] For `iapp_thaiqa_xquad` dataset where you run `combine_iapp_qa.py` and save combined dataset (use directory path as `dataset_name`)')
+    if args.dataset_name in ['iapp_thaiqa_xquad','chimera_qa']:
+        print(f'\n\n[INFO] For `iapp_thaiqa_xquad` / `chimera_qa` dataset where you run `combine_iapp_qa.py` / `create_chimera_qa.py` and save combined dataset (use directory path as `dataset_name`)')
         datasets = load_from_disk(args.dataset_name)
     else:
         datasets = load_dataset(args.dataset_name)
@@ -254,6 +254,16 @@ if __name__ == '__main__':
     print('[INFO] Done.\n')
     print('[INDO] Begin saving best checkpoint.')
     trainer.save_model(os.path.join(args.output_dir, 'checkpoint-best'))
+    
+    print('[INFO] Done.\n')
+    print('[INDO] Begin loading best checkpoint.')
+    model = AutoModelForQuestionAnswering.from_pretrained(os.path.join(args.output_dir, 'checkpoint-best'))
+    trainer, training_args = init_trainer(model=model,
+                                train_dataset=tokenized_datasets['train'],
+                                val_dataset=tokenized_datasets['validation'],
+                                args=args,
+                                data_collator=data_collator,
+                                tokenizer=tokenizer,)
 
     print('[INFO] Done.\n')
     print('\nBegin model evaluation on test set.')
