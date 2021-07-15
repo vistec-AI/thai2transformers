@@ -26,8 +26,8 @@ class DataCollatorForSpanLevelMask(DataCollatorForLanguageModeling):
     mlm: bool = True
     mlm_probability: float = 0.15
     max_gram: int = 3
-    keep_prob: float = 0.0
-    mask_prob: float = 1.0
+    keep_prob: float = 0.1
+    mask_prob: float = 8.0
     max_preds_per_seq: int = None
     max_seq_len: int = 510
     pad_to_multiple_of: Optional[int] = None
