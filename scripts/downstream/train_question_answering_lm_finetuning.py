@@ -78,6 +78,16 @@ def lowercase_example(example):
     example[args.answers_col][args.text_col] =  [example[args.answers_col][args.text_col][0].lower()]
     return example
 
+
+def replace_spaces(example, space_token_id, special_symbol_id):
+    new_token_ids = []
+    for idx, token_id in enumerate(example['input_ids']):
+        new_token_ids.append(special_symbol_id if token_id == space_token_id and idx != 1 else token_id)
+
+    example['input_ids'] = new_token_ids
+    return example
+
+
 def init_model_tokenizer(model_name, model_max_length):
     
     if model_name in TOKENIZERS.keys():
@@ -190,12 +200,15 @@ if __name__ == '__main__':
     parser.add_argument('--answers_col', type=str, default='answers')
     parser.add_argument('--text_col', type=str, default='text')
     parser.add_argument('--start_col', type=str, default='answer_start')
+    
+    # text processing
+    parser.add_argument('--space_token', type=str, default=None, help='The symbol to substitute space token " " in the text.')
 
     # wandb
     parser.add_argument('--run_name', type=str, default=None)
 
     args = parser.parse_args()
-
+    
     # Set seed
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
@@ -209,6 +222,7 @@ if __name__ == '__main__':
                                             padding=True,
                                             pad_to_multiple_of=8 if args.fp16 else None)
 
+    print(f'\nDEBUG::tokenizer: {tokenizer}')
     print(f'\n\n[INFO] Dataset: {args.dataset_name}')
     if args.dataset_name in ['iapp_thaiqa_xquad','chimera_qa']:
         print(f'\n\n[INFO] For `iapp_thaiqa_xquad` / `chimera_qa` dataset where you run `combine_iapp_qa.py` / `create_chimera_qa.py` and save combined dataset (use directory path as `dataset_name`)')
@@ -222,9 +236,22 @@ if __name__ == '__main__':
         datasets = datasets.map(lowercase_example)
         
     print(f'\n\n[INFO] Prepare training features')
+
+    print(f'\nDEBUG:datasets', datasets['train'][:2])
     tokenized_datasets = datasets.map(lambda x: prepare_qa_train_features(x, tokenizer), 
                                       batched=True, 
                                       remove_columns=datasets["train"].column_names)
+    
+    print(f'\nDEBUG:tokenized_datasets )before)', tokenized_datasets['train'][:2])
+
+    if args.space_token != None:
+        print(f'\n\n[INFO] Replacing spaces token special symbol `{args.space_token}`')
+        tokenized_datasets = tokenized_datasets.map(partial(replace_spaces,
+                                                            space_token_id=tokenizer.encode(' ', add_special_tokens=False)[0],
+                                                            special_symbol_id=tokenizer.vocab[args.space_token]))
+
+
+    print(f'\nDEBUG:tokenized_datasets', tokenized_datasets['train'][:2])
 
     print(f'\n[INFO] Number of train examples = {len(datasets["train"])}')
     print(f'[INFO] Number of batches per epoch (training set) = {math.ceil(len(datasets["train"]) / args.batch_size)}')
