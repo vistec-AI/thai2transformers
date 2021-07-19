@@ -218,7 +218,7 @@ if __name__ == '__main__':
     print(f'dataset: {datasets}')
 
     if args.lowercase:
-        print(f'\n\n[INFO] Lowercaing datasets')
+        print(f'\n\n[INFO] Lowercasing datasets')
         datasets = datasets.map(lowercase_example)
         
     print(f'\n\n[INFO] Prepare training features')
