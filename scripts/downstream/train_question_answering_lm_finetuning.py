@@ -244,7 +244,7 @@ if __name__ == '__main__':
     
     print(f'\nDEBUG:tokenized_datasets )before)', tokenized_datasets['train'][:2])
 
-    if args.space_token != None:
+    if args.space_token != None or args.space_token != 'None':
         print(f'\n\n[INFO] Replacing spaces token special symbol `{args.space_token}`')
         tokenized_datasets = tokenized_datasets.map(partial(replace_spaces,
                                                             space_token_id=tokenizer.encode(' ', add_special_tokens=False)[0],
