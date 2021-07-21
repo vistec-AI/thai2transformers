@@ -98,7 +98,7 @@ def init_model_tokenizer(model_name, model_max_length):
                         f'airesearch/{model_name}' if model_name in WANGCHANBERTA_MODELS else model_name,
                         revision=args.revision, 
                         model_max_length=model_max_length,
-                        use_auth=True)
+                        use_auth_token=True)
     else:
         tokenizer = AutoTokenizer.from_pretrained(
                         model_name,
@@ -108,7 +108,7 @@ def init_model_tokenizer(model_name, model_max_length):
     model = AutoModelForQuestionAnswering.from_pretrained(
             f'airesearch/{model_name}' if model_name in WANGCHANBERTA_MODELS else model_name,
             revision=args.revision,
-            use_auth=True)
+            use_auth_token=True)
 
     print(f'\n[INFO] Model architecture: {model} \n\n')
     print(f'\n[INFO] tokenizer: {tokenizer} \n\n')
