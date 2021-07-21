@@ -26,6 +26,7 @@ from transformers import (
     XLMRobertaTokenizerFast,
     XLMRobertaConfig,
     DataCollatorWithPadding,
+    CamembertTokenizer,
 )
 
 from datasets import (
@@ -62,6 +63,7 @@ TOKENIZERS = {
     'wangchanberta-base-wiki-ssg': ThaiWordsSyllableTokenizer,
     'wangchanberta-base-wiki-sefr': FakeSefrCutTokenizer,
     'wangchanberta-base-wiki-spm': ThaiRobertaTokenizer,
+    'wangchan-deberta_v1-base-wiki-20210520-news-spm': CamembertTokenizer,
 }
 WANGCHANBERTA_MODELS = [
     'wangchanberta-base-att-spm-uncased',
@@ -69,6 +71,7 @@ WANGCHANBERTA_MODELS = [
     'wangchanberta-base-wiki-ssg',
     'wangchanberta-base-wiki-sefr',
     'wangchanberta-base-wiki-spm',
+    'wangchan-deberta_v1-base-wiki-20210520-news-spm',
 ] 
 
 #lowercase when using uncased model
