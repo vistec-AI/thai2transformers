@@ -36,7 +36,7 @@ do
             echo "The experiment with this hyperparams set is done."
         else
             python train_question_answering_lm_finetuning.py \
-            --model_name ${ENCODER_NAME} \
+            --model_name ${ENCODER_DIR} \
             --dataset_name chimera_qa \
             --output_dir /workspace/thai2transformers_store/checkpoints/chimera-qa/${EXP_NAME} \
             --log_dir /workspace/thai2transformers_store/logs/chimera-qa/${EXP_NAME} \
