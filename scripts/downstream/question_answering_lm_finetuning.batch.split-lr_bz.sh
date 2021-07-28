@@ -22,7 +22,7 @@ do
         
         cd /workspace/thai2transformers/scripts/downstream
 
-        echo "Encoder pretrained_model_name_or_path: ${ENCODER}"
+        echo "Encoder pretrained_model_name_or_path: ${ENCODER_DIR}"
         echo "Encoder name: ${ENCODER_NAME}"
         echo "space token: |${SPACE_TOKEN}|"
 
