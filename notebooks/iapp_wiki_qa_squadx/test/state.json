@@ -1,0 +1,24 @@
+{
+  "_data": null,
+  "_data_files": [
+    {
+      "filename": "json-test.arrow",
+      "skip": 0,
+      "take": 739
+    }
+  ],
+  "_fingerprint": "9ad458fb5b194c08",
+  "_format_columns": null,
+  "_format_kwargs": {},
+  "_format_type": null,
+  "_indexes": {},
+  "_indices": null,
+  "_indices_data_files": [],
+  "_inplace_history": [
+    {
+      "transforms": []
+    }
+  ],
+  "_output_all_columns": false,
+  "_split": "test"
+}

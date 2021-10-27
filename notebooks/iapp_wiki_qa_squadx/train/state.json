@@ -1,0 +1,24 @@
+{
+  "_data": null,
+  "_data_files": [
+    {
+      "filename": "json-train.arrow",
+      "skip": 0,
+      "take": 5761
+    }
+  ],
+  "_fingerprint": "b6b968cf3ebb1ea4",
+  "_format_columns": null,
+  "_format_kwargs": {},
+  "_format_type": null,
+  "_indexes": {},
+  "_indices": null,
+  "_indices_data_files": [],
+  "_inplace_history": [
+    {
+      "transforms": []
+    }
+  ],
+  "_output_all_columns": false,
+  "_split": "train"
+}

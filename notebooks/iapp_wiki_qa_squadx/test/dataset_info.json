@@ -1,0 +1,114 @@
+{
+  "builder_name": "json",
+  "citation": "",
+  "config_name": "default",
+  "dataset_size": 20319557,
+  "description": "",
+  "download_checksums": {
+    "../data/iapp_test.jsonl": {
+      "checksum": "0b75ad574564ec949d03cb074faf74bf3de0bb6dd97a7cd37cd29cfd0e0d2154",
+      "num_bytes": 3989988
+    },
+    "../data/iapp_train.jsonl": {
+      "checksum": "cecf067d3d9b6e19098633e9681d0d1cbbcdddff9108ac93e232f2a7def577fe",
+      "num_bytes": 31608311
+    },
+    "../data/iapp_validation.jsonl": {
+      "checksum": "1df33fbc7fcc6292774ac690ba47fb76c891f20eb7571e3c21ca8cd640ab17e6",
+      "num_bytes": 4157798
+    }
+  },
+  "download_size": 39756097,
+  "features": {
+    "answers": {
+      "answer_end": {
+        "_type": "Sequence",
+        "feature": {
+          "_type": "Value",
+          "dtype": "int64",
+          "id": null
+        },
+        "id": null,
+        "length": -1
+      },
+      "answer_start": {
+        "_type": "Sequence",
+        "feature": {
+          "_type": "Value",
+          "dtype": "int64",
+          "id": null
+        },
+        "id": null,
+        "length": -1
+      },
+      "text": {
+        "_type": "Sequence",
+        "feature": {
+          "_type": "Value",
+          "dtype": "string",
+          "id": null
+        },
+        "id": null,
+        "length": -1
+      }
+    },
+    "article_id": {
+      "_type": "Value",
+      "dtype": "string",
+      "id": null
+    },
+    "context": {
+      "_type": "Value",
+      "dtype": "string",
+      "id": null
+    },
+    "question": {
+      "_type": "Value",
+      "dtype": "string",
+      "id": null
+    },
+    "question_id": {
+      "_type": "Value",
+      "dtype": "string",
+      "id": null
+    },
+    "title": {
+      "_type": "Value",
+      "dtype": "string",
+      "id": null
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "post_processed": null,
+  "post_processing_size": null,
+  "size_in_bytes": 60075654,
+  "splits": {
+    "test": {
+      "dataset_name": "json",
+      "name": "test",
+      "num_bytes": 2038036,
+      "num_examples": 739
+    },
+    "train": {
+      "dataset_name": "json",
+      "name": "train",
+      "num_bytes": 16154709,
+      "num_examples": 5761
+    },
+    "validation": {
+      "dataset_name": "json",
+      "name": "validation",
+      "num_bytes": 2126812,
+      "num_examples": 742
+    }
+  },
+  "supervised_keys": null,
+  "version": {
+    "description": null,
+    "major": 0,
+    "minor": 0,
+    "patch": 0,
+    "version_str": "0.0.0"
+  }
+}

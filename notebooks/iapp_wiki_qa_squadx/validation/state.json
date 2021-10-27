@@ -1,0 +1,24 @@
+{
+  "_data": null,
+  "_data_files": [
+    {
+      "filename": "json-validation.arrow",
+      "skip": 0,
+      "take": 742
+    }
+  ],
+  "_fingerprint": "f4009a6af4875bf0",
+  "_format_columns": null,
+  "_format_kwargs": {},
+  "_format_type": null,
+  "_indexes": {},
+  "_indices": null,
+  "_indices_data_files": [],
+  "_inplace_history": [
+    {
+      "transforms": []
+    }
+  ],
+  "_output_all_columns": false,
+  "_split": "validation"
+}
