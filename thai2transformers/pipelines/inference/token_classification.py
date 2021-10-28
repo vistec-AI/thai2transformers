@@ -28,7 +28,8 @@ class TokenClassificationPipeline:
                  strict: bool = False,
                  tag_delimiter: str = '-',
                  scheme: str = 'IOB',
-                 use_crf=False):
+                 use_crf=False,
+                 remove_spiece=True):
 
         super().__init__()
 
@@ -48,6 +49,7 @@ class TokenClassificationPipeline:
         self.id2label = self.model.config.id2label
         self.label2id = self.model.config.label2id
         self.use_crf = use_crf
+        self.remove_spiece = remove_spiece
         self.model.to(self.device)
 
     def preprocess(self, inputs: Union[str, List[str]]) -> Union[List[str], List[List[str]]]:
@@ -85,10 +87,11 @@ class TokenClassificationPipeline:
 
         list_of_token_label_tuple = list(zip(flatten_tokens, [ self.id2label[idx] for idx in indices_np] ))
         merged_preds = self._merged_pred(preds=list_of_token_label_tuple, ids=ids)
-        merged_preds_removed_spiece = list(map(lambda x: (x[0].replace(SPIECE, ''), x[1]), merged_preds))
-
+        if self.remove_spiece:
+            merged_preds = list(map(lambda x: (x[0].replace(SPIECE, ''), x[1]), merged_preds))
+       
         # remove start and end tokens
-        merged_preds_removed_bos_eos = merged_preds_removed_spiece[1:-1]
+        merged_preds_removed_bos_eos = merged_preds[1:-1]
         # convert to list of Dict objects
         merged_preds_return_dict = [ {'word': word if word != self.space_token else ' ', 'entity': tag, 'index': idx } \
             for idx, (word, tag) in enumerate(merged_preds_removed_bos_eos) ]
