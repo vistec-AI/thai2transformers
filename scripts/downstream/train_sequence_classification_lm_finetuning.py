@@ -316,7 +316,7 @@ if __name__ == '__main__':
             print(f'\n\n[INFO] Done')
             print(f'dataset: {dataset}')
         elif args.dataset_name.startswith('prachathai67k'):
-            dataset = load_dataset(DATASET_METADATA["prachathai67k"]["huggingface_dataset_name"])
+            dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
         else:
             dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
 
