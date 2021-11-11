@@ -113,7 +113,7 @@ DATASET_METADATA = {
         'num_labels': 5,
         'split_names': ['train', 'validation', 'test']
     },
-    'prachathai67k': {
+    'prachathai67k-title_multilabel': {
         'huggingface_dataset_name': 'prachathai67k',
         # 'url': 'https://archive.org/download/prachathai67k/data.zip',
         'task': Task.MULTILABEL_CLS,
@@ -124,7 +124,19 @@ DATASET_METADATA = {
                            'national_security', 'ict', 'education'],
         'num_labels': 12,
         'split_names': ['train', 'validation', 'test']
-    }
+    },
+    'prachathai67k-body_multilabel': {
+        'huggingface_dataset_name': 'prachathai67k',
+        # 'url': 'https://archive.org/download/prachathai67k/data.zip',
+        'task': Task.MULTILABEL_CLS,
+        'text_input_col_name': 'body_text',
+        'label_col_name': ['politics', 'human_rights', 'quality_of_life',
+                           'international', 'social', 'environment',
+                           'economics', 'culture', 'labor',
+                           'national_security', 'ict', 'education'],
+        'num_labels': 12,
+        'split_names': ['train', 'validation', 'test']
+    },
 }
 
 def init_public_model_tokenizer_for_seq_cls(public_model_name, task, num_labels):
@@ -303,6 +315,8 @@ if __name__ == '__main__':
             dataset['validation'] = train_val_split['test']
             print(f'\n\n[INFO] Done')
             print(f'dataset: {dataset}')
+        elif args.dataset_name.startswith('prachathai67k'):
+            dataset = load_dataset(DATASET_METADATA["prachathai67k"]["huggingface_dataset_name"])
         else:
             dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
 
