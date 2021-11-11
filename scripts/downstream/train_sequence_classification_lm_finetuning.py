@@ -201,7 +201,7 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, da
                         no_cuda=args.no_cuda,
                         metric_for_best_model=args.metric_for_best_model,
                         prediction_loss_only=False,
-                        run_name=args.run_name
+                        run_name=args.wandb_run_name
                     )
     if task == Task.MULTICLASS_CLS:
         compute_metrics_fn = METRICS[task]
