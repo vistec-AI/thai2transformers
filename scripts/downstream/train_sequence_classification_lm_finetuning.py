@@ -192,6 +192,7 @@ def init_trainer(task, model, train_dataset, val_dataset, warmup_steps, args, da
                         logging_steps=args.logging_steps,
                         #eval
                         save_strategy='epoch',
+                        save_total_limit=1,
                         evaluation_strategy='epoch' if 'validation' in DATASET_METADATA[args.dataset_name]['split_names'] else 'no',
                         load_best_model_at_end=True,
                         #others
