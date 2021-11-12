@@ -391,7 +391,7 @@ def agg_preds_labels(model, dataset, device=torch.device('cuda')):
         batch = {k: torch.tensor(v, dtype=torch.int64).to(device) for k, v in batch.items()
                  if k not in dont_include}
 
-        preds, = model(**batch)
+        preds, = model(**batch, return_dict=False)
         preds = preds.argmax(2)
         preds = preds.tolist()
 
