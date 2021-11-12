@@ -20,6 +20,7 @@ from functools import lru_cache
 from seqeval.metrics import classification_report
 from sklearn.metrics import classification_report as sk_classification_report
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
+from sklearn.preprocessing import MultiLabelBinarizer
 
 # thai2transformers
 from thai2transformers import metrics as t2f_metrics
@@ -441,6 +442,26 @@ def sk_classification_metrics(labels, preds):
     }
 
 
+def classification_metrics(labels, preds):
+    multilabel_transformer = MultiLabelBinarizer()
+    multilabel_transformer.fit(labels)
+    labels = multilabel_transformer.transform(labels)
+    preds = multilabel_transformer.transform(preds)
+    precision_macro, recall_macro, f1_macro, _ = precision_recall_fscore_support(labels, preds, average="macro")
+    precision_micro, recall_micro, f1_micro, _ = precision_recall_fscore_support(labels, preds, average="micro")
+    acc = accuracy_score(labels, preds)
+    return {
+        'accuracy': acc,
+        'f1_micro': f1_micro,
+        'precision_micro': precision_micro,
+        'recall_micro': recall_micro,
+        'f1_macro': f1_macro,
+        'precision_macro': precision_macro,
+        'recall_macro': recall_macro,
+        'nb_samples': len(labels)
+    }
+
+
 def compute_token_metrics(agg_chunk_labels, agg_chunk_preds):
     report = sk_classification_report(sum(agg_chunk_labels, []),
                                       sum(agg_chunk_preds, []), target_names=label_names)
@@ -581,6 +602,7 @@ else:
     raise NotImplementedError
 
 
+
 if not custom_args.no_train_report:
     agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, train_dataset)
     agg_chunk_labels = [[label_maps[e] for e in a] for a in agg_chunk_labels]
@@ -588,8 +610,15 @@ if not custom_args.no_train_report:
     if 'ner' in data_args.label_name:
         result = t2t_chunk_metrics(agg_chunk_labels, agg_chunk_preds)
     else:
-        result = t2t_sk_classification_metrics(sum(agg_chunk_labels, []),
-                                               sum(agg_chunk_preds, []))
+        result = classification_metrics(agg_chunk_labels, agg_chunk_preds)
+        multilabel_transformer = MultiLabelBinarizer()
+        multilabel_transformer.fit(agg_chunk_labels)
+        agg_chunk_labels = multilabel_transformer.transform(agg_chunk_labels)
+        agg_chunk_preds = multilabel_transformer.transform(agg_chunk_preds)
+        result['classification_report'] = sk_classification_report(agg_chunk_labels,
+                                                                agg_chunk_preds,
+                                                                digits=4,
+                                                                target_names=label_names)
     print('[ Train Result ]')
     pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
     print(result['classification_report'])
@@ -598,11 +627,22 @@ if not custom_args.no_eval_report:
     agg_chunk_labels, agg_chunk_preds = agg_preds_labels(model, val_dataset)
     agg_chunk_labels = [[label_maps[e] for e in a] for a in agg_chunk_labels]
     agg_chunk_preds = [[label_maps[e] for e in a] for a in agg_chunk_preds]
+
+    # logger.info("true_predictions: %s", agg_chunk_labels)
+    # logger.info("true_labels: %s", agg_chunk_preds)
+
     if 'ner' in data_args.label_name:
         result = t2t_chunk_metrics(agg_chunk_labels, agg_chunk_preds)
     else:
-        result = t2t_sk_classification_metrics(sum(agg_chunk_labels, []),
-                                               sum(agg_chunk_preds, []))
+        result = classification_metrics(agg_chunk_labels, agg_chunk_preds)
+        multilabel_transformer = MultiLabelBinarizer()
+        multilabel_transformer.fit(agg_chunk_labels)
+        agg_chunk_labels = multilabel_transformer.transform(agg_chunk_labels)
+        agg_chunk_preds = multilabel_transformer.transform(agg_chunk_preds)
+        result['classification_report'] = sk_classification_report(agg_chunk_labels,
+                                                                agg_chunk_preds,
+                                                                digits=4,
+                                                                target_names=label_names)
     print('[ Val Result ]')
     pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
     print(result['classification_report'])
@@ -615,8 +655,15 @@ if not custom_args.no_test_report:
     if 'ner' in data_args.label_name:
         result = t2t_chunk_metrics(agg_chunk_labels, agg_chunk_preds)
     else:
-        result = t2t_sk_classification_metrics(sum(agg_chunk_labels, []),
-                                               sum(agg_chunk_preds, []))
+        result = classification_metrics(agg_chunk_labels, agg_chunk_preds)
+        multilabel_transformer = MultiLabelBinarizer()
+        multilabel_transformer.fit(agg_chunk_labels)
+        agg_chunk_labels = multilabel_transformer.transform(agg_chunk_labels)
+        agg_chunk_preds = multilabel_transformer.transform(agg_chunk_preds)
+        result['classification_report'] = sk_classification_report(agg_chunk_labels,
+                                                                agg_chunk_preds,
+                                                                digits=4,
+                                                                target_names=label_names)
     print('[ Test Result ]')
     pprint.pprint({k: v for k, v in result.items() if k != 'classification_report'})
     print(result['classification_report'])
