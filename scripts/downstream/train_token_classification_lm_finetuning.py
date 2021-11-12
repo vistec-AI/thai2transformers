@@ -514,8 +514,7 @@ def compute_metrics(p):
             "accuracy": results["overall_accuracy"],
         }
     else:
-        result = t2t_sk_classification_metrics(sum(true_labels, []),
-                                               sum(true_predictions, []))
+        result = classification_metrics(true_predictions, true_labels)
         result = {k: v for k, v in result.items() if k != 'classification_report'}
         return result
 
