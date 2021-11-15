@@ -329,7 +329,8 @@ if __name__ == '__main__':
         else:
             dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
 
-
+        print(f'\n\nINFO: dataset info {dataset}\n\n')
+        
         if DATASET_METADATA[args.dataset_name]['task'] == Task.MULTICLASS_CLS:
 
             label_encoder = preprocessing.LabelEncoder()
