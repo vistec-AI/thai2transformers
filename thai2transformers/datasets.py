@@ -368,7 +368,7 @@ class SequenceClassificationDataset(Dataset):
                             prepare_for_tokenization,
                             label_encoder,
                             preprocessor=None):
-        texts = get_dictag_val(dataset, text_column_name)
+        texts = get_dict_val(dataset, text_column_name)
         if task == Task.MULTICLASS_CLS:
             labels = get_dict_val(dataset, label_column_name)
 
