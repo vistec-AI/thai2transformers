@@ -140,7 +140,7 @@ DATASET_METADATA = {
     'xnli-th': {
         'huggingface_dataset_name': ('xnli', 'th'),
         'task': Task.MULTICLASS_CLS,
-        'text_input_col_name': ('premises', 'hypothesis'),
+        'text_input_col_name': ('premise', 'hypothesis'),
         'label_col_name': 'label',
         'num_labels': 3,
         'split_names': ['train', 'validation', 'test']
