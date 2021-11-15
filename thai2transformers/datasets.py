@@ -368,7 +368,7 @@ class SequenceClassificationDataset(Dataset):
                             prepare_for_tokenization,
                             label_encoder,
                             preprocessor=None):
-        texts = get_dict_val(dataset, text_column_name)
+        texts = get_dictag_val(dataset, text_column_name)
         if task == Task.MULTICLASS_CLS:
             labels = get_dict_val(dataset, label_column_name)
 
@@ -389,6 +389,7 @@ class SequenceClassificationDataset(Dataset):
 
         if preprocessor != None:
             print('[INFO] Apply preprocessor to texts.')
+            print(f'[DEBUG]: type(texts), type(texts[0] -> {type(texts)}, {type(texts[0])}')
             if type(texts) == list and type(texts[0]) == list:
                 for i, list_of_texts in enumerate(texts):
                     texts[i] = list(map(preprocessor, list_of_texts))
