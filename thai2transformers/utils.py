@@ -5,7 +5,7 @@ from typing import Tuple, Dict, Union, List
 from thai2transformers import __file__ as thai2transformers_file
 
 
-def get_dict_val(root:Dict, keys:Union[str, List[str]]):
+def get_dict_val(root:Dict, keys:Union[str, List[str], Tuple[str]]):
     """
     Access a nested object in root by item sequence.
 
