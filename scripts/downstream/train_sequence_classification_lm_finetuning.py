@@ -313,8 +313,9 @@ if __name__ == '__main__':
         print(f'[INFO] Task: {DATASET_METADATA[args.dataset_name]["task"].value}')
         print(f'\n[INFO] space_token: {args.space_token}')
         print(f'[INFO] prepare_for_tokenization: {args.prepare_for_tokenization}\n')
-
-        if args.dataset_name == 'wongnai_reviews':
+        if type(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"]) == tuple:
+            dataset = load_dataset(*DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
+        elif args.dataset_name == 'wongnai_reviews':
             print(f'\n\n[INFO] For Wongnai reviews dataset, perform train-val set splitting (0.9,0.1)')
             dataset = load_dataset(DATASET_METADATA[args.dataset_name]["huggingface_dataset_name"])
             print(f'\n\n[INFO] Perform dataset splitting')
