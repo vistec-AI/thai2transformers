@@ -137,6 +137,14 @@ DATASET_METADATA = {
         'num_labels': 12,
         'split_names': ['train', 'validation', 'test']
     },
+    'xnli-th': {
+        'huggingface_dataset_name': ('xnli', 'th'),
+        'task': Task.MULTICLASS_CLS,
+        'text_input_col_name': ('premises', 'hypothesis'),
+        'label_col_name': 'label',
+        'num_labels': 3,
+        'split_names': ['train', 'validation', 'test']
+    }
 }
 
 def init_public_model_tokenizer_for_seq_cls(public_model_name, task, num_labels):

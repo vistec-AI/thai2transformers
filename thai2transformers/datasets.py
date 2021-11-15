@@ -389,18 +389,34 @@ class SequenceClassificationDataset(Dataset):
 
         if preprocessor != None:
             print('[INFO] Apply preprocessor to texts.')
-            texts = list(map(preprocessor, texts))
+            if type(texts) == list and type(texts[0]) == list:
+                for i, list_of_texts in enumerate(texts):
+                    texts[i] = list(map(preprocessor, list_of_texts))
+            else:
+                texts = list(map(preprocessor, texts))
 
         for i in tqdm(range(math.ceil(len(texts) / bs))):
+            if type(texts) == list and type(texts[0]) == list:
+                batched_sub_lists = [[] for j in range(len(texts))]
+                for k, list_of_texts in enumerate(texts):
 
-            batched_texts = texts[i * bs: (i+1) * bs]
+                    batched_sub_lists[k] = list_of_texts[i * bs: (i+1) * bs]
 
-            tokenized_inputs = tokenizer(
-                batched_texts,
-                max_length=max_length,
-                truncation=True,
-                # padding='max_length'            
-            )
+                tokenized_inputs = tokenizer(
+                    *batched_sub_lists,
+                    max_length=max_length,
+                    truncation=True,
+                    # padding='max_length'            
+                )
+            else:
+                batched_texts = texts[i * bs: (i+1) * bs]
+
+                tokenized_inputs = tokenizer(
+                    batched_texts,
+                    max_length=max_length,
+                    truncation=True,
+                    # padding='max_length'            
+                )
             # add to list
             input_ids += tokenized_inputs["input_ids"]
             attention_masks += tokenized_inputs["attention_mask"]

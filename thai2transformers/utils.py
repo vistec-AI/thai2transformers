@@ -23,8 +23,13 @@ def get_dict_val(root:Dict, keys:Union[str, List[str]]):
         [1,2,3]
 
         >>> obj = {"a": [ {"aa": 100, "bb": 0}, {"aa": 2, "bb": 5 } ] }
-        >>> get_dict_val(obj, ("a", "aa"))
+        >>> get_dict_val(obj, ["a", "aa"])
         [100, 2]
+
+        >>> obj = {"aa": [100, 0], "bb": [2, 5]] }
+        >>> get_dict_val(obj, ("aa", "bb"))
+        [[100, 2], [0, 5]]
+
 
     """
     if type(keys) == str:
@@ -34,7 +39,8 @@ def get_dict_val(root:Dict, keys:Union[str, List[str]]):
         for item in root[keys[0]]:
             _results.append(item[keys[1]])
         return _results
-    
+    elif type(keys) == tuple:
+        return [root[key] for key in keys]
     return None
 
 def get_thai2transformers_path() -> str:
