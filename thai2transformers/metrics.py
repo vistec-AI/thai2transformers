@@ -13,6 +13,10 @@ from datasets import load_metric
 from thai2transformers.preprocess import prepare_qa_validation_features
 from thai2transformers.utils import get_thai2transformers_path
 
+#tokenize
+from pythainlp.tokenize import word_tokenize, syllable_tokenize
+def character_tokenize(word): return [i for i in word]
+
 def sk_classification_metrics(pred, pred_labs=False):
     result = classification_metrics(pred)
     labels = pred.label_ids
@@ -214,6 +218,7 @@ def _postprocess_qa_predictions(examples,
 def question_answering_metrics(datasets,
                                trainer,
                                metric=squad_newmm_metric,
+                               tok_func=word_tokenize,
                                n_best_size=20,
                                max_answer_length=100,
                                allow_no_answer=False,
@@ -262,4 +267,4 @@ def question_answering_metrics(datasets,
                    "answers": {'text': ex[answers_col][text_col],
                                'answer_start':ex[answers_col][start_col]}} for ex in datasets]
 
-    return metric.compute(predictions=formatted_predictions, references=references), formatted_predictions, references
+    return metric.compute(predictions=formatted_predictions, references=references, tok_func=tok_func), formatted_predictions, references

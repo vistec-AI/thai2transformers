@@ -1,0 +1,31 @@
+program: ./downstream/train_question_answering_lm_finetuning.py
+method: grid 
+metric:
+  name: test-set_f1_syllable
+  goal: maximize
+parameters:
+  learning_rate:
+    values: [0.00001, 0.000015, 0.00002, 0.000025, 0.00003]
+  per_device_train_batch_size:
+    values: [8, 16, 32, 48]
+  num_train_epochs:
+    values: [1, 2, 3, 4, 5]
+  warmup_ratio:
+    values: [0.05, 0.075, 0.1]
+  dataset_name:
+    value: chimera_qa
+  model_name:
+    value: xlm-roberta-base
+  output_dir:
+    value: xlm-roberta-base-finetune-chimera_qa-model
+  log_dir:
+    value: xlm-roberta-base-finetune-chimera_qa-log
+
+project: thai2transformers_qa-fintuneing_hp-search
+entity: thai2transformers_qa-fintuneing_hp-search_xlmr-base
+
+command:
+  - ${env}
+  - python
+  - ${program}
+  - ${args}

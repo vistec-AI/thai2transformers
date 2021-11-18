@@ -26,6 +26,8 @@ from transformers import (
     XLMRobertaTokenizerFast,
     XLMRobertaConfig,
     DataCollatorWithPadding,
+    CamembertTokenizer,
+    CamembertTokenizerFast,
 )
 
 from datasets import (
@@ -48,6 +50,12 @@ from thai2transformers.preprocess import (
     prepare_qa_validation_features,
 )
 
+from pythainlp.tokenize import (
+    word_tokenize,
+    syllable_tokenize,
+)
+def character_tokenize(word): return [i for i in word]
+
 TOKENIZERS = {
     'wangchanberta-base-att-spm-uncased': AutoTokenizer,
     'xlm-roberta-base': AutoTokenizer,
@@ -56,6 +64,7 @@ TOKENIZERS = {
     'wangchanberta-base-wiki-ssg': ThaiWordsSyllableTokenizer,
     'wangchanberta-base-wiki-sefr': FakeSefrCutTokenizer,
     'wangchanberta-base-wiki-spm': ThaiRobertaTokenizer,
+    'wangchan-deberta_v1-base-wiki-20210520-news-spm': CamembertTokenizerFast,
 }
 WANGCHANBERTA_MODELS = [
     'wangchanberta-base-att-spm-uncased',
@@ -63,6 +72,7 @@ WANGCHANBERTA_MODELS = [
     'wangchanberta-base-wiki-ssg',
     'wangchanberta-base-wiki-sefr',
     'wangchanberta-base-wiki-spm',
+    'wangchan-deberta_v1-base-wiki-20210520-news-spm',
 ] 
 
 #lowercase when using uncased model
@@ -72,22 +82,34 @@ def lowercase_example(example):
     example[args.answers_col][args.text_col] =  [example[args.answers_col][args.text_col][0].lower()]
     return example
 
+
+def replace_spaces(example, space_token_id, special_symbol_id):
+    new_token_ids = []
+    for idx, token_id in enumerate(example['input_ids']):
+        new_token_ids.append(special_symbol_id if token_id == space_token_id and idx != 1 else token_id)
+
+    example['input_ids'] = new_token_ids
+    return example
+
+
 def init_model_tokenizer(model_name, model_max_length):
     
     if model_name in TOKENIZERS.keys():
         tokenizer = TOKENIZERS[model_name].from_pretrained(
                         f'airesearch/{model_name}' if model_name in WANGCHANBERTA_MODELS else model_name,
-                        revision='main',
-                        model_max_length=model_max_length,)
+                        revision=args.revision, 
+                        model_max_length=model_max_length,
+                        use_auth_token=True)
     else:
         tokenizer = AutoTokenizer.from_pretrained(
                         model_name,
+                        revision=args.revision,
                         model_max_length=model_max_length,)
         
-    
     model = AutoModelForQuestionAnswering.from_pretrained(
             f'airesearch/{model_name}' if model_name in WANGCHANBERTA_MODELS else model_name,
-            revision='main',)
+            revision=args.revision,
+            use_auth_token=True)
 
     print(f'\n[INFO] Model architecture: {model} \n\n')
     print(f'\n[INFO] tokenizer: {tokenizer} \n\n')
@@ -148,6 +170,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # Required
     parser.add_argument('--model_name', type=str, help='Model names on Huggingface for tokenizers and architectures')
+    parser.add_argument('--revision', type=str, default='main', help='Specify branch of model')
     parser.add_argument('--dataset_name', help='Specify the dataset name to finetune. Currently, sequence classification datasets include `thaiqa_squad` and `iapp_wiki_qa_squad`.')
     parser.add_argument('--output_dir', type=str)
     parser.add_argument('--log_dir', type=str)
@@ -183,12 +206,15 @@ if __name__ == '__main__':
     parser.add_argument('--answers_col', type=str, default='answers')
     parser.add_argument('--text_col', type=str, default='text')
     parser.add_argument('--start_col', type=str, default='answer_start')
+    
+    # text processing
+    parser.add_argument('--space_token', type=str, default=None, help='The symbol to substitute space token " " in the text.')
 
     # wandb
     parser.add_argument('--run_name', type=str, default=None)
 
     args = parser.parse_args()
-
+    
     # Set seed
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
@@ -202,22 +228,36 @@ if __name__ == '__main__':
                                             padding=True,
                                             pad_to_multiple_of=8 if args.fp16 else None)
 
+    print(f'\nDEBUG::tokenizer: {tokenizer}')
     print(f'\n\n[INFO] Dataset: {args.dataset_name}')
-    if args.dataset_name == 'iapp_thaiqa':
-        print(f'\n\n[INFO] For `iapp_thaiqa` dataset where you run `combine_iapp_qa.py` and save combined dataset (use directory path as `dataset_name`)')
+    if args.dataset_name in ['iapp_thaiqa_xquad','chimera_qa']:
+        print(f'\n\n[INFO] For `iapp_thaiqa_xquad` / `chimera_qa` dataset where you run `combine_iapp_qa.py` / `create_chimera_qa.py` and save combined dataset (use directory path as `dataset_name`)')
         datasets = load_from_disk(args.dataset_name)
     else:
         datasets = load_dataset(args.dataset_name)
     print(f'dataset: {datasets}')
 
     if args.lowercase:
-        print(f'\n\n[INFO] Lowercaing datasets')
+        print(f'\n\n[INFO] Lowercasing datasets')
         datasets = datasets.map(lowercase_example)
         
     print(f'\n\n[INFO] Prepare training features')
+
+    print(f'\nDEBUG:datasets', datasets['train'][:2])
     tokenized_datasets = datasets.map(lambda x: prepare_qa_train_features(x, tokenizer), 
                                       batched=True, 
                                       remove_columns=datasets["train"].column_names)
+    
+    print(f'\nDEBUG:tokenized_datasets )before)', tokenized_datasets['train'][:2])
+
+    if args.space_token != None and args.space_token != 'None':
+        print(f'\n\n[INFO] Replacing spaces token special symbol `{args.space_token}`')
+        tokenized_datasets = tokenized_datasets.map(partial(replace_spaces,
+                                                            space_token_id=tokenizer.encode(' ', add_special_tokens=False)[0],
+                                                            special_symbol_id=tokenizer.vocab[args.space_token]))
+
+
+    print(f'\nDEBUG:tokenized_datasets', tokenized_datasets['train'][:2])
 
     print(f'\n[INFO] Number of train examples = {len(datasets["train"])}')
     print(f'[INFO] Number of batches per epoch (training set) = {math.ceil(len(datasets["train"]) / args.batch_size)}')
@@ -247,13 +287,58 @@ if __name__ == '__main__':
     print('[INFO] Done.\n')
     print('[INDO] Begin saving best checkpoint.')
     trainer.save_model(os.path.join(args.output_dir, 'checkpoint-best'))
+    
+    print('[INFO] Done.\n')
+    print('[INDO] Begin loading best checkpoint.')
+    model = AutoModelForQuestionAnswering.from_pretrained(os.path.join(args.output_dir, 'checkpoint-best'))
+    trainer, training_args = init_trainer(model=model,
+                                train_dataset=tokenized_datasets['train'],
+                                val_dataset=tokenized_datasets['validation'],
+                                args=args,
+                                data_collator=data_collator,
+                                tokenizer=tokenizer,)
 
     print('[INFO] Done.\n')
     print('\nBegin model evaluation on test set.')
     
-    result,_,_ = question_answering_metrics(datasets=datasets['test'], 
+    result_word,_,_ = question_answering_metrics(datasets=datasets['test'],
                                         trainer=trainer,
                                         metric=squad_newmm_metric,
+                                        tok_func=word_tokenize,
+                                        n_best_size=args.n_best_size,
+                                        max_answer_length=args.max_answer_length,
+                                        question_col=args.question_col,
+                                        context_col=args.context_col,
+                                        question_id_col=args.question_id_col,
+                                        answers_col=args.answers_col,
+                                        text_col=args.text_col,
+                                        start_col=args.start_col,
+                                        pad_on_right=args.pad_on_right,
+                                        max_length=args.model_max_length,
+                                        doc_stride=args.doc_stride,
+                                        allow_no_answer=args.allow_no_answer)
+    
+    result_syllable,_,_ = question_answering_metrics(datasets=datasets['test'],
+                                        trainer=trainer,
+                                        metric=squad_newmm_metric,
+                                        tok_func=syllable_tokenize,
+                                        n_best_size=args.n_best_size,
+                                        max_answer_length=args.max_answer_length,
+                                        question_col=args.question_col,
+                                        context_col=args.context_col,
+                                        question_id_col=args.question_id_col,
+                                        answers_col=args.answers_col,
+                                        text_col=args.text_col,
+                                        start_col=args.start_col,
+                                        pad_on_right=args.pad_on_right,
+                                        max_length=args.model_max_length,
+                                        doc_stride=args.doc_stride,
+                                        allow_no_answer=args.allow_no_answer)
+    
+    result_character,_,_ = question_answering_metrics(datasets=datasets['test'],
+                                        trainer=trainer,
+                                        metric=squad_newmm_metric,
+                                        tok_func=character_tokenize,
                                         n_best_size=args.n_best_size,
                                         max_answer_length=args.max_answer_length,
                                         question_col=args.question_col,
@@ -267,8 +352,12 @@ if __name__ == '__main__':
                                         doc_stride=args.doc_stride,
                                         allow_no_answer=args.allow_no_answer)
 
-    print(f'Evaluation on test set (dataset: {args.dataset_name})')    
+    print(f'Evaluation on test set (dataset: {args.dataset_name})')
+    print(result_word,result_syllable,result_character)
     
-    for key, value in result.items():
-        print(f'{key} : {value:.4f}')
-        wandb.run.summary[f'test-set_{key}'] = value
+    
+    #record to wandb
+    wandb.run.summary['test-set_exact_match'] = result_word['exact_match']
+    wandb.run.summary['test-set_f1_word'] = result_word['f1']
+    wandb.run.summary['test-set_f1_syllable'] = result_syllable['f1']
+    wandb.run.summary['test-set_f1_character'] = result_character['f1']
