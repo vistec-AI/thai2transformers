@@ -142,6 +142,7 @@ def init_trainer(model,
                         logging_first_step=False,
                         logging_steps=args.logging_steps,
                         #eval
+                        save_strategy='epoch',
                         evaluation_strategy='epoch',
                         load_best_model_at_end=True,
                         #others
