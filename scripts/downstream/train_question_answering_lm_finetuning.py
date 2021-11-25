@@ -136,7 +136,7 @@ def init_trainer(model,
                         #checkpoint
                         output_dir=args.output_dir,
                         overwrite_output_dir=True,
-                        save_total_limit=3,
+                        save_total_limit=1,
                         #logs
                         logging_dir=args.log_dir,
                         logging_first_step=False,
