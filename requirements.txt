@@ -7,7 +7,7 @@ sacrebleu==2.0.0
 seqeval==1.2.2
 pythainlp==2.3.2
 sefr_cut==0.2
-emoji==1.1.2
+emoji==1.6.1
 tensorboard==2.7.0
 tqdm==4.62.3
 pandas==1.3.5
