@@ -34,7 +34,7 @@ class TokenClassificationPipeline:
         super().__init__()
 
         assert isinstance(tokenizer, PreTrainedTokenizerBase)
-        assert isinstance(model, PreTrainedModel)
+        # assert isinstance(model, PreTrainedModel)
         
         self.model = model
         self.tokenizer = tokenizer
