@@ -11,7 +11,7 @@ swifter==1.0.7
 tensorboard==2.3.0
 pydantic==1.7.4
 jsonlines==1.2.0
-nltk==3.4.5
+nltk==3.6.6
 tensorflow>=2.0.0
 git+git://github.com/huggingface/datasets.git@686717b3cc56dcf830106f0e231bb22406b86156
 sefr_cut==0.2
