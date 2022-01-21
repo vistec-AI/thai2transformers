@@ -23,9 +23,9 @@ thai2transformers provides customized scripts to pretrain transformer-based mask
 <br>
 
 We curate a list of sources that can be used to pretrain language model.
-The statistics for each data source are listed in this [spreadsheet](https://docs.google.com/spreadsheets/d/1lQ06FT2RvBE8twKzvXeSe4w5CHnU29f8ZWMUcJdmRks/edit?usp=sharing). 
+The statistics for each data source are listed in this [page](./docs/_dataset_statistics.md). 
 
-Also, you can download current version of cleaned datasets from [here](https://drive.google.com/file/d/1oF7_COZJqGdIaDGMNI1rKdDCOEzVoZHq/view?usp=sharing).
+Also, you can download current version of cleaned datasets from [here](https://github.com/vistec-AI/thai2transformers/releases/tag/att-v1.0).
 
 <br>
 
