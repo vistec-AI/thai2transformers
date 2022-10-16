@@ -1,3 +1,0 @@
-wget https://github.com/attardi/wikiextractor/archive/e4abb4cbd019b0257824ee47c23dd163919b731b.zip
-unzip e4abb4cbd019b0257824ee47c23dd163919b731b.zip
-mv wikiextractor-e4abb4cbd019b0257824ee47c23dd163919b731b wikiextractor
