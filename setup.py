@@ -6,7 +6,7 @@ with open('README.md', 'r') as f:
 
 requirements = [
     "torch>=1.5.0",
-    "transformers==3.5.0",
+    "transformers==4.30.0",
     "sentencepiece==0.1.91",
     "emoji",
     "pythainlp>=2.2.4",
