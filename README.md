@@ -49,7 +49,7 @@ In this example, we demonstrate how pretrain RoBERTa base model on Thai Wikipedi
     
     b) For word-level token from [Limkonchotiwat et al., 2020](https://github.com/mrpeerat/SEFR_CUT) (`sefr-cut`) : [3b_sefr-cut_pretokenize.md](./docs/2b_sefr-cut_pretokenize.md)  
 
-4. Pretrain a masked langauge model: [4_run_mlm.md](./docs/3_run_mlm.md)  
+4. Pretrain a masked language model: [4_run_mlm.md](./docs/3_run_mlm.md)  
 
 <br>
 
