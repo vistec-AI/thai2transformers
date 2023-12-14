@@ -1,6 +1,10 @@
 
 # thai2transformers
 
+<p>
+<a href="https://console.tiyaro.ai/explore/airesearch-wangchanberta-base-att-spm-uncased"> <img src="https://tiyaro-public-docs.s3.us-west-2.amazonaws.com/assets/try_on_tiyaro_badge.svg"></a>
+</p>
+
 **Pretraining transformer-based Thai language models**
 
 
